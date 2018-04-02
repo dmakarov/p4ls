@@ -9,7 +9,9 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-hunter_add_package(Boost)
-find_package(Boost CONFIG REQUIRED)
+option(ENABLE_UNITTESTS "Build all unit tests." OFF)
 
 add_subdirectory(src)
+if (ENABLE_UNITTESTS)
+  add_subdirectory(test)
+endif()

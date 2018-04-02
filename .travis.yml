@@ -93,8 +93,10 @@ before_script:
 script:
   - mkdir -p build
   - cd build
-  - cmake ..
+  - cmake -DENABLE_UNITTESTS=ON ..
   - cmake --build .
+  - cd test
+  - ctest
 
 notifications:
   email: false
