@@ -1,0 +1,106 @@
+dist: trusty
+sudo: false
+language: c++
+
+env:
+  global:
+  - COMPILER=g++
+
+# Default --recursive (rapidjson/thirdparty/gtest) is unnecessary
+git:
+  submodules: false
+  depth: 1
+
+before_install:
+
+addons:
+  apt:
+    sources: &apt_sources
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.5
+      - llvm-toolchain-trusty-5.0
+
+compiler: clang
+os: linux
+
+cache:
+  directories:
+    - build/clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-14.04/
+    - build/clang+llvm-6.0.0-x86_64-apple-darwin/
+
+matrix:
+  fast_finish: true
+  include:
+    - env: COMPILER=g++-5
+      compiler: gcc
+      addons: &gcc5
+        apt:
+          packages: ["g++-5"]
+          sources: *apt_sources
+
+    - env: COMPILER=g++-7
+      compiler: gcc
+      addons: &gcc7
+        apt:
+          packages: ["g++-7"]
+          sources: *apt_sources
+
+    - env: COMPILER=clang++-3.5
+      addons: &clang35
+        apt:
+          packages: ["clang-3.5", "g++-7"]
+          sources: *apt_sources
+
+    - env: COMPILER=clang++-5.0
+      addons: &clang50
+        apt:
+          packages: ["clang-5.0", "g++-7"]
+          sources: *apt_sources
+
+    - env: COMPILER=clang++
+      osx_image: xcode9.1
+      os: osx
+
+    - env: COMPILER=g++-7
+      compiler: gcc
+      osx_image: xcode9.1
+      os: osx
+
+
+  allow_failures:
+
+install:
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      if [[ "${COMPILER}" == "g++-5" ]]; then
+        brew install gcc@5
+        brew link --overwrite gcc@5
+      fi
+      if [[ "${COMPILER}" == "g++-6" ]]; then
+        brew install gcc@6
+        brew link --overwrite gcc@6
+      fi
+      if [[ "${COMPILER}" == "g++-7" ]]; then
+        brew install gcc@7
+        brew link --overwrite gcc@7
+      fi
+    fi
+
+  - export CXX="${COMPILER}"
+
+before_script:
+  - ${CXX} --version
+
+script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - cmake --build .
+
+notifications:
+  email: false
+#  irc:
+#    channels:
+#      - "ircs://chat.freenode.net:6697/#p4ls"
+#    template:
+#      - "[ %{repository_slug}#%{commit}] %{result} on %{branch} by %{author} (%{build_url} )"
