@@ -6,7 +6,6 @@ env:
   global:
   - COMPILER=g++
 
-# Default --recursive (rapidjson/thirdparty/gtest) is unnecessary
 git:
   submodules: false
   depth: 1
