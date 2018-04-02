@@ -92,7 +92,7 @@ before_script:
   - ${CXX} --version
 
 script:
-  - mkdir build
+  - mkdir -p build
   - cd build
   - cmake ..
   - cmake --build .
