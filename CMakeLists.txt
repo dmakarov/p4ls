@@ -11,6 +11,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(ENABLE_UNITTESTS "Build all unit tests." OFF)
 
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+  set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/clang.cmake)
+endif()
+
 add_subdirectory(src)
 if (ENABLE_UNITTESTS)
   add_subdirectory(test)
