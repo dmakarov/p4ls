@@ -47,9 +47,9 @@ matrix:
       osx_image: xcode9.2
       os: osx
 
-    - env: COMPILER=clang++
-      osx_image: xcode9.2
-      os: osx
+#    - env: COMPILER=clang++
+#      osx_image: xcode9.2
+#      os: osx
 
 install:
   - |
