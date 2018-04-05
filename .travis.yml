@@ -47,9 +47,9 @@ matrix:
       osx_image: xcode9.2
       os: osx
 
-#    - env: COMPILER=clang++
-#      osx_image: xcode9.2
-#      os: osx
+    - env: COMPILER=clang++
+      osx_image: xcode9.2
+      os: osx
 
 install:
   - |
@@ -68,7 +68,7 @@ before_script:
 script:
   - mkdir -p build
   - cd build
-  - cmake -DENABLE_UNITTESTS=ON ..
+  - cmake -DENABLE_UNITTESTS=ON -DHUNTER_STATUS_DEBUG=ON ..
   - cmake --build .
   - cd test
   - ctest
