@@ -10,15 +10,21 @@ LSP_server::LSP_server() : _is_done(false)
 
 int LSP_server::run(std::istream &input_stream)
 {
+	Dispatcher dispatcher;
 	while (!_is_done && input_stream.good()) {
 		if (auto json = read_message(input_stream)) {
+			if (!dispatcher.call(*json))
+				std::cout << "JSON dispatch failed!" << std::endl;
 		}
 	}
+	_is_done = true;
 	return 0;
 }
 
 void LSP_server::on_exit(Params_exit &params)
 {
+	_is_done = true;
+	std::cout << "LSP_server::on_exit()" << std::endl;
 }
 
 void LSP_server::on_initialize(Params_initialize &params)

@@ -1,4 +1,5 @@
 add_library(p4ls
+  dispatcher.cpp
   dispatcher.h
   lsp_server.cpp
   lsp_server.h
