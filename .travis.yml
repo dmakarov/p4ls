@@ -64,13 +64,12 @@ install:
 
 before_script:
   - ${CXX} --version
+  - mkdir -p build
 
 script:
-  - mkdir -p build
   - cd build
   - cmake -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_STATUS_PRINT=OFF ..
   - cmake --build .
-  - cd test
   - ctest
 
 notifications:
