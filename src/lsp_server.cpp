@@ -1,6 +1,7 @@
 #include "lsp_server.h"
 
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 #include <rapidjson/istreamwrapper.h>
 
 #include <iostream>
@@ -150,11 +151,25 @@ boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &inpu
 		}
 	}
 	std::cout << "Content length " << content_length << std::endl;
-	rapidjson::IStreamWrapper input_stream_wrapper(input_stream);
-	rapidjson::Document json_document;
-	json_document.ParseStream(input_stream_wrapper);
-	for (auto& m : json_document.GetObject())
-		std::cout << "Type of member " << m.name.GetString()
-				  << " is " << m.value.GetType() << std::endl;
-	return json_document;
+	if (content_length > 1 << 30)
+	{
+		input_stream.ignore(content_length);
+		return boost::none;
+	}
+	if (content_length > 0)
+	{
+		rapidjson::IStreamWrapper input_stream_wrapper(input_stream);
+		rapidjson::Document json_document;
+		if (json_document.ParseStream(input_stream_wrapper).HasParseError())
+		{
+			std::cout << "JSON parse error: " << rapidjson::GetParseError_En(json_document.GetParseError())
+					  << " (" << json_document.GetErrorOffset() << ")" << std::endl;
+			return boost::none;
+		}
+		for (auto& m : json_document.GetObject())
+			std::cout << "Type of member " << m.name.GetString()
+					  << " is " << m.value.GetType() << std::endl;
+		return std::move(json_document);
+	}
+	return boost::none;
 }
