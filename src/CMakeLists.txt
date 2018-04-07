@@ -1,5 +1,10 @@
 add_library(p4ls
-  lsp_server.cpp)
+  dispatcher.h
+  lsp_server.cpp
+  lsp_server.h
+  params.h
+  protocol.cpp
+  protocol.h)
 
 hunter_add_package(Boost)
 hunter_add_package(RapidJSON)
