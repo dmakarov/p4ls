@@ -1,8 +1,11 @@
 #include "lsp_server.h"
 
 #include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
 
 #include <iostream>
+#include <regex>
+#include <string>
 
 LSP_server::LSP_server() : _is_done(false)
 {
@@ -106,11 +109,50 @@ void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand &pa
 
 boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &input_stream)
 {
-	std::string json_input;
-	input_stream >> json_input;
+	// process a set of HTTP headers of an LSP message
+	unsigned long long content_length = 0;
+	std::regex content_length_regex("Content-Length: ([0-9]+)", std::regex::extended);
+	std::smatch match;
+	while (input_stream.good())
+	{
+		std::string line;
+		std::getline(input_stream, line);
+		if (line.back() == '\r')
+		{
+			line.pop_back();
+		}
+		std::cout << "Current line '" << line << "'" << std::endl;
+		if (!input_stream.good() && errno == EINTR)
+		{
+			input_stream.clear();
+			continue;
+		}
+		if (0 == line.find_first_of('#'))
+		{
+			std::cout << "Skipping a comment line" << std::endl;
+			continue;
+		}
+		if (std::regex_match(line, match, content_length_regex))
+		{
+			std::cout << "Regex match " << match[1].str() << std::endl;
+			content_length = std::stoull(match[1].str());
+			continue;
+		}
+		else if (!line.empty())
+		{
+			std::cout << "Ignoring another header line" << std::endl;
+			continue;
+		}
+		else
+		{
+			std::cout << "Empty line, header ended" << std::endl;
+			break;
+		}
+	}
+	std::cout << "Content length " << content_length << std::endl;
+	rapidjson::IStreamWrapper input_stream_wrapper(input_stream);
 	rapidjson::Document json_document;
-	std::cout << "Input is " << json_input << std::endl;
-	json_document.Parse(json_input.c_str());
+	json_document.ParseStream(input_stream_wrapper);
 	for (auto& m : json_document.GetObject())
 		std::cout << "Type of member " << m.name.GetString()
 				  << " is " << m.value.GetType() << std::endl;
