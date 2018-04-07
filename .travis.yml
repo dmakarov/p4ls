@@ -74,11 +74,8 @@ script:
 
 notifications:
   email: false
-#  irc:
-#    channels:
-#      - "ircs://chat.freenode.net:6697/#p4ls"
-#    template:
-#      - "[ %{repository_slug}#%{commit}] %{result} on %{branch} by %{author} (%{build_url} )"
   slack:
+    template:
+      - "[ %{repository_slug}#%{commit} ] %{result} on %{branch} by %{author} ( %{build_url} )"
     rooms:
       secure: Ezco+WkDybTPe+8iNKFyCAAuimsotzPeqy5Yv8+BOYVa9dC/glLjfofDAvjW5cfJ/FxpmDxAXWcG2Ruk7n1jDq/Jnn5gnjNQ44KrxUcjMq2CPNVtdJIn6TJyz0ZMYN3MpUCkDnsuIPBwb4lDlMrKpu1C8bIAoEFZite/RgYENLq6C4bu72e6RND2sHvCjYPj13+fTAjY9/voVDZK1Hkss8RM5V7QlG8z/c+KuCTk0qWsAbM/Z9Wrak4Ir8RHQ8XwPIz6mIlQaIdwy4UspQ8tA+wu2frxnkZatN4cfuhEUHtYB5K2wrtcCac6pC/SjJIDdAbA5nMb+drBdCqxXiFf1bhdBSu+F55Q/THlJltdxae8kqKszy33OBJPr+kAfNxIRYg8zrzhSQucLYsg797sQ4fnOGR+nNOqRdVUQ232PIaXBzLObczi64qC0MOJBgJcYT4nFyHeZHJhb0CorGt7/ay2VK5tJJ0XNE55xCSxiJuA8lVUtO3VQwijoT8AoO95citQ0DRShZXRzhVgmmmIk/SKN6y23d4N1vi0AXCxt010ArWusARWqu7j8bqsj7xUdzjEG9HsVluqrSYVH+Ca2F63sFW7mWZntLz7oKmeHLBj/bYKyBZmw/4hP/H8lzBdfeMx2lZDqvZN9UrENzzifjPPopPD94idc0pdYllt4KM=
