@@ -5,6 +5,23 @@
 #pragma once
 
 #include <rapidjson/document.h>
+#include <boost/optional.hpp>
+
+#include <string>
+#include <vector>
+
+enum class Trace_level {
+	OFF = 0, MESSAGES = 1, VERBOSE = 2
+};
+
+struct File_uri {
+};
+
+struct Workspace_folder {
+};
+
+struct Client_capabilities {
+};
 
 struct Params_exit {
 };
@@ -12,6 +29,12 @@ struct Params_exit {
 bool set_params_from_json(const rapidjson::Value &json, Params_exit &params);
 
 struct Params_initialize {
+	boost::optional<int> process_id;
+	boost::optional<std::string> root_path;
+	boost::optional<File_uri> root_uri;
+	Client_capabilities capabilities;
+	Trace_level trace;
+	std::vector<Workspace_folder> workspace_folders;
 };
 
 bool set_params_from_json(const rapidjson::Value &json, Params_initialize &params);
