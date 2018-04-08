@@ -15,10 +15,14 @@ LSP_server::LSP_server() : _is_done(false)
 int LSP_server::run(std::istream &input_stream)
 {
 	Dispatcher dispatcher;
-	while (!_is_done && input_stream.good()) {
-		if (auto json = read_message(input_stream)) {
+	while (!_is_done && input_stream.good())
+	{
+		if (auto json = read_message(input_stream))
+		{
 			if (!dispatcher.call(*json))
+			{
 				std::cout << "JSON dispatch failed!" << std::endl;
+			}
 		}
 	}
 	_is_done = true;
@@ -107,7 +111,6 @@ void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand &pa
 {
 }
 
-
 boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &input_stream)
 {
 	// process a set of HTTP headers of an LSP message
@@ -150,25 +153,27 @@ boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &inpu
 			break;
 		}
 	}
+	// discard unrealistically large requests
 	std::cout << "Content length " << content_length << std::endl;
 	if (content_length > 1 << 30)
 	{
 		input_stream.ignore(content_length);
 		return boost::none;
 	}
+	// parse JSON payload
 	if (content_length > 0)
 	{
 		rapidjson::IStreamWrapper input_stream_wrapper(input_stream);
 		rapidjson::Document json_document;
 		if (json_document.ParseStream(input_stream_wrapper).HasParseError())
 		{
-			std::cout << "JSON parse error: " << rapidjson::GetParseError_En(json_document.GetParseError())
-					  << " (" << json_document.GetErrorOffset() << ")" << std::endl;
+			std::cout << "JSON parse error: " << rapidjson::GetParseError_En(json_document.GetParseError()) << " (" << json_document.GetErrorOffset() << ")" << std::endl;
 			return boost::none;
 		}
 		for (auto& m : json_document.GetObject())
-			std::cout << "Type of member " << m.name.GetString()
-					  << " is " << m.value.GetType() << std::endl;
+		{
+			std::cout << "Type of member " << m.name.GetString() << " is " << m.value.GetType() << std::endl;
+		}
 		return std::move(json_document);
 	}
 	return boost::none;
