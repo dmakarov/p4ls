@@ -58,7 +58,7 @@ install:
       brew link --overwrite gcc@7
     fi
 
-#  - export CXX="${COMPILER}"
+  - export CXX="${COMPILER}"
 
 before_script:
   - mkdir -p build
