@@ -13,7 +13,7 @@
 
 class Dispatcher {
 public:
-	using handler_type = std::function<void (const rapidjson::Document&)>;
+	using handler_type = std::function<void (const rapidjson::Value&)>;
 
 	Dispatcher() = default;
 

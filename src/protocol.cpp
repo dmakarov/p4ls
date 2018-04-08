@@ -8,7 +8,7 @@ namespace
 		template <typename param> void operator()(const std::string &method, void(Protocol::*handler)(param))
 		{
 			auto *protocol = this->protocol;
-			dispatcher.register_handler(method, [=](const rapidjson::Document &json) {
+			dispatcher.register_handler(method, [=](const rapidjson::Value &json) {
 				typename std::remove_reference<param>::type params;
 				if (set_params_from_json(json, params))
 				{
