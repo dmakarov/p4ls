@@ -11,13 +11,12 @@
 
 #include <istream>
 
-class LSP_server : public Protocol
-{
- public:
+class LSP_server : public Protocol {
+public:
 	LSP_server();
 	int run(std::istream &input_stream);
 
- private:
+private:
 	void on_exit(Params_exit &params) override;
 	void on_initialize(Params_initialize &params) override;
 	void on_shutdown(Params_shutdown &params) override;
@@ -38,7 +37,6 @@ class LSP_server : public Protocol
 	void on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration &params) override;
 	void on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles &params) override;
 	void on_workspace_executeCommand(Params_workspace_executeCommand &params) override;
-
 
 	boost::optional<rapidjson::Document> read_message(std::istream &input_stream);
 
