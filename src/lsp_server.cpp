@@ -15,6 +15,7 @@ LSP_server::LSP_server() : _is_done(false)
 int LSP_server::run(std::istream &input_stream)
 {
 	Dispatcher dispatcher;
+	register_protocol_handlers(dispatcher, *this);
 	while (!_is_done && input_stream.good())
 	{
 		if (auto json = read_message(input_stream))
@@ -32,83 +33,102 @@ int LSP_server::run(std::istream &input_stream)
 void LSP_server::on_exit(Params_exit &params)
 {
 	_is_done = true;
-	std::cout << "LSP_server::on_exit()" << std::endl;
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_initialize(Params_initialize &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_shutdown(Params_shutdown &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_codeAction(Params_textDocument_codeAction &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_completion(Params_textDocument_completion &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_definition(Params_textDocument_definition &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_didChange(Params_textDocument_didChange &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_didClose(Params_textDocument_didClose &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_formatting(Params_textDocument_formatting &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_hover(Params_textDocument_hover &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_rename(Params_textDocument_rename &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_signatureHelp(Params_textDocument_signatureHelp &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand &params)
 {
+	std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &input_stream)
