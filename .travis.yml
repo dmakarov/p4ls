@@ -68,7 +68,7 @@ before_script:
 
 script:
   - cd build
-  - cmake -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_STATUS_PRINT=OFF ..
+  - cmake -Wno-dev -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_STATUS_PRINT=OFF ..
   - cmake --build .
   - ctest
 

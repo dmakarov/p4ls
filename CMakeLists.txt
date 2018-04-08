@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.9)
-cmake_policy(SET CMP0054 NEW)
 
 include("cmake/HunterGate.cmake")
 HunterGate(URL "https://github.com/ruslo/hunter/archive/v0.20.31.tar.gz" SHA1 "65c8f2292566aedb2fe10e08e09c74dda8e5d07a")
