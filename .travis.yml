@@ -21,8 +21,7 @@ os: linux
 
 cache:
   directories:
-    - build/clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-14.04/
-    - build/clang+llvm-6.0.0-x86_64-apple-darwin/
+    - ${HOME}/.hunter
 
 matrix:
   fast_finish: true
