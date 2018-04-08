@@ -53,22 +53,19 @@ matrix:
 
 install:
   - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      if [[ "${COMPILER}" == "g++-7" ]]; then
-        brew install gcc@7
-        brew link --overwrite gcc@7
-      fi
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "g++-7" ]]; then
+      brew install gcc@7
+      brew link --overwrite gcc@7
     fi
 
-  - export CXX="${COMPILER}"
+#  - export CXX="${COMPILER}"
 
 before_script:
-  - ${CXX} --version
   - mkdir -p build
 
 script:
   - cd build
-  - cmake -Wno-dev -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_STATUS_PRINT=OFF ..
+  - cmake -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_STATUS_PRINT=OFF ..
   - cmake --build .
   - ctest
 
