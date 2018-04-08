@@ -1,3 +1,5 @@
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
+
 add_library(p4ls
   dispatcher.cpp
   dispatcher.h
@@ -8,11 +10,11 @@ add_library(p4ls
   protocol.cpp
   protocol.h)
 
-hunter_add_package(Boost)
+hunter_add_package(Boost COMPONENTS date_time system thread filesystem log)
 hunter_add_package(RapidJSON)
-find_package(Boost CONFIG REQUIRED)
+find_package(Boost CONFIG REQUIRED COMPONENTS date_time system thread filesystem log)
 find_package(RapidJSON CONFIG REQUIRED)
 
-target_link_libraries(p4ls PUBLIC Boost::boost RapidJSON::rapidjson)
+target_link_libraries(p4ls PUBLIC Boost::boost Boost::date_time Boost::system Boost::thread Boost::filesystem Boost::log RapidJSON::rapidjson)
 
 add_subdirectory(tool)

@@ -1,5 +1,7 @@
 enable_testing()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
+
 hunter_add_package(Boost COMPONENTS test)
 find_package(Boost CONFIG REQUIRED COMPONENTS unit_test_framework)
 
