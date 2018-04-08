@@ -10,8 +10,6 @@ git:
   submodules: false
   depth: 1
 
-before_install:
-
 addons:
   apt:
     sources: &apt_sources
@@ -51,6 +49,8 @@ matrix:
       osx_image: xcode9.2
       os: osx
 
+before_install:
+
 install:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "g++-7" ]]; then
@@ -64,10 +64,7 @@ before_script:
   - mkdir -p build
 
 script:
-  - cd build
-  - cmake -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_STATUS_PRINT=OFF ..
-  - cmake --build .
-  - ctest
+  - cd build && cmake -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_STATUS_PRINT=OFF .. && cmake --build . && ctest
 
 notifications:
   email: false
