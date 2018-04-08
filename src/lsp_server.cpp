@@ -177,15 +177,22 @@ boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &inpu
 	std::cout << "Content length " << content_length << std::endl;
 	if (content_length > 1 << 30)
 	{
+		std::cout << "Huge message size " << content_length << std::endl;
 		input_stream.ignore(content_length);
 		return boost::none;
 	}
 	// parse JSON payload
 	if (content_length > 0)
 	{
-		rapidjson::IStreamWrapper input_stream_wrapper(input_stream);
+		std::string content(content_length, '\0');
+		input_stream.read(&content[0], content_length);
+		if (!input_stream)
+		{
+			std::cout << "Read " << input_stream.gcount() << " bytes, expected " << content_length << std::endl;
+			return boost::none;
+		}
 		rapidjson::Document json_document;
-		if (json_document.ParseStream(input_stream_wrapper).HasParseError())
+		if (json_document.Parse(content.c_str()).HasParseError())
 		{
 			std::cout << "JSON parse error: " << rapidjson::GetParseError_En(json_document.GetParseError()) << " (" << json_document.GetErrorOffset() << ")" << std::endl;
 			return boost::none;
