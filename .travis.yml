@@ -2,22 +2,15 @@ dist: trusty
 sudo: false
 language: c++
 
-env:
-  global:
-  - COMPILER=g++
-
 git:
-  submodules: false
   depth: 1
+  submodules: false
 
 addons:
   apt:
     sources: &apt_sources
       - ubuntu-toolchain-r-test
       - llvm-toolchain-trusty-5.0
-
-compiler: clang
-os: linux
 
 cache:
   directories:
@@ -27,6 +20,7 @@ matrix:
   fast_finish: true
   include:
     - env: COMPILER=g++-7
+      os: linux
       compiler: gcc
       addons: &gcc7
         apt:
@@ -34,19 +28,22 @@ matrix:
           sources: *apt_sources
 
     - env: COMPILER=clang++-5.0
+      os: linux
+      compiler: clang
       addons: &clang50
         apt:
           packages: ["clang-5.0", "g++-7"]
           sources: *apt_sources
 
     - env: COMPILER=g++-7
+      os: osx
       compiler: gcc
       osx_image: xcode9.2
-      os: osx
 
     - env: COMPILER=clang++
-      osx_image: xcode9.2
       os: osx
+      compiler: clang
+      osx_image: xcode9.2
 
 before_install:
 
