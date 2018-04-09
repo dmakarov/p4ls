@@ -1,6 +1,7 @@
 #include "protocol.h"
 
-#include <iostream>
+#include <boost/log/trivial.hpp>
+
 
 namespace
 {
@@ -16,7 +17,7 @@ namespace
 				}
 				else
 				{
-					std::cout << method << " cannot be handled." << std::endl;
+					BOOST_LOG_TRIVIAL(error) << method << " cannot be handled.";
 				}
 			});
 		}
@@ -29,7 +30,7 @@ namespace
 void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
 {
 	registration_helper register_handler{dispatcher, &protocol};
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 	register_handler("exit", &Protocol::on_exit);
 	register_handler("initialize", &Protocol::on_initialize);
 	register_handler("shutdown", &Protocol::on_shutdown);

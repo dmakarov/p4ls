@@ -1,11 +1,12 @@
 #include "dispatcher.h"
 
-#include <iostream>
+#include <boost/log/trivial.hpp>
+
 
 void Dispatcher::register_handler(const std::string &method, handler_type handler)
 {
 	handlers[method] = std::move(handler);
-	std::cout << __PRETTY_FUNCTION__ << " registered method " << method << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__ << " registered method " << method;
 }
 
 bool Dispatcher::call(rapidjson::Document &msg) const

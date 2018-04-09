@@ -2,8 +2,9 @@
 
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/file.hpp>
-
+// for std::cin
 #include <iostream>
+
 
 int main(int argc, char* argv[])
 {

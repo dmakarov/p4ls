@@ -1,10 +1,11 @@
 #include "lsp_server.h"
 
+#include <boost/log/trivial.hpp>
+
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 #include <rapidjson/istreamwrapper.h>
 
-#include <iostream>
 #include <regex>
 #include <string>
 
@@ -22,7 +23,7 @@ int LSP_server::run(std::istream &input_stream)
 		{
 			if (!dispatcher.call(*json))
 			{
-				std::cout << "JSON dispatch failed!" << std::endl;
+				BOOST_LOG_TRIVIAL(error) << "JSON dispatch failed!";
 			}
 		}
 	}
@@ -33,102 +34,102 @@ int LSP_server::run(std::istream &input_stream)
 void LSP_server::on_exit(Params_exit &params)
 {
 	_is_done = true;
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_initialize(Params_initialize &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_shutdown(Params_shutdown &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_codeAction(Params_textDocument_codeAction &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_completion(Params_textDocument_completion &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_definition(Params_textDocument_definition &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_didChange(Params_textDocument_didChange &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_didClose(Params_textDocument_didClose &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_formatting(Params_textDocument_formatting &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_hover(Params_textDocument_hover &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_rename(Params_textDocument_rename &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_signatureHelp(Params_textDocument_signatureHelp &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand &params)
 {
-	std::cout << __PRETTY_FUNCTION__ << std::endl;
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
 boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &input_stream)
@@ -145,7 +146,7 @@ boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &inpu
 		{
 			line.pop_back();
 		}
-		std::cout << "Current line '" << line << "'" << std::endl;
+		BOOST_LOG_TRIVIAL(info) << "Current line '" << line << "'";
 		if (!input_stream.good() && errno == EINTR)
 		{
 			input_stream.clear();
@@ -153,31 +154,31 @@ boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &inpu
 		}
 		if (0 == line.find_first_of('#'))
 		{
-			std::cout << "Skipping a comment line" << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "Skipping a comment line";
 			continue;
 		}
 		if (std::regex_match(line, match, content_length_regex))
 		{
-			std::cout << "Regex match " << match[1].str() << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "Regex match " << match[1].str();
 			content_length = std::stoull(match[1].str());
 			continue;
 		}
 		else if (!line.empty())
 		{
-			std::cout << "Ignoring another header line" << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "Ignoring another header line";
 			continue;
 		}
 		else
 		{
-			std::cout << "Empty line, header ended" << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "Empty line, header ended";
 			break;
 		}
 	}
 	// discard unrealistically large requests
-	std::cout << "Content length " << content_length << std::endl;
+	BOOST_LOG_TRIVIAL(info) << "Content length " << content_length;
 	if (content_length > 1 << 30)
 	{
-		std::cout << "Huge message size " << content_length << std::endl;
+		BOOST_LOG_TRIVIAL(info) << "Huge message size " << content_length;
 		input_stream.ignore(content_length);
 		return boost::none;
 	}
@@ -188,18 +189,18 @@ boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &inpu
 		input_stream.read(&content[0], content_length);
 		if (!input_stream)
 		{
-			std::cout << "Read " << input_stream.gcount() << " bytes, expected " << content_length << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "Read " << input_stream.gcount() << " bytes, expected " << content_length;
 			return boost::none;
 		}
 		rapidjson::Document json_document;
 		if (json_document.Parse(content.c_str()).HasParseError())
 		{
-			std::cout << "JSON parse error: " << rapidjson::GetParseError_En(json_document.GetParseError()) << " (" << json_document.GetErrorOffset() << ")" << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "JSON parse error: " << rapidjson::GetParseError_En(json_document.GetParseError()) << " (" << json_document.GetErrorOffset() << ")";
 			return boost::none;
 		}
 		for (auto& m : json_document.GetObject())
 		{
-			std::cout << "Type of member " << m.name.GetString() << " is " << m.value.GetType() << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "Type of member " << m.name.GetString() << " is " << m.value.GetType();
 		}
 		return std::move(json_document);
 	}
