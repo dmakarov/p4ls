@@ -58,7 +58,7 @@ before_script:
   - mkdir -p build
 
 script:
-  - cd build && travis_wait 45 cmake -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 -DHUNTER_STATUS_PRINT=OFF .. && cmake --build . && ctest
+  - cd build && cmake -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && ctest
 
 notifications:
   email: false
