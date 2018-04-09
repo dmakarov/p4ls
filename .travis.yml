@@ -45,8 +45,6 @@ matrix:
       compiler: clang
       osx_image: xcode9.2
 
-before_install:
-
 install:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "g++-7" ]]; then
@@ -60,7 +58,7 @@ before_script:
   - mkdir -p build
 
 script:
-  - cd build && cmake -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_STATUS_PRINT=OFF .. && cmake --build . && ctest
+  - cd build && cmake -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_STATUS_DEBUG=ON .. && cmake --build . && ctest
 
 notifications:
   email: false
