@@ -4,7 +4,8 @@
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
-#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 #include <regex>
 #include <string>
@@ -192,16 +193,17 @@ boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &inpu
 			BOOST_LOG_TRIVIAL(info) << "Read " << input_stream.gcount() << " bytes, expected " << content_length;
 			return boost::none;
 		}
+		BOOST_LOG_TRIVIAL(info) << "Received request " << content;
 		rapidjson::Document json_document;
 		if (json_document.Parse(content.c_str()).HasParseError())
 		{
 			BOOST_LOG_TRIVIAL(info) << "JSON parse error: " << rapidjson::GetParseError_En(json_document.GetParseError()) << " (" << json_document.GetErrorOffset() << ")";
 			return boost::none;
 		}
-		for (auto& m : json_document.GetObject())
-		{
-			BOOST_LOG_TRIVIAL(info) << "Type of member " << m.name.GetString() << " is " << m.value.GetType();
-		}
+		rapidjson::StringBuffer buffer;
+		rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+		json_document.Accept(writer);
+		BOOST_LOG_TRIVIAL(info) << "Parsed document " << buffer.GetString();
 		return std::move(json_document);
 	}
 	return boost::none;
