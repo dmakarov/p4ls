@@ -11,12 +11,13 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 // for std::cin
 #include <iostream>
-#include <memory>
+
 
 void init_native_syslog()
 {
 	// Create a syslog sink
-	boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::syslog_backend>> sink(new boost::log::sinks::synchronous_sink<boost::log::sinks::syslog_backend>(boost::log::keywords::use_impl = boost::log::sinks::syslog::native, boost::log::keywords::facility = boost::log::sinks::syslog::local7));
+	using ss = boost::log::sinks::synchronous_sink<boost::log::sinks::syslog_backend>;
+	boost::shared_ptr<ss> sink(new ss(boost::log::keywords::use_impl = boost::log::sinks::syslog::native, boost::log::keywords::facility = boost::log::sinks::syslog::local7));
 	sink->set_formatter(boost::log::expressions::format("%1%: %2%") % boost::log::expressions::attr<unsigned int>("RecordID") % boost::log::expressions::smessage);
 	sink->locked_backend()->set_severity_mapper(boost::log::sinks::syslog::direct_severity_mapping<int>("Severity"));
 	// Add the sink to the core
