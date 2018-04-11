@@ -15,12 +15,33 @@ enum class Trace_level {
 };
 
 struct File_uri {
+	File_uri() = default;
+
+	void set_from_path(const std::string &path)
+	{
+	}
+
+	void set_from_uri(const std::string &uri)
+	{
+	}
 };
 
 struct Workspace_folder {
+	Workspace_folder(const rapidjson::Value &json)
+	{
+	}
+	std::string uri;
+	std::string name;
 };
 
 struct Client_capabilities {
+	Client_capabilities()
+	{
+	}
+
+	void set(const rapidjson::Value &json)
+	{
+	}
 };
 
 struct Params_exit {
@@ -29,11 +50,11 @@ struct Params_exit {
 bool set_params_from_json(const rapidjson::Value &json, Params_exit &params);
 
 struct Params_initialize {
-	boost::optional<int> process_id;
-	boost::optional<std::string> root_path;
-	boost::optional<File_uri> root_uri;
+	int process_id;
+	File_uri root_uri;
 	Client_capabilities capabilities;
 	Trace_level trace;
+	boost::optional<std::string> options;
 	std::vector<Workspace_folder> workspace_folders;
 };
 
