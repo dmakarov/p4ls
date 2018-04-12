@@ -19,9 +19,11 @@ public:
 
 	void register_handler(const std::string &method, handler_type handler);
 
-	bool call(rapidjson::Document &msg) const;
+	bool call(rapidjson::Document &msg, std::ostream &output_stream) const;
 
 private:
 
-	std::unordered_map<std::string, handler_type> handlers;
+	std::unordered_map<std::string, handler_type> _handlers;
 };
+
+void reply(rapidjson::Value &result);

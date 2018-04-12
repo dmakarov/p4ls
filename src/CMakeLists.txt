@@ -1,6 +1,8 @@
 set(CMAKE_CXX_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 
 add_library(p4ls
+  context.cpp
+  context.h
   dispatcher.cpp
   dispatcher.h
   lsp_server.cpp

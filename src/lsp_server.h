@@ -13,8 +13,8 @@
 
 class LSP_server : public Protocol {
 public:
-	LSP_server();
-	int run(std::istream &input_stream);
+	LSP_server(std::istream &input_stream, std::ostream &output_stream);
+	int run();
 
 private:
 	void on_exit(Params_exit &params) override;
@@ -38,7 +38,9 @@ private:
 	void on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles &params) override;
 	void on_workspace_executeCommand(Params_workspace_executeCommand &params) override;
 
-	boost::optional<rapidjson::Document> read_message(std::istream &input_stream);
+	boost::optional<rapidjson::Document> read_message();
 
+	std::istream &_input_stream;
+	std::ostream &_output_stream;
 	bool _is_done;
 };

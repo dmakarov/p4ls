@@ -31,6 +31,6 @@ int main(int argc, char* argv[])
 	init_native_syslog();
 	boost::log::sources::severity_logger<int> lg(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
 	BOOST_LOG_SEV(lg, boost::log::sinks::syslog::notice) << "STARTED";
-	LSP_server the_server;
-	return the_server.run(std::cin);
+	LSP_server the_server(std::cin, std::cout);
+	return the_server.run();
 }

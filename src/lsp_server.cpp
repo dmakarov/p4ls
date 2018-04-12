@@ -10,19 +10,20 @@
 #include <regex>
 #include <string>
 
-LSP_server::LSP_server() : _is_done(false)
+LSP_server::LSP_server(std::istream &input_stream, std::ostream &output_stream)
+	: _input_stream(input_stream), _output_stream(output_stream), _is_done(false)
 {
 }
 
-int LSP_server::run(std::istream &input_stream)
+int LSP_server::run()
 {
 	Dispatcher dispatcher;
 	register_protocol_handlers(dispatcher, *this);
-	while (!_is_done && input_stream.good())
+	while (!_is_done && _input_stream.good())
 	{
-		if (auto json = read_message(input_stream))
+		if (auto json = read_message())
 		{
-			if (!dispatcher.call(*json))
+			if (!dispatcher.call(*json, _output_stream))
 			{
 				BOOST_LOG_TRIVIAL(error) << "JSON dispatch failed!";
 			}
@@ -41,6 +42,12 @@ void LSP_server::on_exit(Params_exit &params)
 void LSP_server::on_initialize(Params_initialize &params)
 {
 	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	rapidjson::Document json_document;
+	auto &allocator = json_document.GetAllocator();
+	rapidjson::Value capabilities(rapidjson::kObjectType);
+	rapidjson::Value result(rapidjson::kObjectType);
+	result.AddMember("capabilities", capabilities, allocator);
+	reply(result);
 }
 
 void LSP_server::on_shutdown(Params_shutdown &params)
@@ -133,24 +140,24 @@ void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand &pa
 	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 }
 
-boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &input_stream)
+boost::optional<rapidjson::Document> LSP_server::read_message()
 {
 	// process a set of HTTP headers of an LSP message
 	unsigned long long content_length = 0;
 	std::regex content_length_regex("Content-Length: ([0-9]+)", std::regex::extended);
 	std::smatch match;
-	while (input_stream.good())
+	while (_input_stream.good())
 	{
 		std::string line;
-		std::getline(input_stream, line);
+		std::getline(_input_stream, line);
 		if (line.back() == '\r')
 		{
 			line.pop_back();
 		}
 		BOOST_LOG_TRIVIAL(info) << "Current line '" << line << "'";
-		if (!input_stream.good() && errno == EINTR)
+		if (!_input_stream.good() && errno == EINTR)
 		{
-			input_stream.clear();
+			_input_stream.clear();
 			continue;
 		}
 		if (0 == line.find_first_of('#'))
@@ -180,17 +187,17 @@ boost::optional<rapidjson::Document> LSP_server::read_message(std::istream &inpu
 	if (content_length > 1 << 30)
 	{
 		BOOST_LOG_TRIVIAL(info) << "Huge message size " << content_length;
-		input_stream.ignore(content_length);
+		_input_stream.ignore(content_length);
 		return boost::none;
 	}
 	// parse JSON payload
 	if (content_length > 0)
 	{
 		std::string content(content_length, '\0');
-		input_stream.read(&content[0], content_length);
-		if (!input_stream)
+		_input_stream.read(&content[0], content_length);
+		if (!_input_stream)
 		{
-			BOOST_LOG_TRIVIAL(info) << "Read " << input_stream.gcount() << " bytes, expected " << content_length;
+			BOOST_LOG_TRIVIAL(info) << "Read " << _input_stream.gcount() << " bytes, expected " << content_length;
 			return boost::none;
 		}
 		BOOST_LOG_TRIVIAL(info) << "Received request " << content;
