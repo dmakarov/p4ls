@@ -2,6 +2,147 @@
 
 #include <boost/log/trivial.hpp>
 
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
+#include <sstream>
+
+bool set_params_from_json(const rapidjson::Value &json, Params_exit &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_initialize &params)
+{
+	BOOST_LOG_TRIVIAL(info) << "Start processing params for initialize request";
+	if (json.HasMember("processId") && !json["processId"].IsNull())
+	{
+		params.process_id = json["processId"].GetInt();
+	}
+	if (json.HasMember("rootUri") && !json["rootUri"].IsNull())
+	{
+		params.root_uri.set_from_uri(json["rootUri"].GetString());
+	}
+	else if (json.HasMember("rootPath") && !json["rootPath"].IsNull())
+	{
+		params.root_uri.set_from_path(json["rootPath"].GetString());
+	}
+	if (json.HasMember("initializationOptions") && !json["initializationOptions"].IsNull())
+	{
+		params.options = json["initializationOptions"].GetString();
+	}
+	if (json.HasMember("capabilities"))
+	{
+		params.capabilities.set(json["capabilities"]);
+	}
+	if (json.HasMember("trace"))
+	{
+		params.trace =
+			(json["trace"] == "off"     ) ? Trace_level::OFF :
+			(json["trace"] == "messages") ? Trace_level::MESSAGES :
+			(json["trace"] == "verbose" ) ? Trace_level::VERBOSE : Trace_level::OFF;
+	}
+	if (json.HasMember("workspaceFolders") && !json["workspaceFolders"].IsNull())
+	{
+		for (auto *it = json["workspaceFolders"].Begin(); it != json["workspaceFolders"].End(); ++it)
+		{
+			params.workspace_folders.emplace_back(*it);
+		}
+	}
+	BOOST_LOG_TRIVIAL(info) << "Finish processing params for initialize request";
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_shutdown &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_codeAction &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_completion &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_definition &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didChange &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didClose &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didOpen &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentHighlight &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_formatting &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_hover &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_onTypeFormatting &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_rangeFormatting &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_rename &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_signatureHelp &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_switchSourceHeader &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_workspace_didChangeConfiguration &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_workspace_didChangeWatchedFiles &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_workspace_executeCommand &params)
+{
+	return true;
+}
+
 
 namespace
 {

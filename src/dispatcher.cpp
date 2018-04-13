@@ -36,15 +36,17 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 	{
 		return false;
 	}
-	auto handler = _handlers.find(msg["method"].GetString());
 	Scoped_context_with_value context_with_request_output_stream(request_output_stream, &output_stream);
 	boost::optional<Scoped_context_with_value> context_with_id;
 	if (id)
 	{
 		context_with_id.emplace(request_id, *id);
 	}
+	BOOST_LOG_TRIVIAL(info) << "Searching for a handler for method " << msg["method"].GetString();
+	auto handler = _handlers.find(msg["method"].GetString());
 	if (handler != _handlers.end())
 	{
+		BOOST_LOG_TRIVIAL(info) << "Found a handler and calling it";
 		handler->second(std::move(msg["params"].GetObject()));
 	}
 	return true;

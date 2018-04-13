@@ -1,8 +1,8 @@
 #include "context.h"
 
 static Context &create_empty_context() {
-	static thread_local auto ctx = Context::get_empty();
-	return ctx;
+	thread_local static auto context = Context::get_empty();
+	return context;
 }
 
 Context Context::get_empty()

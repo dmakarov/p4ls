@@ -7,8 +7,6 @@ add_library(p4ls
   dispatcher.h
   lsp_server.cpp
   lsp_server.h
-  params.cpp
-  params.h
   protocol.cpp
   protocol.h)
 
