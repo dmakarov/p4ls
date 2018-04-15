@@ -207,9 +207,77 @@ struct Text_document_client_capabilities {
 		{
 			synchronization.emplace(Synchronization(json["synchronization"]));
 		}
+		if (json.HasMember("completion") && !json["completion"].IsNull())
+		{
+			completion.emplace(Completion(json["completion"]));
+		}
+		if (json.HasMember("hover") && !json["hover"].IsNull())
+		{
+			hover.emplace(Hover(json["hover"]));
+		}
+		if (json.HasMember("signatureHelp") && !json["signatureHelp"].IsNull())
+		{
+			signature_help.emplace(Signature_help(json["signatureHelp"]));
+		}
+		if (json.HasMember("references") && !json["references"].IsNull())
+		{
+			references.emplace(References(json["references"]));
+		}
+		if (json.HasMember("documentHighlight") && !json["documentHighlight"].IsNull())
+		{
+			document_highlight.emplace(Document_highlight(json["documentHighlight"]));
+		}
 		if (json.HasMember("documentSymbol") && !json["documentSymbol"].IsNull())
 		{
 			document_symbol.emplace(Document_symbol(json["documentSymbol"]));
+		}
+		if (json.HasMember("formatting") && !json["formatting"].IsNull())
+		{
+			formatting.emplace(Formatting(json["formatting"]));
+		}
+		if (json.HasMember("rangeFormatting") && !json["rangeFormatting"].IsNull())
+		{
+			range_formatting.emplace(Range_formatting(json["rangeFormatting"]));
+		}
+		if (json.HasMember("onTypeFormatting") && !json["onTypeFormatting"].IsNull())
+		{
+			on_type_formatting.emplace(On_type_formatting(json["onTypeFormatting"]));
+		}
+		if (json.HasMember("definition") && !json["definition"].IsNull())
+		{
+			definition.emplace(Definition(json["definition"]));
+		}
+		if (json.HasMember("typeDefinition") && !json["typeDefinition"].IsNull())
+		{
+			type_definition.emplace(Type_definition(json["typeDefinition"]));
+		}
+		if (json.HasMember("implementation") && !json["implementation"].IsNull())
+		{
+			implementation.emplace(Implementation(json["implementation"]));
+		}
+		if (json.HasMember("codeAction") && !json["codeAction"].IsNull())
+		{
+			code_action.emplace(Code_action(json["codeAction"]));
+		}
+		if (json.HasMember("codeLens") && !json["codeLens"].IsNull())
+		{
+			code_lens.emplace(Code_lens(json["codeLens"]));
+		}
+		if (json.HasMember("documentLink") && !json["documentLink"].IsNull())
+		{
+			document_link.emplace(Document_link(json["documentLink"]));
+		}
+		if (json.HasMember("colorProvider") && !json["colorProvider"].IsNull())
+		{
+			color_provider.emplace(Color_provider(json["colorProvider"]));
+		}
+		if (json.HasMember("rename") && !json["rename"].IsNull())
+		{
+			rename.emplace(Rename(json["rename"]));
+		}
+		if (json.HasMember("publishDiagnostics") && !json["publishDiagnostics"].IsNull())
+		{
+			publish_diagnostics.emplace(Publish_diagnostics(json["publishDiagnostics"]));
 		}
 	}
 
@@ -241,13 +309,67 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Completion {
+		explicit Completion(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+			if (json.HasMember("contextSupport") && !json["contextSupport"].IsNull())
+			{
+				context_support.emplace(json["contextSupport"].GetBool());
+			}
+			if (json.HasMember("completionItem") && !json["completionItem"].IsNull())
+			{
+				completion_item.emplace(Completion_item(json["completionItem"]));
+			}
+			if (json.HasMember("completionItemKind") && !json["completionItemKind"].IsNull())
+			{
+				completion_item_kind.emplace(Completion_item_kind(json["completionItemKind"]));
+			}
+		}
+
 		struct Completion_item {
-			boost::optional<bool> snippetSupport; /// Client supports snippets as insert text. A snippet can define tab stops and placeholders with `$1`, `$2` and `${3:foo}`. `$0` defines the final tab stop, it defaults to the end of the snippet. Placeholders with equal identifiers are linked, that is typing in one will update others too.
-			boost::optional<bool> commitCharactersSupport; /// Client supports commit characters on a completion item.
+			explicit Completion_item(const rapidjson::Value &json)
+			{
+				if (json.HasMember("snippetSupport") && !json["snippetSupport"].IsNull())
+				{
+					snippet_support.emplace(json["snippetSupport"].GetBool());
+				}
+				if (json.HasMember("commitCharactersSupport") && !json["commitCharactersSupport"].IsNull())
+				{
+					commit_characters_support.emplace(json["commitCharactersSupport"].GetBool());
+				}
+				if (json.HasMember("documentationFormat") && !json["documentationFormat"].IsNull())
+				{
+					std::vector<MARKUP_KIND> values;
+					for (auto *it = json["documentationFormat"].Begin(); it != json["documentationFormat"].End(); ++it)
+					{
+						values.emplace_back(convert_string_to_markup_kind(it->GetString()));
+					}
+					documentation_format.emplace(values);
+				}
+			}
+
+			boost::optional<bool> snippet_support; /// Client supports snippets as insert text. A snippet can define tab stops and placeholders with `$1`, `$2` and `${3:foo}`. `$0` defines the final tab stop, it defaults to the end of the snippet. Placeholders with equal identifiers are linked, that is typing in one will update others too.
+			boost::optional<bool> commit_characters_support; /// Client supports commit characters on a completion item.
 			boost::optional<std::vector<MARKUP_KIND>> documentation_format; /// Client supports the follow content formats for the documentation property. The order describes the preferred format of the client.
 		};
 
 		struct Completion_item_kind {
+			explicit Completion_item_kind(const rapidjson::Value &json)
+			{
+				if (json.HasMember("valueSet") && !json["valueSet"].IsNull())
+				{
+					std::vector<COMPLETION_ITEM_KIND> values;
+					for (auto *it = json["valueSet"].Begin(); it != json["valueSet"].End(); ++it)
+					{
+						values.emplace_back(convert_int_to_completion_item_kind(it->GetInt()));
+					}
+					value_set.emplace(values);
+				}
+			}
+
 			boost::optional<std::vector<COMPLETION_ITEM_KIND>> value_set; /// The completion item kind values the client supports. When this property exists the client also guarantees that it will handle values outside its set gracefully and falls back to a default value when unknown. If this property is not present the client only supports the completion items kinds from `Text` to `Reference` as defined in the initial version of the protocol.
 		};
 
@@ -258,24 +380,82 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Hover {
-		bool dynamic_registration; /// Whether hover supports dynamic registration.
+		explicit Hover(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+			if (json.HasMember("contentFormat") && !json["contentFormat"].IsNull())
+			{
+				std::vector<MARKUP_KIND> values;
+				for (auto *it = json["contentFormat"].Begin(); it != json["contentFormat"].End(); ++it)
+				{
+					values.emplace_back(convert_string_to_markup_kind(it->GetString()));
+				}
+				content_format.emplace(values);
+			}
+		}
+
+		boost::optional<bool> dynamic_registration; /// Whether hover supports dynamic registration.
 		boost::optional<std::vector<MARKUP_KIND>> content_format; /// Client supports the follow content formats for the content property. The order describes the preferred format of the client.
 	};
 
 	struct Signature_help {
+		explicit Signature_help(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+			if (json.HasMember("signatureInformation") && !json["signatureInformation"].IsNull())
+			{
+				signature_information.emplace(Signature_information(json["signatureInformation"]));
+			}
+		}
+
 		struct Signature_information {
+			explicit Signature_information(const rapidjson::Value &json)
+			{
+				if (json.HasMember("documentationFormat") && !json["documentationFormat"].IsNull())
+				{
+					std::vector<MARKUP_KIND> values;
+					for (auto *it = json["documentationFormat"].Begin(); it != json["documentationFormat"].End(); ++it)
+					{
+						values.emplace_back(convert_string_to_markup_kind(it->GetString()));
+					}
+					documentation_format.emplace(values);
+				}
+			}
+
 			boost::optional<std::vector<MARKUP_KIND>> documentation_format; /// Client supports the follow content formats for the documentation property. The order describes the preferred format of the client.
 		};
 
-		boost::optional<bool> dynamicRegistration; /// Whether signature help supports dynamic registration.
+		boost::optional<bool> dynamic_registration; /// Whether signature help supports dynamic registration.
 		boost::optional<Signature_information> signature_information; /// The client supports the following `SignatureInformation` specific properties.
 	};
 
 	struct References {
+		explicit References(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether references supports dynamic registration.
 	};
 
 	struct Document_highlight {
+		explicit Document_highlight(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether document highlight supports dynamic registration.
 	};
 
@@ -314,50 +494,146 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Formatting {
+		explicit Formatting(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether formatting supports dynamic registration.
 	};
 
 	struct Range_formatting {
+		explicit Range_formatting(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether range formatting supports dynamic registration.
 	};
 
 	struct On_type_formatting {
+		explicit On_type_formatting(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether on type formatting supports dynamic registration.
 	};
 
 	struct Definition {
+		explicit Definition(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether definition supports dynamic registration.
 	};
 
 	struct Type_definition {
+		explicit Type_definition(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether typeDefinition supports dynamic registration. If this is set to `true` the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)` return value for the corresponding server capability as well.
 	};
 
 	struct Implementation {
+		explicit Implementation(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether implementation supports dynamic registration. If this is set to `true` the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)` return value for the corresponding server capability as well.
 	};
 
 	struct Code_action {
+		explicit Code_action(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether code action supports dynamic registration.
 	};
 
 	struct Code_lens {
+		explicit Code_lens(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether code lens supports dynamic registration.
 	};
 
 	struct Document_link {
+		explicit Document_link(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether document link supports dynamic registration.
 	};
 
 	struct Color_provider {
+		explicit Color_provider(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether colorProvider supports dynamic registration. If this is set to `true` the client supports the new `(ColorProviderOptions & TextDocumentRegistrationOptions & StaticRegistrationOptions)` return value for the corresponding server capability as well.
 	};
 
 	struct Rename {
+		explicit Rename(const rapidjson::Value &json)
+		{
+			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
+			{
+				dynamic_registration.emplace(json["dynamicRegistration"].GetBool());
+			}
+		}
+
 		boost::optional<bool> dynamic_registration; /// Whether rename supports dynamic registration.
 	};
 
 	struct Publish_diagnostics {
+		explicit Publish_diagnostics(const rapidjson::Value &json)
+		{
+			if (json.HasMember("relatedInformation") && !json["relatedInformation"].IsNull())
+			{
+				related_information.emplace(json["relatedInformation"].GetBool());
+			}
+		}
+
 		boost::optional<bool> related_information; /// Whether the clients accepts diagnostics with related information.
 	};
 
