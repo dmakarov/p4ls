@@ -5,6 +5,7 @@ find_package(Boost CONFIG REQUIRED COMPONENTS unit_test_framework)
 
 add_executable(unittests_driver
   lsp_server_test.cpp
+  protocol_test.cpp
   unittests_driver.cpp)
 target_include_directories(unittests_driver PUBLIC ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(unittests_driver PUBLIC p4ls Boost::unit_test_framework)

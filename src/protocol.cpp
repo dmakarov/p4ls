@@ -7,6 +7,12 @@
 
 #include <sstream>
 
+std::ostream &operator<<(std::ostream &os, const URI &item)
+{
+	os << item._path;
+	return os;
+}
+
 bool set_params_from_json(const rapidjson::Value &json, Params_exit &params)
 {
 	return true;
@@ -29,25 +35,32 @@ bool set_params_from_json(const rapidjson::Value &json, Params_initialize &param
 	}
 	if (json.HasMember("initializationOptions") && !json["initializationOptions"].IsNull())
 	{
-		params.options = json["initializationOptions"].GetString();
+		std::vector<std::string> options;
+		for (auto *it = json["initializationOptions"].Begin(); it != json["initializationOptions"].End(); ++it)
+		{
+			options.emplace_back(it->GetString());
+		}
+		params.initialization_options.emplace(options);
 	}
 	if (json.HasMember("capabilities"))
 	{
 		params.capabilities.set(json["capabilities"]);
 	}
-	if (json.HasMember("trace"))
+	if (json.HasMember("trace") && !json["trace"].IsNull())
 	{
-		params.trace =
+		params.trace.emplace(
 			(json["trace"] == "off"     ) ? Trace_level::OFF :
 			(json["trace"] == "messages") ? Trace_level::MESSAGES :
-			(json["trace"] == "verbose" ) ? Trace_level::VERBOSE : Trace_level::OFF;
+			(json["trace"] == "verbose" ) ? Trace_level::VERBOSE : Trace_level::OFF);
 	}
 	if (json.HasMember("workspaceFolders") && !json["workspaceFolders"].IsNull())
 	{
+		std::vector<Workspace_folder> folders;
 		for (auto *it = json["workspaceFolders"].Begin(); it != json["workspaceFolders"].End(); ++it)
 		{
-			params.workspace_folders.emplace_back(*it);
+			folders.emplace_back(Workspace_folder(*it));
 		}
+		params.workspace_folders.emplace(folders);
 	}
 	BOOST_LOG_TRIVIAL(info) << "Finish processing params for initialize request";
 	return true;
