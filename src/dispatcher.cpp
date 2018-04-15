@@ -68,6 +68,7 @@ void reply(rapidjson::Value &result)
 	rapidjson::StringBuffer buffer;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 	root.Accept(writer);
-	*(Context::get_current().get_existing(request_output_stream)) << buffer.GetString();
-	BOOST_LOG_TRIVIAL(info) << "Sent response " << buffer.GetString();
+	std::string content(buffer.GetString());
+	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+	BOOST_LOG_TRIVIAL(info) << "Sent response " << "Content-Length: " << content.size() << "\r\n\r\n" << content;
 }
