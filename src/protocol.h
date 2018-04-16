@@ -77,6 +77,12 @@ enum class MARKUP_KIND { plaintext, markdown };
 
 enum class Trace_level { OFF = 0, MESSAGES = 1, VERBOSE = 2 };
 
+enum class TEXT_DOCUMENT_SYNC_KIND {
+	None = 0, /// documents should not be synced at all
+	Full = 1, /// documents are synced by always sending the full content of the document
+	Incremental = 2 /// documents are synced by sending the full content on open; after that only incremental updates to the document are send
+};
+
 namespace
 {
 
@@ -813,312 +819,42 @@ struct Client_capabilities {
 	boost::optional<Text_document_client_capabilities> text_document;
 };
 
-#if 0
-/**
- * Defines how the host (editor) should sync document changes to the language server.
- */
-export namespace TextDocumentSyncKind {
-	/**
-	 * Documents should not be synced at all.
-	 */
-	export const None = 0;
-
-	/**
-	 * Documents are synced by always sending the full content
-	 * of the document.
-	 */
-	export const Full = 1;
-
-	/**
-	 * Documents are synced by sending the full content on open.
-	 * After that only incremental updates to the document are
-	 * send.
-	 */
-	export const Incremental = 2;
-}
-
-/**
- * Completion options.
- */
-export interface CompletionOptions {
-	/**
-	 * The server provides support to resolve additional
-	 * information for a completion item.
-	 */
-	resolveProvider?: boolean;
-
-	/**
-	 * The characters that trigger completion automatically.
-	 */
-	triggerCharacters?: string[];
-}
-/**
- * Signature help options.
- */
-export interface SignatureHelpOptions {
-	/**
-	 * The characters that trigger signature help
-	 * automatically.
-	 */
-	triggerCharacters?: string[];
-}
-
-/**
- * Code Lens options.
- */
-export interface CodeLensOptions {
-	/**
-	 * Code lens has a resolve provider as well.
-	 */
-	resolveProvider?: boolean;
-}
-
-/**
- * Format document on type options
- */
-export interface DocumentOnTypeFormattingOptions {
-	/**
-	 * A character on which formatting should be triggered, like `}`.
-	 */
-	firstTriggerCharacter: string;
-
-	/**
-	 * More trigger characters.
-	 */
-	moreTriggerCharacter?: string[];
-}
-
-/**
- * Document link options
- */
-export interface DocumentLinkOptions {
-	/**
-	 * Document links have a resolve provider as well.
-	 */
-	resolveProvider?: boolean;
-}
-
-/**
- * Execute command options.
- */
-export interface ExecuteCommandOptions {
-	/**
-	 * The commands to be executed on the server
-	 */
-	commands: string[]
-}
-
-/**
- * Save options.
- */
-export interface SaveOptions {
-	/**
-	 * The client is supposed to include the content on save.
-	 */
-	includeText?: boolean;
-}
-
-/**
- * Color provider Options
- */
-export interface ColorProviderOptions {
-}
-
-export interface TextDocumentSyncOptions {
-	/**
-	 * Open and close notifications are sent to the server.
-	 */
-	openClose?: boolean;
-	/**
-	 * Change notifications are sent to the server. See TextDocumentSyncKind.None, TextDocumentSyncKind.Full
-	 * and TextDocumentSyncKind.Incremental.
-	 */
-	change?: number;
-	/**
-	 * Will save notifications are sent to the server.
-	 */
-	willSave?: boolean;
-	/**
-	 * Will save wait until requests are sent to the server.
-	 */
-	willSaveWaitUntil?: boolean;
-	/**
-	 * Save notifications are sent to the server.
-	 */
-	save?: SaveOptions;
-}
-
-/**
- * Static registration options to be returned in the initialize request.
- */
-interface StaticRegistrationOptions {
-	/**
-	 * The id used to register the request. The id can be used to deregister
-	 * the request again. See also Registration#id.
-	 */
-	id?: string;
-}
-
-interface ServerCapabilities {
-	/**
-	 * Defines how text documents are synced. Is either a detailed structure defining each notification or
-	 * for backwards compatibility the TextDocumentSyncKind number. If omitted it defaults to `TextDocumentSyncKind.None`.
-	 */
-	textDocumentSync?: TextDocumentSyncOptions | number;
-	/**
-	 * The server provides hover support.
-	 */
-	hoverProvider?: boolean;
-	/**
-	 * The server provides completion support.
-	 */
-	completionProvider?: CompletionOptions;
-	/**
-	 * The server provides signature help support.
-	 */
-	signatureHelpProvider?: SignatureHelpOptions;
-	/**
-	 * The server provides goto definition support.
-	 */
-	definitionProvider?: boolean;
-	/**
-	 * The server provides Goto Type Definition support.
-	 *
-	 * Since 3.6.0
-	 */
-	typeDefinitionProvider?: boolean | (TextDocumentRegistrationOptions & StaticRegistrationOptions);
-	/**
-	 * The server provides Goto Implementation support.
-	 *
-	 * Since 3.6.0
-	 */
-	implementationProvider?: boolean | (TextDocumentRegistrationOptions & StaticRegistrationOptions);
-	/**
-	 * The server provides find references support.
-	 */
-	referencesProvider?: boolean;
-	/**
-	 * The server provides document highlight support.
-	 */
-	documentHighlightProvider?: boolean;
-	/**
-	 * The server provides document symbol support.
-	 */
-	documentSymbolProvider?: boolean;
-	/**
-	 * The server provides workspace symbol support.
-	 */
-	workspaceSymbolProvider?: boolean;
-	/**
-	 * The server provides code actions.
-	 */
-	codeActionProvider?: boolean;
-	/**
-	 * The server provides code lens.
-	 */
-	codeLensProvider?: CodeLensOptions;
-	/**
-	 * The server provides document formatting.
-	 */
-	documentFormattingProvider?: boolean;
-	/**
-	 * The server provides document range formatting.
-	 */
-	documentRangeFormattingProvider?: boolean;
-	/**
-	 * The server provides document formatting on typing.
-	 */
-	documentOnTypeFormattingProvider?: DocumentOnTypeFormattingOptions;
-	/**
-	 * The server provides rename support.
-	 */
-	renameProvider?: boolean;
-	/**
-	 * The server provides document link support.
-	 */
-	documentLinkProvider?: DocumentLinkOptions;
-	/**
-	 * The server provides color provider support.
-	 *
-	 * Since 3.6.0
-	 */
-	colorProvider?: ColorProviderOptions | (ColorProviderOptions & TextDocumentRegistrationOptions & StaticRegistrationOptions);
-	/**
-	 * The server provides execute command support.
-	 */
-	executeCommandProvider?: ExecuteCommandOptions;
-	/**
-	 * Workspace specific server capabilities
-	 */
-	workspace?: {
-		/**
-		 * The server supports workspace folder.
-		 *
-		 * Since 3.6.0
-		 */
-		workspaceFolders?: {
-			/**
-			* The server has support for workspace folders
-			*/
-			supported?: boolean;
-			/**
-			* Whether the server wants to receive workspace folder
-			* change notifications.
-			*
-			* If a strings is provided the string is treated as a ID
-			* under which the notification is registed on the client
-			* side. The ID can be used to unregister for these events
-			* using the `client/unregisterCapability` request.
-			*/
-			changeNotifications?: string | boolean;
-		}
-	}
-	/**
-	 * Experimental server capabilities.
-	 */
-	experimental?: any;
-}
-#endif
 
 struct Server_capabilities {
 
-	struct Save_options {
-		bool include_text; /// the client is supposed to include the content on save
-	};
-
 	struct Text_document_sync_options {
-		enum Text_document_sync_kind {
-			None = 0, /// documents should not be synced at all
-			Full = 1, /// documents are synced by always sending the full content of the document
-			Incremental = 2 /// documents are synced by sending the full content on open; after that only incremental updates to the document are send
+
+		struct Save_options {
+			boost::optional<bool> include_text; /// the client is supposed to include the content on save
 		};
-		bool open_close;           /// open and close notifications are sent to the server
-		bool will_save;            /// will save notifications are sent to the server
-		bool will_save_wait_until; /// will save wait until requests are sent to the server
-		Save_options save;         /// save notifications are sent to the server
-		Text_document_sync_kind change; /// change notifications are sent to the server
+
+		boost::optional<bool> open_close;           /// open and close notifications are sent to the server
+		boost::optional<bool> will_save;            /// will save notifications are sent to the server
+		boost::optional<bool> will_save_wait_until; /// will save wait until requests are sent to the server
+		boost::optional<Save_options> save;         /// save notifications are sent to the server
+		boost::optional<TEXT_DOCUMENT_SYNC_KIND> change; /// change notifications are sent to the server
 	};
 
 	struct Completion_options {
-		bool resolve_provider;          /// the server provides support to resolve additional information for a completion item
-		std::string trigger_characters; /// the characters that trigger completion automatically.
+		boost::optional<bool> resolve_provider;          /// the server provides support to resolve additional information for a completion item
+		boost::optional<std::string> trigger_characters; /// the characters that trigger completion automatically.
 	};
 
 	struct Signature_help_options {
-		std::string trigger_characters; /// the characters that trigger signature help automatically
+		boost::optional<std::string> trigger_characters; /// the characters that trigger signature help automatically
 	};
 
 	struct Code_lens_options {
-		bool resolve_provider; /// code lens has a resolve provider as well
+		boost::optional<bool> resolve_provider; /// code lens has a resolve provider as well
 	};
 
 	struct Document_on_type_formatting_options {
 		std::string first_trigger_character; /// A character on which formatting should be triggered, like `}`
-		std::string more_trigger_character; /// More trigger characters.
+		boost::optional<std::string> more_trigger_character; /// More trigger characters.
 	};
 
 	struct Document_link_options {
-		bool resolve_provider; /// Document links have a resolve provider as well.
+		boost::optional<bool> resolve_provider; /// Document links have a resolve provider as well.
 	};
 
 	struct Execute_command_options {
@@ -1126,32 +862,32 @@ struct Server_capabilities {
 	};
 
 	struct Workspace_folders {
-		bool supported; /// The server has support for workspace folders
-		std::string change_notifications; /// Whether the server wants to receive workspace folder change notifications. If a strings is provided the string is treated as a ID under which the notification is registed on the client side. The ID can be used to unregister for these events using the `client/unregisterCapability` request.
+		boost::optional<bool> supported; /// The server has support for workspace folders
+		boost::optional<std::string> change_notifications; /// Whether the server wants to receive workspace folder change notifications. If a strings is provided the string is treated as a ID under which the notification is registed on the client side. The ID can be used to unregister for these events using the `client/unregisterCapability` request.
 	};
 
 	struct Workspace {
-		boost::optional<Workspace_folders> workspace_folders;
+		boost::optional<Workspace_folders> workspace_folders; /// The server supports workspace folder
 	};
 
 	struct Color_provider_options {
 	};
 
 	boost::optional<Workspace> workspace; /// Workspace specific server capabilities
-	boost::optional<Text_document_sync_options> text_document_sync;
-	boost::optional<Completion_options> completion_provider;
-	boost::optional<Signature_help_options> signature_help_provider;
+	boost::optional<Text_document_sync_options> text_document_sync; /// Defines how text documents are synced. Is either a detailed structure defining each notification or for backwards compatibility the TextDocumentSyncKind number. If omitted it defaults to `TextDocumentSyncKind.None`.
+	boost::optional<Completion_options> completion_provider; /// The server provides completion support.
+	boost::optional<Signature_help_options> signature_help_provider; /// The server provides signature help support
 	boost::optional<Code_lens_options> code_lens_provider; /// The server provides code lens.
 	boost::optional<Document_on_type_formatting_options> document_on_type_formatting_provider; /// The server provides document formatting on typing.
 	boost::optional<Document_link_options> document_link_provider; /// The server provides document link support.
 	boost::optional<Color_provider_options> color_provider; /// The server provides color provider support.
 	boost::optional<Execute_command_options> execute_command_provider; /// The server provides execute command support.
-	boost::optional<bool> hover_provider;
-	boost::optional<bool> definition_provider;
-	boost::optional<bool> type_definition_provider;
-	boost::optional<bool> implementation_provider;
-	boost::optional<bool> references_provider;
-	boost::optional<bool> document_highlight_provider;
+	boost::optional<bool> hover_provider; /// The server provides hover support.
+	boost::optional<bool> definition_provider; /// The server provides goto definition support
+	boost::optional<bool> type_definition_provider; /// The server provides Goto Type Definition support
+	boost::optional<bool> implementation_provider; /// The server provides Goto Implementation support
+	boost::optional<bool> references_provider; /// The server provides find references support
+	boost::optional<bool> document_highlight_provider; /// The server provides document highlight support
 	boost::optional<bool> document_symbol_provider; /// The server provides document symbol support.
 	boost::optional<bool> workspace_symbol_provider; /// The server provides workspace symbol support.
 	boost::optional<bool> code_action_provider; /// The server provides code actions.
@@ -1159,6 +895,7 @@ struct Server_capabilities {
 	boost::optional<bool> document_range_formatting_provider; /// The server provides document range formatting.
 	boost::optional<bool> rename_provider; /// The server provides rename support.
 };
+
 
 struct Params_exit {
 };
