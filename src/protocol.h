@@ -822,9 +822,23 @@ struct Client_capabilities {
 
 struct Server_capabilities {
 
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator);
+
 	struct Text_document_sync_options {
 
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator);
+
 		struct Save_options {
+			rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+			{
+				rapidjson::Value result(rapidjson::kObjectType);
+				if (include_text)
+				{
+					result.AddMember("includeText", *include_text, allocator);
+				}
+				return result;
+			}
+
 			boost::optional<bool> include_text; /// the client is supposed to include the content on save
 		};
 
@@ -836,41 +850,137 @@ struct Server_capabilities {
 	};
 
 	struct Completion_options {
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		{
+			rapidjson::Value result(rapidjson::kObjectType);
+			if (resolve_provider)
+			{
+				result.AddMember("resolveProvider", *resolve_provider, allocator);
+			}
+			if (trigger_characters)
+			{
+				result.AddMember("triggerCharacters", rapidjson::StringRef(trigger_characters->c_str()), allocator);
+			}
+			return result;
+		}
+
 		boost::optional<bool> resolve_provider;          /// the server provides support to resolve additional information for a completion item
 		boost::optional<std::string> trigger_characters; /// the characters that trigger completion automatically.
 	};
 
 	struct Signature_help_options {
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		{
+			rapidjson::Value result(rapidjson::kObjectType);
+			if (trigger_characters)
+			{
+				result.AddMember("triggerCharacters", rapidjson::StringRef(trigger_characters->c_str()), allocator);
+			}
+			return result;
+		}
+
 		boost::optional<std::string> trigger_characters; /// the characters that trigger signature help automatically
 	};
 
 	struct Code_lens_options {
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		{
+			rapidjson::Value result(rapidjson::kObjectType);
+			if (resolve_provider)
+			{
+				result.AddMember("resolveProvider", *resolve_provider, allocator);
+			}
+			return result;
+		}
+
 		boost::optional<bool> resolve_provider; /// code lens has a resolve provider as well
 	};
 
 	struct Document_on_type_formatting_options {
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		{
+			rapidjson::Value result(rapidjson::kObjectType);
+			result.AddMember("firstTriggerCharacter", rapidjson::StringRef(first_trigger_character.c_str()), allocator);
+			if (more_trigger_character)
+			{
+				result.AddMember("moreTriggerCharacter", rapidjson::StringRef(more_trigger_character->c_str()), allocator);
+			}
+			return result;
+		}
+
 		std::string first_trigger_character; /// A character on which formatting should be triggered, like `}`
 		boost::optional<std::string> more_trigger_character; /// More trigger characters.
 	};
 
 	struct Document_link_options {
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		{
+			rapidjson::Value result(rapidjson::kObjectType);
+			if (resolve_provider)
+			{
+				result.AddMember("resolveProvider", *resolve_provider, allocator);
+			}
+			return result;
+		}
+
 		boost::optional<bool> resolve_provider; /// Document links have a resolve provider as well.
 	};
 
 	struct Execute_command_options {
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		{
+			rapidjson::Value a(rapidjson::kArrayType);
+			for (auto &it : commands)
+			{
+				a.PushBack(rapidjson::StringRef(it.c_str()), allocator);
+			}
+			rapidjson::Value result(rapidjson::kObjectType);
+			result.AddMember("commands", a, allocator);
+			return result;
+		}
+
 		std::vector<std::string> commands; ///  The commands to be executed on the server
 	};
 
 	struct Workspace_folders {
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		{
+			rapidjson::Value result(rapidjson::kObjectType);
+			if (supported)
+			{
+				result.AddMember("supported", *supported, allocator);
+			}
+			if (change_notifications)
+			{
+				result.AddMember("changeNotifications", rapidjson::StringRef(change_notifications->c_str()), allocator);
+			}
+			return result;
+		}
+
 		boost::optional<bool> supported; /// The server has support for workspace folders
 		boost::optional<std::string> change_notifications; /// Whether the server wants to receive workspace folder change notifications. If a strings is provided the string is treated as a ID under which the notification is registed on the client side. The ID can be used to unregister for these events using the `client/unregisterCapability` request.
 	};
 
 	struct Workspace {
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		{
+			rapidjson::Value result(rapidjson::kObjectType);
+			if (workspace_folders)
+			{
+				result.AddMember("workspaceFolders", workspace_folders->get_json(allocator), allocator);
+			}
+			return result;
+		}
+
 		boost::optional<Workspace_folders> workspace_folders; /// The server supports workspace folder
 	};
 
 	struct Color_provider_options {
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		{
+			rapidjson::Value result(rapidjson::kObjectType);
+			return result;
+		}
 	};
 
 	boost::optional<Workspace> workspace; /// Workspace specific server capabilities

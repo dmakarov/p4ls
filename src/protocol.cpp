@@ -13,6 +13,123 @@ std::ostream &operator<<(std::ostream &os, const URI &item)
 	return os;
 }
 
+rapidjson::Value Server_capabilities::Text_document_sync_options::get_json(rapidjson::Document::AllocatorType &allocator)
+{
+	rapidjson::Value result(rapidjson::kObjectType);
+	if (open_close)
+	{
+		result.AddMember("openClose", *open_close, allocator);
+	}
+	if (will_save)
+	{
+		result.AddMember("willSave", *will_save, allocator);
+	}
+	if (will_save_wait_until)
+	{
+		result.AddMember("willSaveWaitUntil", *will_save_wait_until, allocator);
+	}
+	if (change)
+	{
+		result.AddMember("change", (int) *change, allocator);
+	}
+	if (save)
+	{
+		result.AddMember("save", save->get_json(allocator), allocator);
+	}
+	return result;
+}
+
+rapidjson::Value Server_capabilities::get_json(rapidjson::Document::AllocatorType &allocator)
+{
+	rapidjson::Value result(rapidjson::kObjectType);
+	if (workspace)
+	{
+		result.AddMember("workspace", workspace->get_json(allocator), allocator);
+	}
+	if (text_document_sync)
+	{
+		result.AddMember("textDocumentSync", text_document_sync->get_json(allocator), allocator);
+	}
+	if (completion_provider)
+	{
+		result.AddMember("completionProvider", completion_provider->get_json(allocator), allocator);
+	}
+	if (signature_help_provider)
+	{
+		result.AddMember("signatureHelpProvider", signature_help_provider->get_json(allocator), allocator);
+	}
+	if (code_lens_provider)
+	{
+		result.AddMember("codeLensProvider", code_lens_provider->get_json(allocator), allocator);
+	}
+	if (document_on_type_formatting_provider)
+	{
+		result.AddMember("documentOnTypeFormattingProvider", document_on_type_formatting_provider->get_json(allocator), allocator);
+	}
+	if (document_link_provider)
+	{
+		result.AddMember("documentLinkProvider", document_link_provider->get_json(allocator), allocator);
+	}
+	if (color_provider)
+	{
+		result.AddMember("colorProvider", color_provider->get_json(allocator), allocator);
+	}
+	if (execute_command_provider)
+	{
+		result.AddMember("executeCommandProvider", execute_command_provider->get_json(allocator), allocator);
+	}
+	if (hover_provider)
+	{
+		result.AddMember("hoverProvider", *hover_provider, allocator);
+	}
+	if (definition_provider)
+	{
+		result.AddMember("definitionProvider", *definition_provider, allocator);
+	}
+	if (type_definition_provider)
+	{
+		result.AddMember("typeDefinitionProvider", *type_definition_provider, allocator);
+	}
+	if (implementation_provider)
+	{
+		result.AddMember("implementationProvider", *implementation_provider, allocator);
+	}
+	if (references_provider)
+	{
+		result.AddMember("referencesProvider", *references_provider, allocator);
+	}
+	if (document_highlight_provider)
+	{
+		result.AddMember("documentHighlightProvider", *document_highlight_provider, allocator);
+	}
+	if (document_symbol_provider)
+	{
+		result.AddMember("documentSymbolProvider", *document_symbol_provider, allocator);
+	}
+	if (workspace_symbol_provider)
+	{
+		result.AddMember("workspaceSymbolProvider", *workspace_symbol_provider, allocator);
+	}
+	if (code_action_provider)
+	{
+		result.AddMember("codeActionProvider", *code_action_provider, allocator);
+	}
+	if (document_formatting_provider)
+	{
+		result.AddMember("documentFormattingProvider", *document_formatting_provider, allocator);
+	}
+	if (document_range_formatting_provider)
+	{
+		result.AddMember("documentRangeFormattingProvider", *document_range_formatting_provider, allocator);
+	}
+	if (rename_provider)
+	{
+		result.AddMember("renameProvider", *rename_provider, allocator);
+	}
+	return result;
+}
+
+
 bool set_params_from_json(const rapidjson::Value &json, Params_exit &params)
 {
 	return true;

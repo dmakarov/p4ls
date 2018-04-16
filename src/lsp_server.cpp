@@ -11,7 +11,37 @@
 #include <string>
 
 LSP_server::LSP_server(std::istream &input_stream, std::ostream &output_stream)
-	: _input_stream(input_stream), _output_stream(output_stream), _is_done(false)
+	:
+	_capabilities {
+				   boost::none,
+				   Server_capabilities::Text_document_sync_options
+				   {
+					true, true, true,
+					Server_capabilities::Text_document_sync_options::Save_options{true},
+					TEXT_DOCUMENT_SYNC_KIND::Incremental
+				   },
+				   boost::none,
+				   boost::none,
+				   Server_capabilities::Code_lens_options{true},
+				   boost::none,
+				   Server_capabilities::Document_link_options{true},
+				   boost::none,
+				   boost::none,
+				   true,
+				   true,
+				   true,
+				   true,
+				   true,
+				   true,
+				   true,
+				   true,
+				   true,
+				   true,
+				   true,
+				   true},
+	_input_stream(input_stream),
+	_output_stream(output_stream),
+	_is_done(false)
 {
 }
 
@@ -44,9 +74,8 @@ void LSP_server::on_initialize(Params_initialize &params)
 	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 	rapidjson::Document json_document;
 	auto &allocator = json_document.GetAllocator();
-	rapidjson::Value capabilities(rapidjson::kObjectType);
 	rapidjson::Value result(rapidjson::kObjectType);
-	result.AddMember("capabilities", capabilities, allocator);
+	result.AddMember("capabilities", _capabilities.get_json(allocator), allocator);
 	reply(result);
 }
 

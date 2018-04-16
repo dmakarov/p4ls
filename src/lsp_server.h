@@ -40,6 +40,7 @@ private:
 
 	boost::optional<rapidjson::Document> read_message();
 
+	Server_capabilities _capabilities;
 	std::istream &_input_stream;
 	std::ostream &_output_stream;
 	bool _is_done;
