@@ -49,6 +49,10 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 		BOOST_LOG_TRIVIAL(info) << "Found a handler and calling it";
 		handler->second(std::move(msg["params"].GetObject()));
 	}
+	else
+	{
+		_error_handler(rapidjson::Value(rapidjson::kObjectType));
+	}
 	return true;
 }
 
@@ -71,4 +75,8 @@ void reply(rapidjson::Value &result)
 	std::string content(buffer.GetString());
 	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content.size() << "\r\n\r\n" << content;
 	BOOST_LOG_TRIVIAL(info) << "Sent response " << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+}
+
+void reply(const std::string &msg)
+{
 }
