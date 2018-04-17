@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "dispatcher.h"
-
 #include <rapidjson/document.h>
 
 #include <boost/log/trivial.hpp>
@@ -15,6 +13,21 @@
 #include <string>
 #include <vector>
 
+enum class ERROR_CODES {
+	// Defined by JSON RPC
+	ParseError = -32700,
+	InvalidRequest = -32600,
+	MethodNotFound = -32601,
+	InvalidParams = -32602,
+	InternalError = -32603,
+	serverErrorStart = -32099,
+	serverErrorEnd = -32000,
+	ServerNotInitialized = -32002,
+	UnknownErrorCode = -32001,
+
+	// Defined by the protocol.
+	RequestCancelled = -32800
+};
 
 enum class COMPLETION_ITEM_KIND {
 	Text = 1,
@@ -1138,5 +1151,3 @@ public:
 	virtual void on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles &params) = 0;
 	virtual void on_workspace_executeCommand(Params_workspace_executeCommand &params) = 0;
 };
-
-void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol);

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "protocol.h"
+
 #include <rapidjson/document.h>
 
 #include <functional>
@@ -25,5 +27,7 @@ private:
 	handler_type _error_handler;
 };
 
+void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol);
+
 void reply(rapidjson::Value &result);
-void reply(const std::string &msg);
+void reply(ERROR_CODES code, const std::string &msg);

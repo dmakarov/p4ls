@@ -1,4 +1,5 @@
 #include "lsp_server.h"
+#include "dispatcher.h"
 
 #include <boost/log/trivial.hpp>
 
@@ -47,7 +48,7 @@ LSP_server::LSP_server(std::istream &input_stream, std::ostream &output_stream)
 
 int LSP_server::run()
 {
-	Dispatcher dispatcher([](const rapidjson::Value&) { reply("method not found"); });
+	Dispatcher dispatcher([](const rapidjson::Value&) { reply(ERROR_CODES::MethodNotFound, "method not found"); });
 	register_protocol_handlers(dispatcher, *this);
 	while (!_is_done && _input_stream.good())
 	{
