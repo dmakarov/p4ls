@@ -61,6 +61,7 @@ int LSP_server::run()
 		}
 	}
 	_is_done = true;
+	BOOST_LOG_TRIVIAL(info) << "FINISHED";
 	return 0;
 }
 
@@ -83,6 +84,8 @@ void LSP_server::on_initialize(Params_initialize &params)
 void LSP_server::on_shutdown(Params_shutdown &params)
 {
 	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	rapidjson::Value result(rapidjson::kObjectType);
+	reply(result);
 }
 
 void LSP_server::on_textDocument_codeAction(Params_textDocument_codeAction &params)
@@ -172,6 +175,7 @@ void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand &pa
 
 boost::optional<rapidjson::Document> LSP_server::read_message()
 {
+	BOOST_LOG_TRIVIAL(info) << "Start reading a new message";
 	// process a set of HTTP headers of an LSP message
 	unsigned long long content_length = 0;
 	std::regex content_length_regex("Content-Length: ([0-9]+)", std::regex::extended);
