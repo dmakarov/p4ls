@@ -215,7 +215,14 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didC
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didOpen &params)
 {
-	return true;
+	auto result = false;
+	BOOST_LOG_TRIVIAL(info) << "Start processing params for textDocument/didOpen notification";
+	if (json.HasMember("textDocument"))
+	{
+		result = params.text_document.set(json["textDocument"]);
+	}
+	BOOST_LOG_TRIVIAL(info) << "Finish processing params for textDocument/didOpen notification";
+	return result;
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentHighlight &params)

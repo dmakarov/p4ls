@@ -1066,7 +1066,29 @@ struct Params_textDocument_didClose {
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didClose &params);
 
+struct Text_document_item {
+
+	bool set(const rapidjson::Value &json)
+	{
+		if (!json.HasMember("uri") || !json.HasMember("languageId") || !json.HasMember("version") || !json.HasMember("text"))
+		{
+			return false;
+		}
+		uri.set_from_uri(json["uri"].GetString());
+		language_id = json["languageId"].GetString();
+		version = json["version"].GetInt();
+		text = json["text"].GetString();
+		return true;
+	}
+
+	URI uri;                 /// text document's URI
+	std::string language_id; /// text document's language identifier
+	int version = 0;         /// version number of this document (it will increase after each change, including undo/redo)
+	std::string text;        /// content of the opened text document
+};
+
 struct Params_textDocument_didOpen {
+	Text_document_item text_document;
 };
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didOpen &params);
