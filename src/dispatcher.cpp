@@ -1,11 +1,13 @@
 #include "dispatcher.h"
 #include "context.h"
 
-#include <boost/log/trivial.hpp>
+#include <boost/log/common.hpp>
 #include <boost/optional.hpp>
 
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+
+boost::log::sources::severity_logger<int> Dispatcher::_logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
 
 namespace {
 
@@ -24,7 +26,7 @@ struct registration_helper {
 			}
 			else
 			{
-				BOOST_LOG_TRIVIAL(error) << method << " cannot be handled.";
+				BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::error) << method << " cannot be handled.";
 			}
 		});
 	}
@@ -37,7 +39,7 @@ struct registration_helper {
 void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
 {
 	registration_helper register_handler{dispatcher, &protocol};
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 	register_handler("exit", &Protocol::on_exit);
 	register_handler("initialize", &Protocol::on_initialize);
 	register_handler("shutdown", &Protocol::on_shutdown);
@@ -63,7 +65,7 @@ void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
 void Dispatcher::register_handler(const std::string &method, handler_type handler)
 {
 	_handlers[method] = std::move(handler);
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__ << " registered method " << method;
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__ << " registered method " << method;
 }
 
 bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) const
@@ -81,31 +83,37 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 	{
 		return false;
 	}
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER create context_with_request_output_stream";
 	Scoped_context_with_value context_with_request_output_stream(request_output_stream, &output_stream);
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER create context_with_id";
 	boost::optional<Scoped_context_with_value> context_with_id;
 	if (id)
 	{
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER emplace ID in context_with_id";
 		context_with_id.emplace(request_id, *id);
 	}
-	BOOST_LOG_TRIVIAL(info) << "Searching for a handler for method " << msg["method"].GetString();
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Searching for a handler for method " << msg["method"].GetString();
 	auto handler = _handlers.find(msg["method"].GetString());
 	if (handler != _handlers.end())
 	{
-		BOOST_LOG_TRIVIAL(info) << "Found a handler and calling it";
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Found a handler and calling it";
 		handler->second(std::move(msg["params"].GetObject()));
 	}
 	else
 	{
 		_error_handler(rapidjson::Value(rapidjson::kObjectType));
 	}
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER exiting the scope of context_with_id and context_with_request_output_stream";
 	return true;
 }
 
 void reply(rapidjson::Value &result)
 {
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER get request_id from context";
 	auto id = Context::get_current().get_value(request_id);
 	if (!id)
 	{
+		BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__ << " no ID, no reply";
 		return;
 	}
 	rapidjson::Document json_document;
@@ -119,14 +127,16 @@ void reply(rapidjson::Value &result)
 	root.Accept(writer);
 	std::string content(buffer.GetString());
 	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content.size() << "\r\n\r\n" << content;
-	BOOST_LOG_TRIVIAL(info) << "Sent response " << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent response " << "Content-Length: " << content.size() << "\r\n\r\n" << content;
 }
 
 void reply(ERROR_CODES code, const std::string &msg)
 {
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER get request_id from context";
 	auto id = Context::get_current().get_value(request_id);
 	if (!id)
 	{
+		BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__ << " no ID, no reply";
 		return;
 	}
 	rapidjson::Document json_document;
@@ -143,5 +153,5 @@ void reply(ERROR_CODES code, const std::string &msg)
 	root.Accept(writer);
 	std::string content(buffer.GetString());
 	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content.size() << "\r\n\r\n" << content;
-	BOOST_LOG_TRIVIAL(info) << "Sent response " << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent response " << "Content-Length: " << content.size() << "\r\n\r\n" << content;
 }

@@ -36,7 +36,7 @@ void init_logging_sink()
 		boost::shared_ptr<ts> sink(new ts());
 		boost::shared_ptr<std::ostream> stream(&std::clog, boost::null_deleter());
 		sink->set_formatter(boost::log::expressions::stream
-							<< boost::log::expressions::attr<unsigned int>("LineID")
+							<< std::setw(6) << boost::log::expressions::attr<unsigned int>("LineID")
 							<< ":" << boost::log::expressions::attr<boost::log::attributes::current_process_id::value_type>("ProcessID")
 							<< ":" << boost::log::expressions::attr<boost::log::attributes::current_thread_id::value_type>("ThreadID")
 							<< " " << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")

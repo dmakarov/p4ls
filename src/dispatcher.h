@@ -6,6 +6,8 @@
 
 #include "protocol.h"
 
+#include <boost/log/sinks/syslog_backend.hpp>
+
 #include <rapidjson/document.h>
 
 #include <functional>
@@ -16,6 +18,7 @@
 class Dispatcher {
 public:
 	using handler_type = std::function<void (const rapidjson::Value&)>;
+	static boost::log::sources::severity_logger<int> _logger;
 
 	Dispatcher(handler_type error_handler) : _error_handler(error_handler) {}
 	void register_handler(const std::string &method, handler_type handler);
