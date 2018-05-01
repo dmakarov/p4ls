@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+  <extension point="org.eclipse.core.contenttype.contentTypes">
+    <content-type
+        base-type="org.eclipse.core.runtime.text"
+        file-extensions="p4"
+        id="org.eclipse.p4lang.p4"
+        name="P4"
+        priority="normal">
+    </content-type>
+  </extension>
+
+  <extension point="org.eclipse.ui.editors">
+    <editorContentTypeBinding
+        contentTypeId="org.eclipse.p4lang.p4"
+        editorId="org.eclipse.ui.genericeditor.GenericEditor">
+    </editorContentTypeBinding>
+  </extension>
+
+  <extension point="org.eclipse.lsp4e.languageServer">
+    <server
+        class="org.eclipse.p4lang.P4LanguageServer"
+        id="org.eclipse.p4lang.p4ls"
+        label="P4 Language Server">
+    </server>
+    <contentTypeMapping
+        contentType="org.eclipse.p4lang.p4"
+        id="org.eclipse.p4lang.p4ls">
+    </contentTypeMapping>
+  </extension>
+
+  <extension point="org.eclipse.tm4e.registry.grammars">
+    <grammar
+        path="grammar/p4.tmLanguage"
+        scopeName="source.p4">
+    </grammar>
+    <scopeNameContentTypeBinding
+        contentTypeId="org.eclipse.p4lang.p4"
+        scopeName="source.p4">
+    </scopeNameContentTypeBinding>
+  </extension>
+
+  <extension point="org.eclipse.ui.genericeditor.presentationReconcilers">
+    <presentationReconciler
+        class="org.eclipse.tm4e.ui.text.TMPresentationReconciler"
+        contentType="org.eclipse.p4lang.p4">
+    </presentationReconciler>
+  </extension>
+
+  <extension point="org.eclipse.ui.genericeditor.contentAssistProcessors">
+    <contentAssistProcessor
+        class="org.eclipse.p4lang.snippet.SnippetContentAssistProcessor"
+        contentType="org.eclipse.p4lang.p4">
+    </contentAssistProcessor>
+  </extension>
+
+  <extension point="org.eclipse.core.runtime.preferences">
+    <initializer
+        class="org.eclipse.p4lang.P4langPreferenceInitializer">
+    </initializer>
+  </extension>
+
+  <extension point="org.eclipse.ui.preferencePages">
+    <page
+        class="org.eclipse.p4lang.P4langPreferencePage"
+        id="org.eclipse.p4lang.preferencePage"
+        name="P4">
+    </page>
+    <page
+        category="org.eclipse.p4lang.preferencePage"
+        class="org.eclipse.p4lang.TextEditorPreferencePage"
+        id="org.eclipse.p4lang.texteditor"
+        name="Text Editor">
+    </page>
+  </extension>
+
+  <!-- INCREMENTAL BUILD PROCESS -->
+
+  <extension point="org.eclipse.ui.menus">
+    <menuContribution
+        allPopups="true"
+        locationURI="popup:#TextEditorContext?after=additions">
+      <command
+          commandId="org.eclipse.p4lang.commands.Implementations"
+          style="push">
+      </command>
+    </menuContribution>
+  </extension>
+
+  <extension point="org.eclipse.ui.commands">
+    <command
+        categoryId="org.eclipse.lsp4e.category"
+        id="org.eclipse.p4lang.commands.Implementations"
+        name="Implementations">
+    </command>
+  </extension>
+
+  <!-- PERSPECTIVE -->
+
+  <extension point="org.eclipse.ui.perspectives">
+    <perspective
+        id="org.eclipse.p4lang.p4Perspective"
+        name="P4"
+        class="org.eclipse.p4lang.P4Perspective"
+        icon="icons/p4.png">
+    </perspective>
+  </extension>
+
+</plugin>

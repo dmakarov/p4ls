@@ -1,0 +1,13 @@
+[
+    {
+        "display": "parser",
+        "completionItemKind": 15,
+        "replacementLines": [
+            "parser $0($1) {",
+            "\tstate $2 {",
+            "\t\ttransition $3;",
+            "\t}",
+            "}"
+        ]
+    }
+]
