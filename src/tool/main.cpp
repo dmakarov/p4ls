@@ -70,6 +70,7 @@ void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& 
 			boost::shared_ptr<std::ostream> clog_stream(&std::clog, boost::null_deleter());
 			sink->locked_backend()->add_stream(clog_stream);
 		}
+		sink->locked_backend()->auto_flush(true);
 		boost::log::core::get()->add_sink(sink);
 	}
 }
