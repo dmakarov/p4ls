@@ -59,6 +59,10 @@ int LSP_server::run()
 				BOOST_LOG_TRIVIAL(error) << "JSON dispatch failed!";
 			}
 		}
+		else
+		{
+			BOOST_LOG_TRIVIAL(error) << "read_message didn't return a valid json object.";
+		}
 	}
 	_is_done = true;
 	BOOST_LOG_TRIVIAL(info) << "FINISHED";

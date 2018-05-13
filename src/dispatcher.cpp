@@ -72,6 +72,7 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 {
 	if (!msg.HasMember("jsonrpc") || !msg["jsonrpc"].IsString() || msg["jsonrpc"] != "2.0")
 	{
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER did not find a valid jsonrpc message.";
 		return false;
 	}
 	boost::optional<int> id;
@@ -81,6 +82,7 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 	}
 	if (!msg.HasMember("method") || !msg["method"].IsString())
 	{
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER did not find a method member in the json message.";
 		return false;
 	}
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER create context_with_request_output_stream";
