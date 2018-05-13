@@ -78,7 +78,14 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 	boost::optional<int> id;
 	if (msg.HasMember("id"))
 	{
-		id = msg["id"].GetInt();
+		if (msg["id"].IsString())
+		{
+			id = std::stoi(msg["id"].GetString());
+		}
+		else
+		{
+			id = msg["id"].GetInt();
+		}
 	}
 	if (!msg.HasMember("method") || !msg["method"].IsString())
 	{
@@ -99,7 +106,7 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 	if (handler != _handlers.end())
 	{
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Found a handler and calling it";
-		if (msg.HasMember("params"))
+		if (msg.HasMember("params") && !msg["params"].IsNull())
 		{
 			handler->second(std::move(msg["params"].GetObject()));
 		}
