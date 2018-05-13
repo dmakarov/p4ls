@@ -78,6 +78,8 @@ void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& 
 
 int main(int argc, char* argv[])
 {
+	std::signal(SIGABRT, signal_handler);
+	std::signal(SIGHUP, signal_handler);
 	std::signal(SIGINT, signal_handler);
 	std::signal(SIGKILL, signal_handler);
 	std::signal(SIGTERM, signal_handler);
