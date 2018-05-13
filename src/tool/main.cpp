@@ -15,13 +15,28 @@
 #include <boost/optional.hpp>
 #include <boost/smart_ptr/make_shared_object.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
+
+#include <csignal>
 // for std::cin, std::cout, std::clog
 #include <fstream>
 #include <iostream>
 #include <string>
 
+namespace
+{
+	boost::optional<boost::shared_ptr<std::ofstream>> log_file_stream;
+}
 
-void init_logging_sink(const boost::optional<std::string>& file_name)
+void signal_handler(int signo)
+{
+	if (log_file_stream)
+	{
+		log_file_stream.get()->close();
+	}
+	std::exit(0);
+}
+
+void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& file_stream)
 {
 	boost::log::add_common_attributes();
 	if (false)
@@ -46,9 +61,9 @@ void init_logging_sink(const boost::optional<std::string>& file_name)
 							<< boost::log::expressions::smessage);
 		boost::shared_ptr<std::ostream> clog_stream(&std::clog, boost::null_deleter());
 		sink->locked_backend()->add_stream(clog_stream);
-		if (file_name)
+		if (file_stream)
 		{
-			sink->locked_backend()->add_stream(boost::make_shared<std::ofstream>(file_name.get()));
+			sink->locked_backend()->add_stream(file_stream.get());
 		}
 		boost::log::core::get()->add_sink(sink);
 	}
@@ -57,20 +72,26 @@ void init_logging_sink(const boost::optional<std::string>& file_name)
 
 int main(int argc, char* argv[])
 {
-	boost::optional<std::string> log_file_name;
+	std::signal(SIGINT, signal_handler);
+	std::signal(SIGTERM, signal_handler);
 	if (argc > 1)
 	{
 		if (std::string("-l") == argv[1])
 		{
 			if (argc > 2)
 			{
-				log_file_name.emplace(argv[2]);
+				log_file_stream.emplace(boost::make_shared<std::ofstream>(argv[2], std::ios::app));
 			}
 		}
 	}
-	init_logging_sink(log_file_name);
+	init_logging_sink(log_file_stream);
 	boost::log::sources::severity_logger<int> lg(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
 	BOOST_LOG_SEV(lg, boost::log::sinks::syslog::debug) << "STARTED";
 	LSP_server the_server(std::cin, std::cout);
-	return the_server.run();
+	auto status = the_server.run();
+	if (log_file_stream)
+	{
+		log_file_stream.get()->close();
+	}
+	return status;
 }
