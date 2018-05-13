@@ -97,7 +97,14 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 	if (handler != _handlers.end())
 	{
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Found a handler and calling it";
-		handler->second(std::move(msg["params"].GetObject()));
+		if (msg.HasMember("params"))
+		{
+			handler->second(std::move(msg["params"].GetObject()));
+		}
+		else
+		{
+			handler->second(rapidjson::Value(rapidjson::kObjectType));
+		}
 	}
 	else
 	{
