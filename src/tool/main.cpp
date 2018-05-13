@@ -25,12 +25,14 @@
 namespace
 {
 	boost::optional<boost::shared_ptr<std::ofstream>> log_file_stream;
+	boost::log::sources::severity_logger<int> logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
 }
 
 void signal_handler(int signo)
 {
 	if (log_file_stream)
 	{
+		BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "TERMINATED " << signo;
 		log_file_stream.get()->close();
 	}
 	std::exit(0);
@@ -59,11 +61,14 @@ void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& 
 							<< " " << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
 							<< " [" << boost::log::expressions::attr<int>("Severity") << "] "
 							<< boost::log::expressions::smessage);
-		boost::shared_ptr<std::ostream> clog_stream(&std::clog, boost::null_deleter());
-		sink->locked_backend()->add_stream(clog_stream);
 		if (file_stream)
 		{
 			sink->locked_backend()->add_stream(file_stream.get());
+		}
+		else
+		{
+			boost::shared_ptr<std::ostream> clog_stream(&std::clog, boost::null_deleter());
+			sink->locked_backend()->add_stream(clog_stream);
 		}
 		boost::log::core::get()->add_sink(sink);
 	}
@@ -73,6 +78,7 @@ void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& 
 int main(int argc, char* argv[])
 {
 	std::signal(SIGINT, signal_handler);
+	std::signal(SIGKILL, signal_handler);
 	std::signal(SIGTERM, signal_handler);
 	if (argc > 1)
 	{
@@ -85,8 +91,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	init_logging_sink(log_file_stream);
-	boost::log::sources::severity_logger<int> lg(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
-	BOOST_LOG_SEV(lg, boost::log::sinks::syslog::debug) << "STARTED";
+	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "STARTED";
 	LSP_server the_server(std::cin, std::cout);
 	auto status = the_server.run();
 	if (log_file_stream)
