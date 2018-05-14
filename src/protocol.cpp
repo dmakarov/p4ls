@@ -221,13 +221,25 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didO
 	{
 		result = params.text_document.set(json["textDocument"]);
 	}
-	BOOST_LOG_TRIVIAL(info) << "Finish processing params for textDocument/didOpen notification";
+	BOOST_LOG_TRIVIAL(info) << "Finish processing params for textDocument/didOpen notification " << result;
 	return result;
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentHighlight &params)
 {
 	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentSymbol &params)
+{
+	auto result = false;
+	BOOST_LOG_TRIVIAL(info) << "Start processing params for textDocument/documentSymbol request";
+	if (json.HasMember("textDocument"))
+	{
+		result = params.text_document.set(json["textDocument"]);
+	}
+	BOOST_LOG_TRIVIAL(info) << "Finish processing params for textDocument/documentSymbol request " << result;
+	return result;
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_formatting &params)

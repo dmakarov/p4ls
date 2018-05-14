@@ -88,7 +88,7 @@ void LSP_server::on_initialize(Params_initialize &params)
 void LSP_server::on_shutdown(Params_shutdown &params)
 {
 	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
-	rapidjson::Value result(rapidjson::kObjectType);
+	rapidjson::Value result(rapidjson::kNullType);
 	reply(result);
 }
 
@@ -125,6 +125,13 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen &params)
 void LSP_server::on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params)
 {
 	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+}
+
+void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymbol &params)
+{
+	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	rapidjson::Value result(rapidjson::kNullType);
+	reply(result);
 }
 
 void LSP_server::on_textDocument_formatting(Params_textDocument_formatting &params)

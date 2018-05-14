@@ -26,7 +26,7 @@ struct registration_helper {
 			}
 			else
 			{
-				BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::error) << method << " cannot be handled.";
+				BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::error) << method << " cannot be handled because setting params failed.";
 			}
 		});
 	}
@@ -50,6 +50,7 @@ void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
 	register_handler("textDocument/didClose", &Protocol::on_textDocument_didClose);
 	register_handler("textDocument/didOpen", &Protocol::on_textDocument_didOpen);
 	register_handler("textDocument/documentHighlight", &Protocol::on_textDocument_documentHighlight);
+	register_handler("textDocument/documentSymbol", &Protocol::on_textDocument_documentSymbol);
 	register_handler("textDocument/formatting", &Protocol::on_textDocument_formatting);
 	register_handler("textDocument/hover", &Protocol::on_textDocument_hover);
 	register_handler("textDocument/onTypeFormatting", &Protocol::on_textDocument_onTypeFormatting);

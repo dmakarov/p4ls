@@ -1098,6 +1098,27 @@ struct Params_textDocument_documentHighlight {
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentHighlight &params);
 
+struct Text_document_identifier {
+
+	bool set(const rapidjson::Value &json)
+	{
+		if (!json.HasMember("uri"))
+		{
+			return false;
+		}
+		uri.set_from_uri(json["uri"].GetString());
+		return true;
+	}
+
+	URI uri;                 /// text document's URI
+};
+
+struct Params_textDocument_documentSymbol {
+	Text_document_identifier text_document;
+};
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentSymbol &params);
+
 struct Params_textDocument_formatting {
 };
 
@@ -1162,6 +1183,7 @@ public:
 	virtual void on_textDocument_didClose(Params_textDocument_didClose &params) = 0;
 	virtual void on_textDocument_didOpen(Params_textDocument_didOpen &params) = 0;
 	virtual void on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params) = 0;
+	virtual void on_textDocument_documentSymbol(Params_textDocument_documentSymbol &params) = 0;
 	virtual void on_textDocument_formatting(Params_textDocument_formatting &params) = 0;
 	virtual void on_textDocument_hover(Params_textDocument_hover &params) = 0;
 	virtual void on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting &params) = 0;

@@ -27,6 +27,7 @@ private:
 	void on_textDocument_didClose(Params_textDocument_didClose &params) override;
 	void on_textDocument_didOpen(Params_textDocument_didOpen &params) override;
 	void on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params) override;
+	void on_textDocument_documentSymbol(Params_textDocument_documentSymbol &params) override;
 	void on_textDocument_formatting(Params_textDocument_formatting &params) override;
 	void on_textDocument_hover(Params_textDocument_hover &params) override;
 	void on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting &params) override;
