@@ -31,12 +31,12 @@ BOOST_AUTO_TEST_CASE(test_case1)
 	json.ParseStream(isw);
 	Params_initialize params;
 	set_params_from_json(json, params);
-	BOOST_TEST(params.process_id == 20943);
-	BOOST_TEST(params.root_uri == "/Users/dmakarov/work/try/p4ls/");
-	BOOST_TEST(*params.capabilities.workspace->apply_edit);
-	BOOST_TEST(*params.capabilities.workspace->execute_command->dynamic_registration);
-	BOOST_TEST(*params.capabilities.text_document->synchronization->will_save);
-	BOOST_TEST(*params.capabilities.text_document->synchronization->did_save);
+	BOOST_TEST(params._process_id == 20943);
+	BOOST_TEST(params._root_uri == "/Users/dmakarov/work/try/p4ls/");
+	BOOST_TEST(*params._capabilities._workspace->_apply_edit);
+	BOOST_TEST(*params._capabilities._workspace->_execute_command->_dynamic_registration);
+	BOOST_TEST(*params._capabilities._text_document->_synchronization->_will_save);
+	BOOST_TEST(*params._capabilities._text_document->_synchronization->_did_save);
 	std::vector<SYMBOL_KIND> v{SYMBOL_KIND::File,
 							   SYMBOL_KIND::Module,
 							   SYMBOL_KIND::Namespace,
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_case1)
 							   SYMBOL_KIND::Event,
 							   SYMBOL_KIND::Operator
 	};
-	BOOST_TEST(*params.capabilities.text_document->document_symbol->symbol_kind->value_set == v);
+	BOOST_TEST(*params._capabilities._text_document->_document_symbol->_symbol_kind->_value_set == v);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

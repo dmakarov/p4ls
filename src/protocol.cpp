@@ -16,25 +16,25 @@ std::ostream &operator<<(std::ostream &os, const URI &item)
 rapidjson::Value Server_capabilities::Text_document_sync_options::get_json(rapidjson::Document::AllocatorType &allocator)
 {
 	rapidjson::Value result(rapidjson::kObjectType);
-	if (open_close)
+	if (_open_close)
 	{
-		result.AddMember("openClose", *open_close, allocator);
+		result.AddMember("openClose", *_open_close, allocator);
 	}
-	if (will_save)
+	if (_will_save)
 	{
-		result.AddMember("willSave", *will_save, allocator);
+		result.AddMember("willSave", *_will_save, allocator);
 	}
-	if (will_save_wait_until)
+	if (_will_save_wait_until)
 	{
-		result.AddMember("willSaveWaitUntil", *will_save_wait_until, allocator);
+		result.AddMember("willSaveWaitUntil", *_will_save_wait_until, allocator);
 	}
-	if (change)
+	if (_change)
 	{
-		result.AddMember("change", static_cast<int>(*change), allocator);
+		result.AddMember("change", static_cast<int>(*_change), allocator);
 	}
-	if (save)
+	if (_save)
 	{
-		result.AddMember("save", save->get_json(allocator), allocator);
+		result.AddMember("save", _save->get_json(allocator), allocator);
 	}
 	return result;
 }
@@ -42,89 +42,89 @@ rapidjson::Value Server_capabilities::Text_document_sync_options::get_json(rapid
 rapidjson::Value Server_capabilities::get_json(rapidjson::Document::AllocatorType &allocator)
 {
 	rapidjson::Value result(rapidjson::kObjectType);
-	if (workspace)
+	if (_workspace)
 	{
-		result.AddMember("workspace", workspace->get_json(allocator), allocator);
+		result.AddMember("workspace", _workspace->get_json(allocator), allocator);
 	}
-	if (text_document_sync)
+	if (_text_document_sync)
 	{
-		result.AddMember("textDocumentSync", text_document_sync->get_json(allocator), allocator);
+		result.AddMember("textDocumentSync", _text_document_sync->get_json(allocator), allocator);
 	}
-	if (completion_provider)
+	if (_completion_provider)
 	{
-		result.AddMember("completionProvider", completion_provider->get_json(allocator), allocator);
+		result.AddMember("completionProvider", _completion_provider->get_json(allocator), allocator);
 	}
-	if (signature_help_provider)
+	if (_signature_help_provider)
 	{
-		result.AddMember("signatureHelpProvider", signature_help_provider->get_json(allocator), allocator);
+		result.AddMember("signatureHelpProvider", _signature_help_provider->get_json(allocator), allocator);
 	}
-	if (code_lens_provider)
+	if (_code_lens_provider)
 	{
-		result.AddMember("codeLensProvider", code_lens_provider->get_json(allocator), allocator);
+		result.AddMember("codeLensProvider", _code_lens_provider->get_json(allocator), allocator);
 	}
-	if (document_on_type_formatting_provider)
+	if (_document_on_type_formatting_provider)
 	{
-		result.AddMember("documentOnTypeFormattingProvider", document_on_type_formatting_provider->get_json(allocator), allocator);
+		result.AddMember("documentOnTypeFormattingProvider", _document_on_type_formatting_provider->get_json(allocator), allocator);
 	}
-	if (document_link_provider)
+	if (_document_link_provider)
 	{
-		result.AddMember("documentLinkProvider", document_link_provider->get_json(allocator), allocator);
+		result.AddMember("documentLinkProvider", _document_link_provider->get_json(allocator), allocator);
 	}
-	if (color_provider)
+	if (_color_provider)
 	{
-		result.AddMember("colorProvider", color_provider->get_json(allocator), allocator);
+		result.AddMember("colorProvider", _color_provider->get_json(allocator), allocator);
 	}
-	if (execute_command_provider)
+	if (_execute_command_provider)
 	{
-		result.AddMember("executeCommandProvider", execute_command_provider->get_json(allocator), allocator);
+		result.AddMember("executeCommandProvider", _execute_command_provider->get_json(allocator), allocator);
 	}
-	if (hover_provider)
+	if (_hover_provider)
 	{
-		result.AddMember("hoverProvider", *hover_provider, allocator);
+		result.AddMember("hoverProvider", *_hover_provider, allocator);
 	}
-	if (definition_provider)
+	if (_definition_provider)
 	{
-		result.AddMember("definitionProvider", *definition_provider, allocator);
+		result.AddMember("definitionProvider", *_definition_provider, allocator);
 	}
-	if (type_definition_provider)
+	if (_type_definition_provider)
 	{
-		result.AddMember("typeDefinitionProvider", *type_definition_provider, allocator);
+		result.AddMember("typeDefinitionProvider", *_type_definition_provider, allocator);
 	}
-	if (implementation_provider)
+	if (_implementation_provider)
 	{
-		result.AddMember("implementationProvider", *implementation_provider, allocator);
+		result.AddMember("implementationProvider", *_implementation_provider, allocator);
 	}
-	if (references_provider)
+	if (_references_provider)
 	{
-		result.AddMember("referencesProvider", *references_provider, allocator);
+		result.AddMember("referencesProvider", *_references_provider, allocator);
 	}
-	if (document_highlight_provider)
+	if (_document_highlight_provider)
 	{
-		result.AddMember("documentHighlightProvider", *document_highlight_provider, allocator);
+		result.AddMember("documentHighlightProvider", *_document_highlight_provider, allocator);
 	}
-	if (document_symbol_provider)
+	if (_document_symbol_provider)
 	{
-		result.AddMember("documentSymbolProvider", *document_symbol_provider, allocator);
+		result.AddMember("documentSymbolProvider", *_document_symbol_provider, allocator);
 	}
-	if (workspace_symbol_provider)
+	if (_workspace_symbol_provider)
 	{
-		result.AddMember("workspaceSymbolProvider", *workspace_symbol_provider, allocator);
+		result.AddMember("workspaceSymbolProvider", *_workspace_symbol_provider, allocator);
 	}
-	if (code_action_provider)
+	if (_code_action_provider)
 	{
-		result.AddMember("codeActionProvider", *code_action_provider, allocator);
+		result.AddMember("codeActionProvider", *_code_action_provider, allocator);
 	}
-	if (document_formatting_provider)
+	if (_document_formatting_provider)
 	{
-		result.AddMember("documentFormattingProvider", *document_formatting_provider, allocator);
+		result.AddMember("documentFormattingProvider", *_document_formatting_provider, allocator);
 	}
-	if (document_range_formatting_provider)
+	if (_document_range_formatting_provider)
 	{
-		result.AddMember("documentRangeFormattingProvider", *document_range_formatting_provider, allocator);
+		result.AddMember("documentRangeFormattingProvider", *_document_range_formatting_provider, allocator);
 	}
-	if (rename_provider)
+	if (_rename_provider)
 	{
-		result.AddMember("renameProvider", *rename_provider, allocator);
+		result.AddMember("renameProvider", *_rename_provider, allocator);
 	}
 	return result;
 }
@@ -142,15 +142,15 @@ bool set_params_from_json(const rapidjson::Value &json, Params_initialize &param
 #endif
 	if (json.HasMember("processId") && !json["processId"].IsNull())
 	{
-		params.process_id = json["processId"].GetInt();
+		params._process_id = json["processId"].GetInt();
 	}
 	if (json.HasMember("rootUri") && !json["rootUri"].IsNull())
 	{
-		params.root_uri.set_from_uri(json["rootUri"].GetString());
+		params._root_uri.set_from_uri(json["rootUri"].GetString());
 	}
 	else if (json.HasMember("rootPath") && !json["rootPath"].IsNull())
 	{
-		params.root_uri.set_from_path(json["rootPath"].GetString());
+		params._root_uri.set_from_path(json["rootPath"].GetString());
 	}
 	if (json.HasMember("initializationOptions") && !json["initializationOptions"].IsNull())
 	{
@@ -159,15 +159,15 @@ bool set_params_from_json(const rapidjson::Value &json, Params_initialize &param
 		{
 			options.emplace_back(it->GetString());
 		}
-		params.initialization_options.emplace(options);
+		params._initialization_options.emplace(options);
 	}
 	if (json.HasMember("capabilities"))
 	{
-		params.capabilities.set(json["capabilities"]);
+		params._capabilities.set(json["capabilities"]);
 	}
 	if (json.HasMember("trace") && !json["trace"].IsNull())
 	{
-		params.trace.emplace(
+		params._trace.emplace(
 			(json["trace"] == "off"     ) ? Trace_level::OFF :
 			(json["trace"] == "messages") ? Trace_level::MESSAGES :
 			(json["trace"] == "verbose" ) ? Trace_level::VERBOSE : Trace_level::OFF);
@@ -179,7 +179,7 @@ bool set_params_from_json(const rapidjson::Value &json, Params_initialize &param
 		{
 			folders.emplace_back(Workspace_folder(*it));
 		}
-		params.workspace_folders.emplace(folders);
+		params._workspace_folders.emplace(folders);
 	}
 #if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "Finish processing params for initialize request";
@@ -225,7 +225,7 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didO
 #endif
 	if (json.HasMember("textDocument"))
 	{
-		result = params.text_document.set(json["textDocument"]);
+		result = params._text_document.set(json["textDocument"]);
 	}
 #if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "Finish processing params for textDocument/didOpen notification " << result;
@@ -246,7 +246,7 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_docu
 #endif
 	if (json.HasMember("textDocument"))
 	{
-		result = params.text_document.set(json["textDocument"]);
+		result = params._text_document.set(json["textDocument"]);
 	}
 #if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "Finish processing params for textDocument/documentSymbol request " << result;

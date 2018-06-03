@@ -146,7 +146,7 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen &params)
 #if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 #endif
-	add_document(params.text_document);
+	add_document(params._text_document);
 }
 
 void LSP_server::on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params)
@@ -161,7 +161,7 @@ void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymb
 #if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 #endif
-	auto result = get_document_symbols(params.text_document.uri);
+	auto result = get_document_symbols(params._text_document._uri);
 	reply(result);
 }
 
@@ -339,7 +339,7 @@ boost::optional<rapidjson::Document> LSP_server::read_message()
 void LSP_server::add_document(const Text_document_item &document)
 {
 	std::string compile_command("/Users/dmakarov/work/try/p4ls/build/ninja/src/tool/p4lsd --nocpp -I /Users/dmakarov/work/try/p4c/p4include ");
-	_files[document.uri._path] = document_file{document.text, compile_command + document.uri._path};
+	_files[document._uri._path] = document_file{document._text, compile_command + document._uri._path};
 }
 
 rapidjson::Value LSP_server::get_document_symbols(const URI &uri)
