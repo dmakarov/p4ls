@@ -137,7 +137,9 @@ bool set_params_from_json(const rapidjson::Value &json, Params_exit &params)
 
 bool set_params_from_json(const rapidjson::Value &json, Params_initialize &params)
 {
+#if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "Start processing params for initialize request";
+#endif
 	if (json.HasMember("processId") && !json["processId"].IsNull())
 	{
 		params.process_id = json["processId"].GetInt();
@@ -179,7 +181,9 @@ bool set_params_from_json(const rapidjson::Value &json, Params_initialize &param
 		}
 		params.workspace_folders.emplace(folders);
 	}
+#if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "Finish processing params for initialize request";
+#endif
 	return true;
 }
 
@@ -216,12 +220,16 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didC
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didOpen &params)
 {
 	auto result = false;
+#if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "Start processing params for textDocument/didOpen notification";
+#endif
 	if (json.HasMember("textDocument"))
 	{
 		result = params.text_document.set(json["textDocument"]);
 	}
+#if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "Finish processing params for textDocument/didOpen notification " << result;
+#endif
 	return result;
 }
 
@@ -233,12 +241,16 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_docu
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentSymbol &params)
 {
 	auto result = false;
+#if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "Start processing params for textDocument/documentSymbol request";
+#endif
 	if (json.HasMember("textDocument"))
 	{
 		result = params.text_document.set(json["textDocument"]);
 	}
+#if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "Finish processing params for textDocument/documentSymbol request " << result;
+#endif
 	return result;
 }
 

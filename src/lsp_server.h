@@ -10,6 +10,8 @@
 #include <rapidjson/document.h>
 
 #include <istream>
+#include <string>
+#include <unordered_map>
 
 class LSP_server : public Protocol {
 public:
@@ -41,8 +43,18 @@ private:
 
 	boost::optional<rapidjson::Document> read_message();
 
+	void add_document(const Text_document_item &document);
+	rapidjson::Value get_document_symbols(const URI &uri);
+
+	struct document_file {
+		std::string _text;
+		std::string _compile_command;
+	};
+
 	Server_capabilities _capabilities;
 	std::istream &_input_stream;
 	std::ostream &_output_stream;
 	bool _is_done;
+
+	std::unordered_map<std::string, document_file> _files;
 };

@@ -22,6 +22,10 @@
 #include <iostream>
 #include <string>
 
+#include <execinfo.h>
+#include <unistd.h>
+
+
 namespace
 {
 	boost::optional<boost::shared_ptr<std::ofstream>> log_file_stream;
@@ -34,6 +38,24 @@ void signal_handler(int signo)
 	{
 		BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "TERMINATED " << signo;
 		log_file_stream.get()->close();
+	}
+	if (signo == SIGSEGV || signo == SIGBUS)
+	{
+		static void *buffer[64];
+		auto size = backtrace(buffer, 64);
+		char **strings = backtrace_symbols(buffer, size);
+		if (strings)
+		{
+			for (int i = 1; i < size; ++i)
+			{
+				BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << strings[i];
+			}
+			free(strings);
+		}
+		if (size < 1)
+		{
+			BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "backtrace failed";
+		}
 	}
 	std::exit(0);
 }
@@ -79,23 +101,35 @@ void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& 
 int main(int argc, char* argv[])
 {
 	std::signal(SIGABRT, signal_handler);
+	std::signal(SIGBUS, signal_handler);
 	std::signal(SIGHUP, signal_handler);
 	std::signal(SIGINT, signal_handler);
 	std::signal(SIGKILL, signal_handler);
+	std::signal(SIGSEGV, signal_handler);
 	std::signal(SIGTERM, signal_handler);
-	if (argc > 1)
+	boost::optional<std::istream&> input(std::cin);
+	std::ifstream ifs;
+	for (auto index = 1; index < argc; ++index)
 	{
-		if (std::string("-l") == argv[1])
+		if (std::string("-l") == argv[index])
 		{
-			if (argc > 2)
+			if (++index < argc)
 			{
-				log_file_stream.emplace(boost::make_shared<std::ofstream>(argv[2], std::ios::app));
+				log_file_stream.emplace(boost::make_shared<std::ofstream>(argv[index], std::ios::app));
+			}
+		}
+		else if (std::string("-i") == argv[index])
+		{
+			if (++index < argc)
+			{
+				ifs.open(argv[index]);
+				input.emplace(ifs);
 			}
 		}
 	}
 	init_logging_sink(log_file_stream);
 	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "STARTED";
-	LSP_server the_server(std::cin, std::cout);
+	LSP_server the_server(*input, std::cout);
 	auto status = the_server.run();
 	if (log_file_stream)
 	{

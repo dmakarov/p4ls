@@ -24,10 +24,12 @@ struct registration_helper {
 			{
 				(protocol->*handler)(params);
 			}
+#if LOGGING_ENABLED
 			else
 			{
 				BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::error) << method << " cannot be handled because setting params failed.";
 			}
+#endif
 		});
 	}
 
@@ -39,7 +41,9 @@ struct registration_helper {
 void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
 {
 	registration_helper register_handler{dispatcher, &protocol};
+#if LOGGING_ENABLED
 	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
+#endif
 	register_handler("exit", &Protocol::on_exit);
 	register_handler("initialize", &Protocol::on_initialize);
 	register_handler("shutdown", &Protocol::on_shutdown);
@@ -66,14 +70,18 @@ void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
 void Dispatcher::register_handler(const std::string &method, handler_type handler)
 {
 	_handlers[method] = std::move(handler);
+#if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__ << " registered method " << method;
+#endif
 }
 
 bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) const
 {
 	if (!msg.HasMember("jsonrpc") || !msg["jsonrpc"].IsString() || msg["jsonrpc"] != "2.0")
 	{
+#if LOGGING_ENABLED
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER did not find a valid jsonrpc message.";
+#endif
 		return false;
 	}
 	boost::optional<int> id;
@@ -90,23 +98,35 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 	}
 	if (!msg.HasMember("method") || !msg["method"].IsString())
 	{
+#if LOGGING_ENABLED
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER did not find a method member in the json message.";
+#endif
 		return false;
 	}
+#if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER create context_with_request_output_stream";
+#endif
 	Scoped_context_with_value context_with_request_output_stream(request_output_stream, &output_stream);
+#if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER create context_with_id";
+#endif
 	boost::optional<Scoped_context_with_value> context_with_id;
 	if (id)
 	{
+#if LOGGING_ENABLED
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER emplace ID in context_with_id";
+#endif
 		context_with_id.emplace(request_id, *id);
 	}
+#if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Searching for a handler for method " << msg["method"].GetString();
+#endif
 	auto handler = _handlers.find(msg["method"].GetString());
 	if (handler != _handlers.end())
 	{
+#if LOGGING_ENABLED
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Found a handler and calling it";
+#endif
 		if (msg.HasMember("params") && !msg["params"].IsNull())
 		{
 			handler->second(std::move(msg["params"].GetObject()));
@@ -120,17 +140,26 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 	{
 		_error_handler(rapidjson::Value(rapidjson::kObjectType));
 	}
+#if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER exiting the scope of context_with_id and context_with_request_output_stream";
+#endif
 	return true;
 }
 
 void reply(rapidjson::Value &result)
 {
+#if LOGGING_ENABLED
 	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER get request_id from context";
+#endif
 	auto id = Context::get_current().get_value(request_id);
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER got id " << id;
+#endif
 	if (!id)
 	{
+#if LOGGING_ENABLED
 		BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__ << " no ID, no reply";
+#endif
 		return;
 	}
 	rapidjson::Document json_document;
@@ -144,16 +173,22 @@ void reply(rapidjson::Value &result)
 	root.Accept(writer);
 	std::string content(buffer.GetString());
 	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+#if LOGGING_ENABLED
 	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent response " << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+#endif
 }
 
 void reply(ERROR_CODES code, const std::string &msg)
 {
+#if LOGGING_ENABLED
 	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER get request_id from context";
+#endif
 	auto id = Context::get_current().get_value(request_id);
 	if (!id)
 	{
+#if LOGGING_ENABLED
 		BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__ << " no ID, no reply";
+#endif
 		return;
 	}
 	rapidjson::Document json_document;
@@ -170,5 +205,7 @@ void reply(ERROR_CODES code, const std::string &msg)
 	root.Accept(writer);
 	std::string content(buffer.GetString());
 	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+#if LOGGING_ENABLED
 	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent response " << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+#endif
 }
