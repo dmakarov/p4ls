@@ -6,11 +6,13 @@
 
 #include "protocol.h"
 
+#include <boost/asio.hpp>
 #include <boost/optional.hpp>
 #include <rapidjson/document.h>
 
 #include <istream>
 #include <string>
+#include <thread>
 #include <unordered_map>
 
 class LSP_server : public Protocol {
@@ -41,10 +43,7 @@ private:
 	void on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles &params) override;
 	void on_workspace_executeCommand(Params_workspace_executeCommand &params) override;
 
-	boost::optional<rapidjson::Document> read_message();
-
-	void add_document(const Text_document_item &document);
-	rapidjson::Value get_document_symbols(const URI &uri);
+	boost::optional<std::string> read_message();
 
 	struct document_file {
 		std::string _text;
@@ -56,5 +55,8 @@ private:
 	std::ostream &_output_stream;
 	bool _is_done;
 
+	boost::asio::io_context _io_context;
+	std::shared_ptr<boost::asio::io_service::work> _work;
+	std::thread _worker_thread;
 	std::unordered_map<std::string, document_file> _files;
 };

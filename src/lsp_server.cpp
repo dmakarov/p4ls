@@ -5,10 +5,8 @@
 #include <boost/log/trivial.hpp>
 
 #include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
 
+#include <functional>
 #include <regex>
 #include <string>
 
@@ -44,7 +42,9 @@ LSP_server::LSP_server(std::istream &input_stream, std::ostream &output_stream)
 				   true},
 	_input_stream(input_stream),
 	_output_stream(output_stream),
-	_is_done(false)
+	_is_done(false),
+	_work(new boost::asio::io_service::work(_io_context)),
+	_worker_thread(std::thread([&]{_io_context.run();}))
 {
 }
 
@@ -54,14 +54,11 @@ int LSP_server::run()
 	register_protocol_handlers(dispatcher, *this);
 	while (!_is_done && _input_stream.good())
 	{
-		if (auto json = read_message())
+		auto message = read_message();
+		if (message)
 		{
-			if (!dispatcher.call(*json, _output_stream))
-			{
-#if LOGGING_ENABLED
-				BOOST_LOG_TRIVIAL(error) << "JSON dispatch failed!";
-#endif
-			}
+			auto content = *message;
+			_io_context.post([this, content, &dispatcher]{dispatcher.call(content, this->_output_stream);});
 		}
 		else
 		{
@@ -74,6 +71,8 @@ int LSP_server::run()
 #if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "FINISHED";
 #endif
+	_work.reset();
+	_worker_thread.join();
 	return 0;
 }
 
@@ -146,7 +145,8 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen &params)
 #if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 #endif
-	add_document(params._text_document);
+	std::string compile_command("/Users/dmakarov/work/try/p4ls/build/ninja/src/tool/p4lsd -I /Users/dmakarov/work/try/p4c/p4include ");
+	_files[params._text_document._uri._path] = document_file{params._text_document._text, compile_command + params._text_document._uri._path};
 }
 
 void LSP_server::on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params)
@@ -161,7 +161,21 @@ void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymb
 #if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 #endif
-	auto result = get_document_symbols(params._text_document._uri);
+	auto &text = _files[params._text_document._uri._path]._text;
+	auto &command = _files[params._text_document._uri._path]._compile_command;
+#if LOGGING_ENABLED
+	BOOST_LOG_TRIVIAL(info) << "Create new P4_file with command " << command << " path " << params._text_document._uri._path << " and text.";
+#endif
+	P4_file file(command, params._text_document._uri._path, text);
+	std::vector<Symbol_information> symbols;
+	file.get_symbols(symbols);
+	rapidjson::Document json_document;
+	auto &allocator = json_document.GetAllocator();
+	rapidjson::Value result(rapidjson::kArrayType);
+	for (auto& it : symbols)
+	{
+		result.PushBack(it.get_json(allocator), allocator);
+	}
 	reply(result);
 }
 
@@ -235,7 +249,7 @@ void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand &pa
 #endif
 }
 
-boost::optional<rapidjson::Document> LSP_server::read_message()
+boost::optional<std::string> LSP_server::read_message()
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(info) << "Start reading a new message";
@@ -317,39 +331,7 @@ boost::optional<rapidjson::Document> LSP_server::read_message()
 #if LOGGING_ENABLED
 		BOOST_LOG_TRIVIAL(info) << "Received request " << content;
 #endif
-		rapidjson::Document json_document;
-		if (json_document.Parse(content.c_str()).HasParseError())
-		{
-#if LOGGING_ENABLED
-			BOOST_LOG_TRIVIAL(info) << "JSON parse error: " << rapidjson::GetParseError_En(json_document.GetParseError()) << " (" << json_document.GetErrorOffset() << ")";
-#endif
-			return boost::none;
-		}
-		rapidjson::StringBuffer buffer;
-		rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-		json_document.Accept(writer);
-#if LOGGING_ENABLED
-		BOOST_LOG_TRIVIAL(info) << "Parsed document " << buffer.GetString();
-#endif
-		return std::move(json_document);
+		return std::move(content);
 	}
 	return boost::none;
-}
-
-void LSP_server::add_document(const Text_document_item &document)
-{
-	std::string compile_command("/Users/dmakarov/work/try/p4ls/build/ninja/src/tool/p4lsd --nocpp -I /Users/dmakarov/work/try/p4c/p4include ");
-	_files[document._uri._path] = document_file{document._text, compile_command + document._uri._path};
-}
-
-rapidjson::Value LSP_server::get_document_symbols(const URI &uri)
-{
-	auto &text = _files[uri._path]._text;
-	auto &command = _files[uri._path]._compile_command;
-#if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << "Create new P4_file with command " << command << " path " << uri._path << " and text.";
-#endif
-	P4_file file(command, uri._path, text);
-	rapidjson::Value result(rapidjson::kNullType);
-	return result;
 }

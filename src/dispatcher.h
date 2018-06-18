@@ -22,7 +22,7 @@ public:
 
 	Dispatcher(handler_type error_handler) : _error_handler(error_handler) {}
 	void register_handler(const std::string &method, handler_type handler);
-	bool call(rapidjson::Document &msg, std::ostream &output_stream) const;
+	void call(std::string content, std::ostream &output_stream) const;
 
 private:
 

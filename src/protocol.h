@@ -1026,6 +1026,105 @@ struct Server_capabilities {
 };
 
 
+struct Position {
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+	{
+		rapidjson::Value result(rapidjson::kObjectType);
+		result.AddMember("line", _line, allocator);
+		result.AddMember("character", _character, allocator);
+		return result;
+	}
+	unsigned int _line;	// Line position in a document (zero-based).
+	/**
+	 * Character offset on a line in a document (zero-based). Assuming
+	 * that the line is represented as a string, the `character` value
+	 * represents the gap between the `character` and `character + 1`.
+	 *
+	 * If the character value is greater than the line length it
+	 * defaults back to the line length.
+	 */
+	unsigned int _character;
+};
+
+
+struct Range {
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+	{
+		rapidjson::Value result(rapidjson::kObjectType);
+		result.AddMember("start", _start.get_json(allocator), allocator);
+		result.AddMember("end", _end.get_json(allocator), allocator);
+		return result;
+	}
+	Position _start;	// the range's start position
+	Position _end;		// the range's end position
+};
+
+
+/**
+ * Represents a location inside a resource, such as a line inside a
+ * text file.
+ */
+struct Location {
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+	{
+		rapidjson::Value result(rapidjson::kObjectType);
+		result.AddMember("uri", rapidjson::StringRef(_uri.c_str()), allocator);
+		result.AddMember("range", _range.get_json(allocator), allocator);
+		return result;
+	}
+	std::string _uri;
+	Range _range;
+};
+
+
+/**
+ * Represents information about programming constructs like variables,
+ * classes, interfaces etc.
+ */
+struct Symbol_information {
+	Symbol_information(std::string name, SYMBOL_KIND kind, const Location& location, std::string container)
+		: _name(std::move(name))
+		, _kind(kind)
+		, _location(std::move(location))
+		, _container_name(std::move(container))
+	{}
+
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+	{
+		rapidjson::Value result(rapidjson::kObjectType);
+		result.AddMember("name", rapidjson::StringRef(_name.c_str()), allocator);
+		result.AddMember("kind", static_cast<int>(_kind), allocator);
+		result.AddMember("deprecated", _deprecated, allocator);
+		result.AddMember("location", _location.get_json(allocator), allocator);
+		result.AddMember("containerName", rapidjson::StringRef(_container_name.c_str()), allocator);
+		return result;
+	}
+
+	std::string _name;	// the name of this symbol
+	SYMBOL_KIND _kind;	// the kind of this symbol
+	bool _deprecated;	// indicates if this symbol is deprecated
+	/**
+	 * The location of this symbol. The location's range is used by a tool
+	 * to reveal the location in the editor. If the symbol is selected in the
+	 * tool the range's start information is used to position the cursor. So
+	 * the range usually spans more then the actual symbol's name and does
+	 * normally include things like visibility modifiers.
+	 *
+	 * The range doesn't have to denote a node range in the sense of a abstract
+	 * syntax tree. It can therefore not be used to re-construct a hierarchy of
+	 * the symbols.
+	 */
+	Location _location;
+	/**
+	 * The name of the symbol containing this symbol. This information is for
+	 * user interface purposes (e.g. to render a qualifier in the user interface
+	 * if necessary). It can't be used to re-infer a hierarchy for the document
+	 * symbols.
+	 */
+	std::string _container_name;
+};
+
+
 struct Params_exit {
 };
 

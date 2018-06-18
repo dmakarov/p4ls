@@ -4,6 +4,8 @@
 #include <boost/log/common.hpp>
 #include <boost/optional.hpp>
 
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
@@ -75,14 +77,29 @@ void Dispatcher::register_handler(const std::string &method, handler_type handle
 #endif
 }
 
-bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) const
+void Dispatcher::call(std::string content, std::ostream &output_stream) const
 {
+	rapidjson::Document msg;
+	if (msg.Parse(content.c_str()).HasParseError())
+	{
+#if LOGGING_ENABLED
+		BOOST_LOG_TRIVIAL(info) << "JSON parse error: " << rapidjson::GetParseError_En(msg.GetParseError()) << " (" << msg.GetErrorOffset() << ")";
+#endif
+		return;
+	}
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	msg.Accept(writer);
+#if LOGGING_ENABLED
+	BOOST_LOG_TRIVIAL(info) << "Parsed document " << buffer.GetString();
+#endif
+
 	if (!msg.HasMember("jsonrpc") || !msg["jsonrpc"].IsString() || msg["jsonrpc"] != "2.0")
 	{
 #if LOGGING_ENABLED
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER did not find a valid jsonrpc message.";
 #endif
-		return false;
+		return;
 	}
 	boost::optional<int> id;
 	if (msg.HasMember("id"))
@@ -101,7 +118,7 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 #if LOGGING_ENABLED
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER did not find a method member in the json message.";
 #endif
-		return false;
+		return;
 	}
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER create context_with_request_output_stream";
@@ -143,7 +160,6 @@ bool Dispatcher::call(rapidjson::Document &msg, std::ostream &output_stream) con
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER exiting the scope of context_with_id and context_with_request_output_stream";
 #endif
-	return true;
 }
 
 void reply(rapidjson::Value &result)
@@ -172,9 +188,10 @@ void reply(rapidjson::Value &result)
 	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 	root.Accept(writer);
 	std::string content(buffer.GetString());
-	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+	auto content_length = content.size() + 2;
+	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content_length << "\r\n\r\n" << content << "\r\n" << std::flush;
 #if LOGGING_ENABLED
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent response " << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent response " << "Content-Length: " << content_length << "\r\n\r\n" << content << "\r\n";
 #endif
 }
 
@@ -204,8 +221,9 @@ void reply(ERROR_CODES code, const std::string &msg)
 	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 	root.Accept(writer);
 	std::string content(buffer.GetString());
-	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+	auto content_length = content.size() + 2;
+	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content_length << "\r\n\r\n" << content << "\r\n" << std::flush;
 #if LOGGING_ENABLED
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent response " << "Content-Length: " << content.size() << "\r\n\r\n" << content;
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent response " << "Content-Length: " << content_length << "\r\n\r\n" << content << "\r\n";
 #endif
 }

@@ -1,5 +1,3 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-hunter_add_package(Boost COMPONENTS iostreams)
-find_package(Boost CONFIG REQUIRED COMPONENTS iostreams)
 add_executable(p4lsd main.cpp)
 target_link_libraries(p4lsd PRIVATE p4ls)
