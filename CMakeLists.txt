@@ -96,6 +96,7 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(LibGc
 mark_as_advanced(LIBGC_INCLUDE_DIR LIBGC_LIBRARIES)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLOGGING_ENABLED=1")
+include_directories(/Users/dmakarov/work/try/p4c /Users/dmakarov/work/try/p4c/test/frameworks/gtest/googletest/include /Users/dmakarov/work/try/p4c/build/ninja /usr/local/include)
 
 add_subdirectory(src)
 if (ENABLE_UNITTESTS)

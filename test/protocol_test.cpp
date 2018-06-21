@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(test_case1)
 	Params_initialize params;
 	set_params_from_json(json, params);
 	BOOST_TEST(params._process_id == 20943);
-	BOOST_TEST(params._root_uri == "/Users/dmakarov/work/try/p4ls/");
+	BOOST_TEST(params._root_uri == URI(std::string("/Users/dmakarov/work/try/p4ls/")));
 	BOOST_TEST(*params._capabilities._workspace->_apply_edit);
 	BOOST_TEST(*params._capabilities._workspace->_execute_command->_dynamic_registration);
 	BOOST_TEST(*params._capabilities._text_document->_synchronization->_will_save);

@@ -17,7 +17,6 @@ hunter_add_package(RapidJSON)
 find_package(Boost CONFIG REQUIRED COMPONENTS date_time system thread filesystem iostreams regex log)
 find_package(RapidJSON CONFIG REQUIRED)
 
-include_directories(/Users/dmakarov/work/try/p4c /Users/dmakarov/work/try/p4c/test/frameworks/gtest/googletest/include /Users/dmakarov/work/try/p4c/build/ninja /usr/local/include)
 find_library(LIBCONTROLPLANE_LIBRARY controlplane HINTS /Users/dmakarov/work/try/p4c/build/ninja/control-plane)
 find_library(LIBFRONTEND_LIBRARY frontend HINTS /Users/dmakarov/work/try/p4c/build/ninja/frontends)
 find_library(LIBIR_LIBRARY ir HINTS /Users/dmakarov/work/try/p4c/build/ninja/ir)

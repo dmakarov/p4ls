@@ -1,7 +1,6 @@
 #include "dispatcher.h"
 #include "context.h"
 
-#include <boost/log/common.hpp>
 #include <boost/optional.hpp>
 
 #include <rapidjson/document.h>
@@ -50,6 +49,8 @@ void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
 	register_handler("initialize", &Protocol::on_initialize);
 	register_handler("shutdown", &Protocol::on_shutdown);
 	register_handler("textDocument/codeAction", &Protocol::on_textDocument_codeAction);
+	register_handler("textDocument/codeLens", &Protocol::on_textDocument_codeLens);
+	register_handler("codeLens/resolve", &Protocol::on_codeLens_resolve);
 	register_handler("textDocument/completion", &Protocol::on_textDocument_completion);
 	register_handler("textDocument/definition", &Protocol::on_textDocument_definition);
 	register_handler("textDocument/didChange", &Protocol::on_textDocument_didChange);
@@ -83,7 +84,7 @@ void Dispatcher::call(std::string content, std::ostream &output_stream) const
 	if (msg.Parse(content.c_str()).HasParseError())
 	{
 #if LOGGING_ENABLED
-		BOOST_LOG_TRIVIAL(info) << "JSON parse error: " << rapidjson::GetParseError_En(msg.GetParseError()) << " (" << msg.GetErrorOffset() << ")";
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "JSON parse error: " << rapidjson::GetParseError_En(msg.GetParseError()) << " (" << msg.GetErrorOffset() << ")";
 #endif
 		return;
 	}
@@ -91,7 +92,7 @@ void Dispatcher::call(std::string content, std::ostream &output_stream) const
 	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 	msg.Accept(writer);
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << "Parsed document " << buffer.GetString();
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Parsed document " << buffer.GetString();
 #endif
 
 	if (!msg.HasMember("jsonrpc") || !msg["jsonrpc"].IsString() || msg["jsonrpc"] != "2.0")

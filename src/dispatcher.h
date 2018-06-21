@@ -6,7 +6,7 @@
 
 #include "protocol.h"
 
-#include <boost/log/sinks/syslog_backend.hpp>
+#include <boost/log/common.hpp>
 
 #include <rapidjson/document.h>
 

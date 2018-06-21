@@ -13,6 +13,54 @@ std::ostream &operator<<(std::ostream &os, const URI &item)
 	return os;
 }
 
+std::ostream &operator<<(std::ostream &os, const Range &range)
+{
+	os << range._start._line << ":" << range._start._character << "-"
+	   << range._end._line << ":" << range._end._character;
+	return os;
+}
+
+bool operator<(const Range& lhs, const Range& rhs)
+{
+	return lhs._start._line < rhs._start._line
+		|| (lhs._start._line == rhs._start._line
+			&& lhs._start._character < rhs._start._character);
+}
+
+bool operator&(const Range& lhs, const Range& rhs)
+{
+	return lhs._start._line == rhs._start._line
+		&& lhs._start._character <= rhs._start._character
+		&& lhs._end._line >= rhs._end._line
+		&& lhs._end._character >= rhs._start._character;
+}
+
+std::ostream &operator<<(std::ostream &os, const Location &location)
+{
+	os << location._uri
+	   << "#" << location._range._start._line << ":" << location._range._start._character
+	   << "-" << location._range._end._line << ":" << location._range._end._character;
+	return os;
+}
+
+bool operator==(const Location& lhs, const Location& rhs)
+{
+	return lhs._uri == rhs._uri
+		&& lhs._range._start._line == rhs._range._start._line
+		&& lhs._range._start._character == rhs._range._start._character
+		&& lhs._range._end._line == rhs._range._end._line
+		&& lhs._range._end._character == rhs._range._end._character;
+}
+
+bool operator<(const Location& lhs, const Location& rhs)
+{
+	return lhs._uri < rhs._uri
+		|| (lhs._uri == rhs._uri
+			&& (lhs._range._start._line < rhs._range._start._line
+				|| (lhs._range._start._line == rhs._range._start._line
+					&& lhs._range._start._character < rhs._range._start._character)));
+}
+
 rapidjson::Value Server_capabilities::Text_document_sync_options::get_json(rapidjson::Document::AllocatorType &allocator)
 {
 	rapidjson::Value result(rapidjson::kObjectType);
@@ -129,7 +177,6 @@ rapidjson::Value Server_capabilities::get_json(rapidjson::Document::AllocatorTyp
 	return result;
 }
 
-
 bool set_params_from_json(const rapidjson::Value &json, Params_exit &params)
 {
 	return true;
@@ -193,6 +240,16 @@ bool set_params_from_json(const rapidjson::Value &json, Params_shutdown &params)
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_codeAction &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_codeLens &params)
+{
+	return true;
+}
+
+bool set_params_from_json(const rapidjson::Value &json, Params_codeLens_resolve &params)
 {
 	return true;
 }
@@ -261,7 +318,14 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_form
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_hover &params)
 {
-	return true;
+#if LOGGING_ENABLED
+	BOOST_LOG_TRIVIAL(info) << "Start processing params for textDocument/hover request";
+#endif
+	auto result = params._text_document_position.set(json);
+#if LOGGING_ENABLED
+	BOOST_LOG_TRIVIAL(info) << "Finish processing params for textDocument/hover request " << result;
+#endif
+	return result;
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_onTypeFormatting &params)

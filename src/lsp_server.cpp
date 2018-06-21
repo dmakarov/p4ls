@@ -1,15 +1,12 @@
 #include "lsp_server.h"
 #include "dispatcher.h"
-#include "p4unit.h"
-
-#include <boost/log/trivial.hpp>
-
-#include <rapidjson/document.h>
 
 #include <functional>
 #include <regex>
 #include <string>
 
+
+boost::log::sources::severity_logger<int> LSP_server::_logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
 
 LSP_server::LSP_server(std::istream &input_stream, std::ostream &output_stream)
 	:
@@ -63,13 +60,13 @@ int LSP_server::run()
 		else
 		{
 #if LOGGING_ENABLED
-			BOOST_LOG_TRIVIAL(error) << "read_message didn't return a valid json object.";
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "read_message didn't return a valid json object.";
 #endif
 		}
 	}
 	_is_done = true;
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << "FINISHED";
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "FINISHED";
 #endif
 	_work.reset();
 	_worker_thread.join();
@@ -80,14 +77,14 @@ void LSP_server::on_exit(Params_exit &params)
 {
 	_is_done = true;
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_initialize(Params_initialize &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 	rapidjson::Document json_document;
 	auto &allocator = json_document.GetAllocator();
@@ -99,7 +96,7 @@ void LSP_server::on_initialize(Params_initialize &params)
 void LSP_server::on_shutdown(Params_shutdown &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 	rapidjson::Value result(rapidjson::kNullType);
 	reply(result);
@@ -108,73 +105,92 @@ void LSP_server::on_shutdown(Params_shutdown &params)
 void LSP_server::on_textDocument_codeAction(Params_textDocument_codeAction &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+}
+
+void LSP_server::on_textDocument_codeLens(Params_textDocument_codeLens &params)
+{
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
+#endif
+	rapidjson::Value result(rapidjson::kNullType);
+	reply(result);
+}
+
+void LSP_server::on_codeLens_resolve(Params_codeLens_resolve &params)
+{
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
+#endif
+	rapidjson::Value result(rapidjson::kNullType);
+	reply(result);
 }
 
 void LSP_server::on_textDocument_completion(Params_textDocument_completion &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_textDocument_definition(Params_textDocument_definition &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_textDocument_didChange(Params_textDocument_didChange &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_textDocument_didClose(Params_textDocument_didClose &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
-	std::string compile_command("/Users/dmakarov/work/try/p4ls/build/ninja/src/tool/p4lsd -I /Users/dmakarov/work/try/p4c/p4include ");
-	_files[params._text_document._uri._path] = document_file{params._text_document._text, compile_command + params._text_document._uri._path};
+	auto &path = params._text_document._uri._path;
+	auto &text = params._text_document._text;
+	std::string command("/Users/dmakarov/work/try/p4ls/build/ninja/src/tool/p4lsd -I /Users/dmakarov/work/try/p4c/p4include ");
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Create new P4_file with command " << command << " path " << path << " and text.";
+#endif
+	_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(command + path, path, text));
 }
 
 void LSP_server::on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymbol &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
-	auto &text = _files[params._text_document._uri._path]._text;
-	auto &command = _files[params._text_document._uri._path]._compile_command;
-#if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << "Create new P4_file with command " << command << " path " << params._text_document._uri._path << " and text.";
-#endif
-	P4_file file(command, params._text_document._uri._path, text);
-	std::vector<Symbol_information> symbols;
-	file.get_symbols(symbols);
 	rapidjson::Document json_document;
 	auto &allocator = json_document.GetAllocator();
 	rapidjson::Value result(rapidjson::kArrayType);
-	for (auto& it : symbols)
+	auto& path = params._text_document._uri._path;
+	for (auto& it : _files[path].get_symbols())
 	{
-		result.PushBack(it.get_json(allocator), allocator);
+		if (it._location._uri == path)
+		{
+			result.PushBack(it.get_json(allocator), allocator);
+		}
 	}
 	reply(result);
 }
@@ -182,77 +198,102 @@ void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymb
 void LSP_server::on_textDocument_formatting(Params_textDocument_formatting &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_textDocument_hover(Params_textDocument_hover &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__
+	<< "(document " << params._text_document_position._text_document._uri._path
+	<< ", line " << params._text_document_position._position._line
+	<< ", character " << params._text_document_position._position._character << ")";
 #endif
+	auto &path = params._text_document_position._text_document._uri._path;
+	Location location;
+	location._uri = path;
+	location._range._start = params._text_document_position._position;
+	location._range._end = params._text_document_position._position;
+	if (auto hover_content = _files[path].get_hover(location))
+	{
+#if LOGGING_ENABLED
+		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Found hover content " << *hover_content;
+#endif
+		Markup_content contents{MARKUP_KIND::plaintext, *hover_content};
+		rapidjson::Document json_document;
+		auto &allocator = json_document.GetAllocator();
+		rapidjson::Value result(rapidjson::kObjectType);
+		result.AddMember("contents", contents.get_json(allocator), allocator);
+		reply(result);
+	}
+	else
+	{
+		rapidjson::Value null(rapidjson::kNullType);
+		reply(null);
+	}
 }
 
 void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_textDocument_rename(Params_textDocument_rename &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_textDocument_signatureHelp(Params_textDocument_signatureHelp &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand &params)
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
 boost::optional<std::string> LSP_server::read_message()
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << "Start reading a new message";
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Start reading a new message";
 #endif
 	// process a set of HTTP headers of an LSP message
 	unsigned long long content_length = 0;
@@ -267,7 +308,7 @@ boost::optional<std::string> LSP_server::read_message()
 			line.pop_back();
 		}
 #if LOGGING_ENABLED
-		BOOST_LOG_TRIVIAL(info) << "Current line '" << line << "'";
+		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Current line '" << line << "'";
 #endif
 		if (!_input_stream.good() && errno == EINTR)
 		{
@@ -277,14 +318,14 @@ boost::optional<std::string> LSP_server::read_message()
 		if (0 == line.find_first_of('#'))
 		{
 #if LOGGING_ENABLED
-			BOOST_LOG_TRIVIAL(info) << "Skipping a comment line";
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Skipping a comment line";
 #endif
 			continue;
 		}
 		if (std::regex_match(line, match, content_length_regex))
 		{
 #if LOGGING_ENABLED
-			BOOST_LOG_TRIVIAL(info) << "Regex match " << match[1].str();
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Regex match " << match[1].str();
 #endif
 			content_length = std::stoull(match[1].str());
 			continue;
@@ -292,26 +333,26 @@ boost::optional<std::string> LSP_server::read_message()
 		else if (!line.empty())
 		{
 #if LOGGING_ENABLED
-			BOOST_LOG_TRIVIAL(info) << "Ignoring another header line";
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Ignoring another header line";
 #endif
 			continue;
 		}
 		else
 		{
 #if LOGGING_ENABLED
-			BOOST_LOG_TRIVIAL(info) << "Empty line, header ended";
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Empty line, header ended";
 #endif
 			break;
 		}
 	}
 	// discard unrealistically large requests
 #if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << "Content length " << content_length;
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Content length " << content_length;
 #endif
 	if (content_length > 1 << 30)
 	{
 #if LOGGING_ENABLED
-		BOOST_LOG_TRIVIAL(info) << "Huge message size " << content_length;
+		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Huge message size " << content_length;
 #endif
 		_input_stream.ignore(content_length);
 		return boost::none;
@@ -324,12 +365,12 @@ boost::optional<std::string> LSP_server::read_message()
 		if (!_input_stream)
 		{
 #if LOGGING_ENABLED
-			BOOST_LOG_TRIVIAL(info) << "Read " << _input_stream.gcount() << " bytes, expected " << content_length << " content <" << content << ">";
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Read " << _input_stream.gcount() << " bytes, expected " << content_length << " content <" << content << ">";
 #endif
 			return boost::none;
 		}
 #if LOGGING_ENABLED
-		BOOST_LOG_TRIVIAL(info) << "Received request " << content;
+		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Received request " << content;
 #endif
 		return std::move(content);
 	}

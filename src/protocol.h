@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <ir/ir.h>
+
 #include <rapidjson/document.h>
 
 #include <boost/log/trivial.hpp>
@@ -182,11 +184,26 @@ MARKUP_KIND convert_string_to_markup_kind(const std::string &v)
 	return MARKUP_KIND::plaintext;
 }
 
+const char* convert_markup_kind_to_string(const MARKUP_KIND kind)
+{
+	switch (kind)
+	{
+	case MARKUP_KIND::plaintext: return "plaintext";
+	case MARKUP_KIND::markdown: return "markdown";
+	default:
+#if LOGGING_ENABLED
+		BOOST_LOG_TRIVIAL(error) << "Unknown markup kind " << static_cast<int>(kind);
+#endif
+	}
+	return "plaintext";
+}
+
 } // namespace
 
 struct URI {
 	URI() = default;
-	explicit URI(std::string path);
+	explicit URI(const std::string& path) : _path(path)
+	{}
 
 	void set_from_path(const std::string &path)
 	{
@@ -206,9 +223,9 @@ struct URI {
 		}
 	}
 
-	bool operator==(const std::string& other) const
+	bool operator==(const URI& other) const
 	{
-		return _path == other;
+		return _path == other._path;
 	}
 
 	std::string _path;
@@ -1027,6 +1044,14 @@ struct Server_capabilities {
 
 
 struct Position {
+	Position() : _line(0), _character(0)
+	{}
+
+	Position(const Util::SourcePosition& position)
+		: _line(position.getLineNumber())
+		, _character(position.getColumnNumber())
+	{}
+
 	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
 	{
 		rapidjson::Value result(rapidjson::kObjectType);
@@ -1034,7 +1059,20 @@ struct Position {
 		result.AddMember("character", _character, allocator);
 		return result;
 	}
+
+	bool set(const rapidjson::Value &json)
+	{
+		if (json.HasMember("line") && json.HasMember("character"))
+		{
+			_line = json["line"].GetInt();
+			_character = json["character"].GetInt();
+			return true;
+		}
+		return false;
+	}
+
 	unsigned int _line;	// Line position in a document (zero-based).
+
 	/**
 	 * Character offset on a line in a document (zero-based). Assuming
 	 * that the line is represented as a string, the `character` value
@@ -1048,6 +1086,22 @@ struct Position {
 
 
 struct Range {
+	Range() = default;
+
+	Range(const Util::SourceInfo& info)
+	{
+		set(info);
+	}
+
+	void set(const Util::SourceInfo& info)
+	{
+		auto line_adjustment = info.getStart().getLineNumber() - info.toPosition().sourceLine;
+		_start._line = info.toPosition().sourceLine - 1;
+		_start._character = info.getStart().getColumnNumber();
+		_end._line = info.getEnd().getLineNumber() - line_adjustment - 1;
+		_end._character = info.getEnd().getColumnNumber();
+	}
+
 	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
 	{
 		rapidjson::Value result(rapidjson::kObjectType);
@@ -1055,9 +1109,14 @@ struct Range {
 		result.AddMember("end", _end.get_json(allocator), allocator);
 		return result;
 	}
+
 	Position _start;	// the range's start position
 	Position _end;		// the range's end position
 };
+
+std::ostream &operator<<(std::ostream &os, const Range &range);
+bool operator<(const Range& lhs, const Range& rhs);
+bool operator&(const Range& lhs, const Range& rhs);
 
 
 /**
@@ -1072,9 +1131,14 @@ struct Location {
 		result.AddMember("range", _range.get_json(allocator), allocator);
 		return result;
 	}
+
 	std::string _uri;
 	Range _range;
 };
+
+std::ostream &operator<<(std::ostream &os, const Location &location);
+bool operator==(const Location& lhs, const Location& rhs);
+bool operator<(const Location& lhs, const Location& rhs);
 
 
 /**
@@ -1082,9 +1146,10 @@ struct Location {
  * classes, interfaces etc.
  */
 struct Symbol_information {
-	Symbol_information(std::string name, SYMBOL_KIND kind, const Location& location, std::string container)
+	Symbol_information(std::string name, SYMBOL_KIND kind, const Location& location, const boost::optional<std::string>& container)
 		: _name(std::move(name))
 		, _kind(kind)
+		, _deprecated(false)
 		, _location(std::move(location))
 		, _container_name(std::move(container))
 	{}
@@ -1096,7 +1161,10 @@ struct Symbol_information {
 		result.AddMember("kind", static_cast<int>(_kind), allocator);
 		result.AddMember("deprecated", _deprecated, allocator);
 		result.AddMember("location", _location.get_json(allocator), allocator);
-		result.AddMember("containerName", rapidjson::StringRef(_container_name.c_str()), allocator);
+		if (_container_name)
+		{
+			result.AddMember("containerName", rapidjson::StringRef(_container_name->c_str()), allocator);
+		}
 		return result;
 	}
 
@@ -1121,7 +1189,75 @@ struct Symbol_information {
 	 * if necessary). It can't be used to re-infer a hierarchy for the document
 	 * symbols.
 	 */
-	std::string _container_name;
+	boost::optional<std::string> _container_name;
+};
+
+
+struct Text_document_item {
+
+	bool set(const rapidjson::Value &json)
+	{
+		if (!json.HasMember("uri") || !json.HasMember("languageId") || !json.HasMember("version") || !json.HasMember("text"))
+		{
+			return false;
+		}
+		_uri.set_from_uri(json["uri"].GetString());
+		_language_id = json["languageId"].GetString();
+		_version = json["version"].GetInt();
+		_text = json["text"].GetString();
+		return true;
+	}
+
+	URI _uri;                 /// text document's URI
+	std::string _language_id; /// text document's language identifier
+	int _version = 0;         /// version number of this document (it will increase after each change, including undo/redo)
+	std::string _text;        /// content of the opened text document
+};
+
+
+struct Text_document_identifier {
+
+	bool set(const rapidjson::Value &json)
+	{
+		if (!json.HasMember("uri"))
+		{
+			return false;
+		}
+		_uri.set_from_uri(json["uri"].GetString());
+		return true;
+	}
+
+	URI _uri;                 /// text document's URI
+};
+
+
+struct Text_document_position {
+
+	bool set(const rapidjson::Value &json)
+	{
+		if (json.HasMember("textDocument") && json.HasMember("position"))
+		{
+			return _text_document.set(json["textDocument"]) && _position.set(json["position"]);
+		}
+		return false;
+	}
+
+	Text_document_identifier _text_document;
+	Position _position;
+};
+
+
+struct Markup_content {
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+	{
+		rapidjson::Value result(rapidjson::kObjectType);
+		result.AddMember("kind", rapidjson::StringRef(convert_markup_kind_to_string(_kind)), allocator);
+		result.AddMember("value", rapidjson::StringRef(_value.c_str()), allocator);
+		return result;
+	}
+
+	MARKUP_KIND _kind;
+	std::string _value;
 };
 
 
@@ -1151,6 +1287,16 @@ struct Params_textDocument_codeAction {
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_codeAction &params);
 
+struct Params_textDocument_codeLens {
+};
+
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_codeLens &params);
+
+struct Params_codeLens_resolve {
+};
+
+bool set_params_from_json(const rapidjson::Value &json, Params_codeLens_resolve &params);
+
 struct Params_textDocument_completion {
 };
 
@@ -1171,27 +1317,6 @@ struct Params_textDocument_didClose {
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didClose &params);
 
-struct Text_document_item {
-
-	bool set(const rapidjson::Value &json)
-	{
-		if (!json.HasMember("uri") || !json.HasMember("languageId") || !json.HasMember("version") || !json.HasMember("text"))
-		{
-			return false;
-		}
-		_uri.set_from_uri(json["uri"].GetString());
-		_language_id = json["languageId"].GetString();
-		_version = json["version"].GetInt();
-		_text = json["text"].GetString();
-		return true;
-	}
-
-	URI _uri;                 /// text document's URI
-	std::string _language_id; /// text document's language identifier
-	int _version = 0;         /// version number of this document (it will increase after each change, including undo/redo)
-	std::string _text;        /// content of the opened text document
-};
-
 struct Params_textDocument_didOpen {
 	Text_document_item _text_document;
 };
@@ -1202,21 +1327,6 @@ struct Params_textDocument_documentHighlight {
 };
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentHighlight &params);
-
-struct Text_document_identifier {
-
-	bool set(const rapidjson::Value &json)
-	{
-		if (!json.HasMember("uri"))
-		{
-			return false;
-		}
-		_uri.set_from_uri(json["uri"].GetString());
-		return true;
-	}
-
-	URI _uri;                 /// text document's URI
-};
 
 struct Params_textDocument_documentSymbol {
 	Text_document_identifier _text_document;
@@ -1230,6 +1340,7 @@ struct Params_textDocument_formatting {
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_formatting &params);
 
 struct Params_textDocument_hover {
+	Text_document_position _text_document_position;
 };
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_hover &params);
@@ -1282,6 +1393,8 @@ public:
 	virtual void on_initialize(Params_initialize &params) = 0;
 	virtual void on_shutdown(Params_shutdown &params) = 0;
 	virtual void on_textDocument_codeAction(Params_textDocument_codeAction &params) = 0;
+	virtual void on_textDocument_codeLens(Params_textDocument_codeLens &params) = 0;
+	virtual void on_codeLens_resolve(Params_codeLens_resolve &params) = 0;
 	virtual void on_textDocument_completion(Params_textDocument_completion &params) = 0;
 	virtual void on_textDocument_definition(Params_textDocument_definition &params) = 0;
 	virtual void on_textDocument_didChange(Params_textDocument_didChange &params) = 0;

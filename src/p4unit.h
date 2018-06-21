@@ -9,83 +9,61 @@
 #include <frontends/common/options.h>
 #include <ir/ir.h>
 
-#include <boost/log/trivial.hpp>
 #include <boost/optional.hpp>
 
+#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 
-class p4options : public CompilerOptions {};
+class p4options : public CompilerOptions {
+};
 
 
-class Collector : public Inspector {
-public:
-	Collector(cstring source_file, std::vector<Symbol_information>& symbols)
-		: _source_file(source_file)
-		, _symbols(symbols)
-	{
-		setName("Collector");
-	}
-
-	bool preorder(const IR::Node* node) override
-	{
-		if (auto ctxt = getContext())
-		{
-			if (ctxt->depth > 1)
-			{
-				return false;
-			}
-			if (node->is<IR::IDeclaration>())
-			{
-				auto si = node->getSourceInfo();
-				if (_source_file == si.getSourceFile())
-				{
-					_symbols.emplace_back(node->to<IR::IDeclaration>()->getName().toString().c_str(), get_symbol_kind(node), Location{_source_file.c_str(), Range{Position{si.getStart().getLineNumber(), si.getStart().getColumnNumber()}, Position{si.getEnd().getLineNumber(), si.getEnd().getColumnNumber()}}}, "");
-					BOOST_LOG_TRIVIAL(info) << node->node_type_name() << " " << node->to<IR::IDeclaration>()->getName().toString();
-				}
-			}
-		}
-		return true;
-	}
-private:
-	SYMBOL_KIND get_symbol_kind(const IR::Node* node)
-	{
-		if (node->node_type_name() == "Declaration_Constant")
-		{
-			return SYMBOL_KIND::Constant;
-		}
-		if (node->node_type_name() == "Type_Header" ||
-			node->node_type_name() == "Type_Struct")
-		{
-			return SYMBOL_KIND::Class;
-		}
-		if (node->node_type_name() == "P4Parser" ||
-			node->node_type_name() == "P4Control")
-		{
-			return SYMBOL_KIND::Class;
-		}
-		if (node->node_type_name() == "Type_Typedef")
-		{
-			return SYMBOL_KIND::Interface;
-		}
-		if (node->node_type_name() == "Declaration_Instance")
-		{
-			return SYMBOL_KIND::Function;
-		}
-		return SYMBOL_KIND::Null;
-	}
-	cstring _source_file;
+struct Collected_data {
+	Collected_data(std::vector<Symbol_information>& symbols, std::unordered_map<std::string, std::map<Range, std::string>>& location_to_name)
+		: _symbols(symbols)
+		, _location_to_name(location_to_name)
+	{}
 	std::vector<Symbol_information>& _symbols;
+	std::unordered_map<std::string, std::map<Range, std::string>>& _location_to_name;
+};
+
+
+class Symbol_collector : public Inspector {
+public:
+	Symbol_collector(cstring temp_path, std::string& unit_path, Collected_data& output)
+		: _temp_path(temp_path)
+		, _unit_path(unit_path)
+		, _max_depth(1)
+		, _symbols(output._symbols)
+		, _location_to_name(output._location_to_name)
+	{
+		setName("Symbol_collector");
+	}
+
+	bool preorder(const IR::Node* node) override;
+	void postorder(const IR::Node* node) override;
+
+private:
+	SYMBOL_KIND get_symbol_kind(const IR::Node* node);
+
+	cstring _temp_path;
+	std::string _unit_path;
+	int _max_depth;
+	std::vector<std::string> _container;
+	std::vector<Symbol_information>& _symbols;
+	std::unordered_map<std::string, std::map<Range, std::string>>& _location_to_name;
 };
 
 
 class Outline : public PassManager {
 public:
-	explicit Outline(CompilerOptions& options, std::vector<Symbol_information>& symbols)
+	Outline(CompilerOptions& options, std::string& unit_path, Collected_data& output)
 	{
 		setName("Outline");
-		addPasses({new Collector(options.file, symbols)});
+		addPasses({new Symbol_collector(options.file, unit_path, output)});
 	}
 
 	void process(std::unique_ptr<const IR::P4Program>& program)
@@ -99,11 +77,15 @@ public:
  *
  */
 class P4_file {
-
 public:
-	P4_file(const std::string &command, const std::string &path, const std::string &text);
+	P4_file()
+	: _p4(new P4CContextWithOptions<p4options>)
+	, _options(P4CContextWithOptions<p4options>::get().options())
+	{}
+	P4_file(const std::string &command, const std::string &unit_path, const std::string &text);
 	~P4_file();
-	void get_symbols(std::vector<Symbol_information>& symbols);
+	std::vector<Symbol_information>& get_symbols();
+	boost::optional<std::string> get_hover(const Location& location);
 
 private:
 	int _argc;
@@ -112,4 +94,7 @@ private:
 	p4options &_options;
 	std::unique_ptr<const IR::P4Program> _program;
 	std::string _temp_path;
+	std::string _unit_path;
+	std::vector<Symbol_information> _symbols;
+	std::unordered_map<std::string, std::map<Range, std::string>> _location_to_name;
 };
