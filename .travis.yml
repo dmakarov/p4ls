@@ -58,7 +58,7 @@ before_script:
   - mkdir -p build
 
 script:
-  - cd build && cmake -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && ctest
+  - cd build && cmake -DENABLE_BMV2=OFF -DHAVE_LIBGC=0 -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && cd test && ctest
 
 notifications:
   email: false

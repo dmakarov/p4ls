@@ -3,6 +3,8 @@ enable_testing()
 hunter_add_package(Boost COMPONENTS test)
 find_package(Boost CONFIG REQUIRED COMPONENTS unit_test_framework)
 
+include_directories(../vendor/p4c ../vendor/p4c/test/frameworks/gtest/googletest/include ${CMAKE_BINARY_DIR}/p4c)
+
 add_executable(unittests_driver
   lsp_server_test.cpp
   protocol_test.cpp

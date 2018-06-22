@@ -190,7 +190,7 @@ const char* convert_markup_kind_to_string(const MARKUP_KIND kind)
 	{
 	case MARKUP_KIND::plaintext: return "plaintext";
 	case MARKUP_KIND::markdown: return "markdown";
-	default:
+	default:;
 #if LOGGING_ENABLED
 		BOOST_LOG_TRIVIAL(error) << "Unknown markup kind " << static_cast<int>(kind);
 #endif
