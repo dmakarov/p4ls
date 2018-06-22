@@ -220,7 +220,9 @@ void LSP_server::on_textDocument_hover(Params_textDocument_hover &params)
 #if LOGGING_ENABLED
 		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Found hover content " << *hover_content;
 #endif
-		Markup_content contents{MARKUP_KIND::plaintext, *hover_content};
+		std::ostringstream os;
+		os << "```p4\n" << *hover_content << "\n```";
+		Markup_content contents{MARKUP_KIND::markdown, os.str()};
 		rapidjson::Document json_document;
 		auto &allocator = json_document.GetAllocator();
 		rapidjson::Value result(rapidjson::kObjectType);

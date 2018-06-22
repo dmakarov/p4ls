@@ -22,12 +22,16 @@ class p4options : public CompilerOptions {
 
 
 struct Collected_data {
-	Collected_data(std::vector<Symbol_information>& symbols, std::unordered_map<std::string, std::map<Range, std::string>>& location_to_name)
+	Collected_data(std::vector<Symbol_information>& symbols,
+				   std::unordered_map<std::string, std::string>& definitions,
+				   std::unordered_map<std::string, std::map<Range, std::string>>& locations)
 		: _symbols(symbols)
-		, _location_to_name(location_to_name)
+		, _definitions(definitions)
+		, _locations(locations)
 	{}
 	std::vector<Symbol_information>& _symbols;
-	std::unordered_map<std::string, std::map<Range, std::string>>& _location_to_name;
+	std::unordered_map<std::string, std::string>& _definitions;
+	std::unordered_map<std::string, std::map<Range, std::string>>& _locations;
 };
 
 
@@ -38,7 +42,8 @@ public:
 		, _unit_path(unit_path)
 		, _max_depth(1)
 		, _symbols(output._symbols)
-		, _location_to_name(output._location_to_name)
+		, _definitions(output._definitions)
+		, _locations(output._locations)
 	{
 		setName("Symbol_collector");
 	}
@@ -54,7 +59,8 @@ private:
 	int _max_depth;
 	std::vector<std::string> _container;
 	std::vector<Symbol_information>& _symbols;
-	std::unordered_map<std::string, std::map<Range, std::string>>& _location_to_name;
+	std::unordered_map<std::string, std::string>& _definitions;
+	std::unordered_map<std::string, std::map<Range, std::string>>& _locations;
 };
 
 
@@ -78,9 +84,7 @@ public:
  */
 class P4_file {
 public:
-	P4_file()
-	: _p4(new P4CContextWithOptions<p4options>)
-	, _options(P4CContextWithOptions<p4options>::get().options())
+	P4_file() : _p4(new P4CContextWithOptions<p4options>), _options(P4CContextWithOptions<p4options>::get().options())
 	{}
 	P4_file(const std::string &command, const std::string &unit_path, const std::string &text);
 	~P4_file();
@@ -89,12 +93,13 @@ public:
 
 private:
 	int _argc;
-	char **_argv;
+	char** _argv;
 	AutoCompileContext _p4;
-	p4options &_options;
+	p4options& _options;
 	std::unique_ptr<const IR::P4Program> _program;
 	std::string _temp_path;
 	std::string _unit_path;
 	std::vector<Symbol_information> _symbols;
-	std::unordered_map<std::string, std::map<Range, std::string>> _location_to_name;
+	std::unordered_map<std::string, std::string> _definitions;
+	std::unordered_map<std::string, std::map<Range, std::string>> _locations;
 };

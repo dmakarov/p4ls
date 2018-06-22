@@ -39,9 +39,22 @@ bool Symbol_collector::preorder(const IR::Node* node)
 			<< " " << node->toString()
 			<< " " << location;
 #endif
+		if (node->is<IR::Type_Header>())
+		{
+			std::ostringstream definition;
+			definition << node->toString() << " {\n";
+			for (auto it : node->to<IR::Type_Header>()->fields)
+			{
+				definition << "  " << it->type->toString() << " " << it->toString() << ";\n";
+			}
+			definition << "}";
+			auto* name = node->to<IR::IDeclaration>()->getName().toString().c_str();
+			_definitions.emplace(name, definition.str());
+			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << definition.str();
+		}
 		if (node->is<IR::Type_Name>())
 		{
-			_location_to_name[path].emplace(std::make_pair(range, node->toString().c_str()));
+			_locations[path].emplace(std::make_pair(range, node->toString().c_str()));
 		}
 		else if (ctxt->depth == _max_depth
 			&& node->is<IR::IDeclaration>()
@@ -188,7 +201,7 @@ P4_file::~P4_file()
 std::vector<Symbol_information>& P4_file::get_symbols()
 {
 	_symbols.clear();
-	Collected_data output{_symbols, _location_to_name};
+	Collected_data output{_symbols, _definitions, _locations};
 	Outline outline(_options, _unit_path, output);
 	outline.process(_program);
 	return _symbols;
@@ -199,14 +212,14 @@ boost::optional<std::string> P4_file::get_hover(const Location& location)
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Searching hover for " << location;
 #endif
-	for (const auto& it : _location_to_name[location._uri])
+	for (const auto& it : _locations[location._uri])
 	{
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Checking location " << it.first;
 #endif
 		if (it.first & location._range)
 		{
-			return it.second;
+			return _definitions[it.second];
 		}
 	}
 	return boost::none;
