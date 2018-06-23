@@ -4,7 +4,6 @@ language: c++
 
 git:
   depth: 1
-  submodules: false
 
 addons:
   apt:
@@ -58,7 +57,7 @@ before_script:
   - mkdir -p build
 
 script:
-  - cd build && cmake -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && cd test && ctest
+  - cd build && cmake -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && cd test && ctest
 
 notifications:
   email: false
