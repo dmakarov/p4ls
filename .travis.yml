@@ -23,21 +23,21 @@ matrix:
       compiler: gcc
       addons: &gcc7
         apt:
-          packages: ["g++-7"]
+          packages: ["g++-7", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex"]
           sources: *apt_sources
 
-    - env: COMPILER=clang++-5.0
-      os: linux
-      compiler: clang
-      addons: &clang50
-        apt:
-          packages: ["clang-5.0", "g++-7"]
-          sources: *apt_sources
+#    - env: COMPILER=clang++-5.0
+#      os: linux
+#      compiler: clang
+#      addons: &clang50
+#        apt:
+#          packages: ["clang-5.0", "g++-7", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex"]
+#          sources: *apt_sources
 
-    - env: COMPILER=g++-7
-      os: osx
-      compiler: gcc
-      osx_image: xcode9.2
+#    - env: COMPILER=g++-7
+#      os: osx
+#      compiler: gcc
+#      osx_image: xcode9.2
 
     - env: COMPILER=clang++
       os: osx
@@ -46,18 +46,30 @@ matrix:
 
 install:
   - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "g++-7" ]]; then
-      brew install gcc@7
-      brew link --overwrite gcc@7
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      brew install bison
+      brew install pkg-config
+      brew install protobuf
+      if [[ "${COMPILER}" == "g++-7" ]]; then
+        brew install gcc@7
+        brew link --overwrite gcc@7
+      fi
+    fi
+    if [[ "${TRAVIS_OS_NAME}" = "linux" ]]; then
+      wget https://github.com/google/protobuf/releases/download/v3.6.0/protobuf-all-3.6.0.tar.gz
+      tar -xzvf protobuf-all-3.6.0.tar.gz
+      pushd protobuf-3.6.0 && ./configure --prefix=/usr && make && sudo make install && popd
     fi
 
   - export CXX="${COMPILER}"
+
+  - export PATH="/usr/local/opt/bison/bin:$PATH"
 
 before_script:
   - mkdir -p build
 
 script:
-  - cd build && cmake -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && cd test && ctest
+  - cd build && cmake -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && cd test && ctest
 
 notifications:
   email: false
