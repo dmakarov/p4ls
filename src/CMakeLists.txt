@@ -17,7 +17,7 @@ hunter_add_package(RapidJSON)
 find_package(Boost CONFIG REQUIRED COMPONENTS date_time system thread filesystem iostreams regex log)
 find_package(RapidJSON CONFIG REQUIRED)
 
-set (P4C_LIB_DEPS "${Boost_LIBRARIES};${LIBGMP_LIBRARIES};${LIBGC_LIBRARIES}")
+set (P4C_LIB_DEPS "${Boost_LIBRARIES};${LIBGMP_LIBRARIES}")
 set (P4C_LIBRARIES controlplane midend p4ctoolkit frontend ir)
 
 message("P4C_LIB_DEPS is ${P4C_LIB_DEPS}")
