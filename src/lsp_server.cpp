@@ -1,6 +1,13 @@
 #include "lsp_server.h"
 #include "dispatcher.h"
 
+#include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
+
+#include <boost/filesystem.hpp>
+#include <boost/tokenizer.hpp>
+
+#include <fstream>
 #include <functional>
 #include <regex>
 #include <string>
@@ -162,11 +169,14 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen &params)
 #endif
 	auto &path = params._text_document._uri._path;
 	auto &text = params._text_document._text;
-	std::string command("/Users/dmakarov/work/try/p4ls/build/ninja/src/tool/p4lsd -I /Users/dmakarov/work/try/p4c/p4include ");
 #if LOGGING_ENABLED
-	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Create new P4_file with command " << command << " path " << path << " and text.";
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Create new P4_file " << path;
 #endif
-	_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(command + path, path, text));
+	auto command = find_command_for_path(path);
+	if (!command.empty())
+	{
+		_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(command, path, text));
+	}
 }
 
 void LSP_server::on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params)
@@ -185,11 +195,15 @@ void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymb
 	auto &allocator = json_document.GetAllocator();
 	rapidjson::Value result(rapidjson::kArrayType);
 	auto& path = params._text_document._uri._path;
-	for (auto& it : _files[path].get_symbols())
+	auto file = _files.find(path);
+	if (file != _files.end())
 	{
-		if (it._location._uri == path)
+		for (auto& it : file->second.get_symbols())
 		{
-			result.PushBack(it.get_json(allocator), allocator);
+			if (it._location._uri == path)
+			{
+				result.PushBack(it.get_json(allocator), allocator);
+			}
 		}
 	}
 	reply(result);
@@ -215,25 +229,27 @@ void LSP_server::on_textDocument_hover(Params_textDocument_hover &params)
 	location._uri = path;
 	location._range._start = params._text_document_position._position;
 	location._range._end = params._text_document_position._position;
-	if (auto hover_content = _files[path].get_hover(location))
+	auto file = _files.find(path);
+	if (file != _files.end())
 	{
+		if (auto hover_content = file->second.get_hover(location))
+		{
 #if LOGGING_ENABLED
-		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Found hover content " << *hover_content;
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Found hover content " << *hover_content;
 #endif
-		std::ostringstream os;
-		os << "```p4\n" << *hover_content << "\n```";
-		Markup_content contents{MARKUP_KIND::markdown, os.str()};
-		rapidjson::Document json_document;
-		auto &allocator = json_document.GetAllocator();
-		rapidjson::Value result(rapidjson::kObjectType);
-		result.AddMember("contents", contents.get_json(allocator), allocator);
-		reply(result);
+			std::ostringstream os;
+			os << "```p4\n" << *hover_content << "\n```";
+			Markup_content contents{MARKUP_KIND::markdown, os.str()};
+			rapidjson::Document json_document;
+			auto &allocator = json_document.GetAllocator();
+			rapidjson::Value result(rapidjson::kObjectType);
+			result.AddMember("contents", contents.get_json(allocator), allocator);
+			reply(result);
+			return;
+		}
 	}
-	else
-	{
-		rapidjson::Value null(rapidjson::kNullType);
-		reply(null);
-	}
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
 }
 
 void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting &params)
@@ -377,4 +393,65 @@ boost::optional<std::string> LSP_server::read_message()
 		return std::move(content);
 	}
 	return boost::none;
+}
+
+std::string LSP_server::find_command_for_path(std::string& file)
+{
+	auto result = _commands.find(file);
+	if (result != _commands.end())
+	{
+		return result->second;
+	}
+	for (boost::filesystem::path path(file); path.has_parent_path();)
+	{
+		path = path.parent_path();
+		auto compile_commands_path = path / "compile_commands.json";
+		if (boost::filesystem::exists(compile_commands_path))
+		{
+			boost::filesystem::ifstream ifs(compile_commands_path);
+			rapidjson::IStreamWrapper isw(ifs);
+			rapidjson::Document json;
+			json.ParseStream(isw);
+			if (json.HasParseError() || !json.IsArray())
+			{
+				BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "JSON parse error: " << rapidjson::GetParseError_En(json.GetParseError()) << " (" << json.GetErrorOffset() << ")";
+				return std::string();
+			}
+			boost::char_separator<char> separator(" ");
+			boost::tokenizer<boost::char_separator<char>> tokens(std::string(json.GetArray()[0]["command"].GetString()), separator);
+			boost::filesystem::path compiler(*tokens.begin());
+			std::string std_include;
+			if (compiler.has_parent_path() && compiler.parent_path().has_parent_path())
+			{
+				auto std_include_path = compiler.parent_path().parent_path() / "share" / "p4c" / "p4include";
+				std_include = std_include_path.c_str();
+			}
+			for (auto& it : json.GetArray())
+			{
+				std::string the_file(it["file"].GetString());
+				std::string command(it["command"].GetString());
+				boost::char_separator<char> separator(" ");
+				boost::tokenizer<boost::char_separator<char>> tokens(command, separator);
+				std::string the_command("p4lsd");
+				if (!std_include.empty())
+				{
+					the_command += " -I ";
+					the_command += std_include;
+				}
+				auto token = tokens.begin();
+				for (++token; token != tokens.end(); ++token)
+				{
+					the_command += " " + *token;
+				}
+				_commands.emplace(the_file, the_command);
+			}
+			auto result = _commands.find(file);
+			if (result != _commands.end())
+			{
+				return result->second;
+			}
+			return std::string();
+		}
+	}
+	return std::string();
 }

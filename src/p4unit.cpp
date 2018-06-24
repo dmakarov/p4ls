@@ -50,7 +50,9 @@ bool Symbol_collector::preorder(const IR::Node* node)
 			definition << "}";
 			auto* name = node->to<IR::IDeclaration>()->getName().toString().c_str();
 			_definitions.emplace(name, definition.str());
+#if LOGGING_ENABLED
 			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << definition.str();
+#endif
 		}
 		if (node->is<IR::Type_Name>())
 		{

@@ -83,9 +83,7 @@ void Dispatcher::call(std::string content, std::ostream &output_stream) const
 	rapidjson::Document msg;
 	if (msg.Parse(content.c_str()).HasParseError())
 	{
-#if LOGGING_ENABLED
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "JSON parse error: " << rapidjson::GetParseError_En(msg.GetParseError()) << " (" << msg.GetErrorOffset() << ")";
-#endif
 		return;
 	}
 	rapidjson::StringBuffer buffer;

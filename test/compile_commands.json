@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/Users/dmakarov/work/try/p4ls/test",
+  "command": "/Users/dmakarov/work/try/opt/bin/p4c /Users/dmakarov/work/try/p4ls/test/main.p4",
+  "file": "/Users/dmakarov/work/try/p4ls/test/main.p4"
+}
+]
