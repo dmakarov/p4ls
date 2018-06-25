@@ -16,39 +16,42 @@
 boost::log::sources::severity_logger<int> LSP_server::_logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
 
 LSP_server::LSP_server(std::istream &input_stream, std::ostream &output_stream)
-	:
-	_capabilities {
-				   boost::none,
-				   Server_capabilities::Text_document_sync_options
-				   {
-					true, true, true,
-					Server_capabilities::Text_document_sync_options::Save_options{true},
-					TEXT_DOCUMENT_SYNC_KIND::Incremental
-				   },
-				   boost::none,
-				   boost::none,
-				   Server_capabilities::Code_lens_options{true},
-				   boost::none,
-				   Server_capabilities::Document_link_options{true},
-				   boost::none,
-				   boost::none,
-				   true,
-				   true,
-				   true,
-				   true,
-				   true,
-				   true,
-				   true,
-				   true,
-				   true,
-				   true,
-				   true,
-				   true},
-	_input_stream(input_stream),
-	_output_stream(output_stream),
-	_is_done(false),
-	_work(new boost::asio::io_service::work(_io_context)),
-	_worker_thread(std::thread([&]{_io_context.run();}))
+	: _capabilities {
+					 boost::none, // Workspace specific server capabilities
+					 Server_capabilities::Text_document_sync_options {
+					  true,       // open and close notifications are sent to the server
+					  true,       // will save notifications are sent to the server
+					  true,       // will save wait until requests are sent to the server
+					  Server_capabilities::Text_document_sync_options::Save_options {
+					   true       // the client is supposed to include the content on save
+					  },
+					  TEXT_DOCUMENT_SYNC_KIND::Incremental
+					 },           // how text documents are synced
+					 boost::none, // completion support
+					 boost::none, // signature help
+					 boost::none, // code lens
+					 boost::none, // document formatting on typing
+					 boost::none, // document link support
+					 boost::none, // color provider
+					 boost::none, // execute command
+					 true,        // hover support
+					 true,        // go to definition
+					 true,        // go to type definition
+					 true,        // go to implementation
+					 true,        // find references
+					 true,        // highlight support
+					 true,        // document symbol
+					 boost::none, // workspace symbol
+					 boost::none, // code actions
+					 boost::none, // formatting
+					 boost::none, // range formatting
+					 true         // rename support
+      }
+	, _input_stream(input_stream)
+	, _output_stream(output_stream)
+	, _is_done(false)
+	, _work(new boost::asio::io_service::work(_io_context))
+	, _worker_thread(std::thread([&]{_io_context.run();}))
 {
 }
 
