@@ -184,6 +184,9 @@ P4_file::P4_file(const std::string &command, const std::string &unit_path, const
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Compiled p4 source file, number of errors " << ::errorCount();
 #endif
+	Collected_data output{_symbols, _definitions, _locations};
+	Outline outline(_options, _unit_path, output);
+	outline.process(_program);
 }
 
 P4_file::~P4_file()
@@ -202,10 +205,6 @@ P4_file::~P4_file()
 
 std::vector<Symbol_information>& P4_file::get_symbols()
 {
-	_symbols.clear();
-	Collected_data output{_symbols, _definitions, _locations};
-	Outline outline(_options, _unit_path, output);
-	outline.process(_program);
 	return _symbols;
 }
 
