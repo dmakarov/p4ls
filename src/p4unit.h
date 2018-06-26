@@ -9,6 +9,7 @@
 #include <frontends/common/options.h>
 #include <ir/ir.h>
 
+#include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 
 #include <map>
@@ -87,17 +88,14 @@ public:
 	P4_file() : _p4(new P4CContextWithOptions<p4options>), _options(P4CContextWithOptions<p4options>::get().options())
 	{}
 	P4_file(const std::string &command, const std::string &unit_path, const std::string &text);
-	~P4_file();
+	~P4_file() = default;
 	std::vector<Symbol_information>& get_symbols();
 	boost::optional<std::string> get_hover(const Location& location);
 
 private:
-	int _argc;
-	char** _argv;
 	AutoCompileContext _p4;
 	p4options& _options;
 	std::unique_ptr<const IR::P4Program> _program;
-	std::string _temp_path;
 	std::string _unit_path;
 	std::vector<Symbol_information> _symbols;
 	std::unordered_map<std::string, std::string> _definitions;
