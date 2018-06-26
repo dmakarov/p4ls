@@ -142,6 +142,8 @@ void LSP_server::on_textDocument_completion(Params_textDocument_completion &para
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
 }
 
 void LSP_server::on_textDocument_definition(Params_textDocument_definition &params)
@@ -149,6 +151,8 @@ void LSP_server::on_textDocument_definition(Params_textDocument_definition &para
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
 }
 
 void LSP_server::on_textDocument_didChange(Params_textDocument_didChange &params)
@@ -187,6 +191,8 @@ void LSP_server::on_textDocument_documentHighlight(Params_textDocument_documentH
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
 }
 
 void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymbol &params)
@@ -217,6 +223,8 @@ void LSP_server::on_textDocument_formatting(Params_textDocument_formatting &para
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
 }
 
 void LSP_server::on_textDocument_hover(Params_textDocument_hover &params)
@@ -260,6 +268,8 @@ void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeForm
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
 }
 
 void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting &params)
@@ -267,6 +277,8 @@ void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormat
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
 }
 
 void LSP_server::on_textDocument_rename(Params_textDocument_rename &params)
@@ -274,6 +286,8 @@ void LSP_server::on_textDocument_rename(Params_textDocument_rename &params)
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
 }
 
 void LSP_server::on_textDocument_signatureHelp(Params_textDocument_signatureHelp &params)
@@ -281,6 +295,8 @@ void LSP_server::on_textDocument_signatureHelp(Params_textDocument_signatureHelp
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
 }
 
 void LSP_server::on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader &params)
@@ -288,6 +304,15 @@ void LSP_server::on_textDocument_switchSourceHeader(Params_textDocument_switchSo
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+}
+
+void LSP_server::on_textDocument_typeDefinition(Params_textDocument_definition &params)
+{
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
+#endif
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
 }
 
 void LSP_server::on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration &params)

@@ -1409,6 +1409,7 @@ public:
 	virtual void on_textDocument_rename(Params_textDocument_rename &params) = 0;
 	virtual void on_textDocument_signatureHelp(Params_textDocument_signatureHelp &params) = 0;
 	virtual void on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader &params) = 0;
+	virtual void on_textDocument_typeDefinition(Params_textDocument_definition &params) = 0;
 	virtual void on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration &params) = 0;
 	virtual void on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles &params) = 0;
 	virtual void on_workspace_executeCommand(Params_workspace_executeCommand &params) = 0;

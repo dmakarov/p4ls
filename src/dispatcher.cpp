@@ -65,6 +65,7 @@ void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
 	register_handler("textDocument/rename", &Protocol::on_textDocument_rename);
 	register_handler("textDocument/signatureHelp", &Protocol::on_textDocument_signatureHelp);
 	register_handler("textDocument/switchSourceHeader", &Protocol::on_textDocument_switchSourceHeader);
+	register_handler("textDocument/typeDefinition", &Protocol::on_textDocument_definition);
 	register_handler("workspace/didChangeConfiguration", &Protocol::on_workspace_didChangeConfiguration);
 	register_handler("workspace/didChangeWatchedFiles", &Protocol::on_workspace_didChangeWatchedFiles);
 	register_handler("workspace/executeCommand", &Protocol::on_workspace_executeCommand);

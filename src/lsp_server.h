@@ -46,6 +46,7 @@ private:
 	void on_textDocument_rename(Params_textDocument_rename& params) override;
 	void on_textDocument_signatureHelp(Params_textDocument_signatureHelp& params) override;
 	void on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader& params) override;
+	void on_textDocument_typeDefinition(Params_textDocument_definition& params) override;
 	void on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration& params) override;
 	void on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles& params) override;
 	void on_workspace_executeCommand(Params_workspace_executeCommand& params) override;
