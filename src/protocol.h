@@ -174,7 +174,7 @@ SYMBOL_KIND convert_int_to_symbol_kind(const int v)
 	return SYMBOL_KIND::File;
 }
 
-MARKUP_KIND convert_string_to_markup_kind(const std::string &v)
+MARKUP_KIND convert_string_to_markup_kind(const std::string& v)
 {
 	if (v == "plaintext") return MARKUP_KIND::plaintext;
 	if (v == "markdown") return MARKUP_KIND::markdown;
@@ -205,12 +205,12 @@ struct URI {
 	explicit URI(const std::string& path) : _path(path)
 	{}
 
-	void set_from_path(const std::string &path)
+	void set_from_path(const std::string& path)
 	{
 		_path = std::move(path);
 	}
 
-	void set_from_uri(const std::string &uri)
+	void set_from_uri(const std::string& uri)
 	{
 		auto pos = uri.find("://");
 		if (pos == std::string::npos)
@@ -231,10 +231,10 @@ struct URI {
 	std::string _path;
 };
 
-std::ostream &operator<<(std::ostream &os, const URI &item);
+std::ostream& operator<<(std::ostream& os, const URI& item);
 
 struct Workspace_folder {
-	Workspace_folder(const rapidjson::Value &json)
+	Workspace_folder(const rapidjson::Value& json)
 	{
 	}
 	std::string _uri;
@@ -243,7 +243,7 @@ struct Workspace_folder {
 
 struct Text_document_client_capabilities {
 
-	explicit Text_document_client_capabilities(const rapidjson::Value &json)
+	explicit Text_document_client_capabilities(const rapidjson::Value& json)
 	{
 		if (json.HasMember("synchronization") && !json["synchronization"].IsNull())
 		{
@@ -324,7 +324,7 @@ struct Text_document_client_capabilities {
 	}
 
 	struct Synchronization {
-		explicit Synchronization(const rapidjson::Value &json)
+		explicit Synchronization(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -351,7 +351,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Completion {
-		explicit Completion(const rapidjson::Value &json)
+		explicit Completion(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -372,7 +372,7 @@ struct Text_document_client_capabilities {
 		}
 
 		struct Completion_item {
-			explicit Completion_item(const rapidjson::Value &json)
+			explicit Completion_item(const rapidjson::Value& json)
 			{
 				if (json.HasMember("snippetSupport") && !json["snippetSupport"].IsNull())
 				{
@@ -399,7 +399,7 @@ struct Text_document_client_capabilities {
 		};
 
 		struct Completion_item_kind {
-			explicit Completion_item_kind(const rapidjson::Value &json)
+			explicit Completion_item_kind(const rapidjson::Value& json)
 			{
 				if (json.HasMember("valueSet") && !json["valueSet"].IsNull())
 				{
@@ -422,7 +422,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Hover {
-		explicit Hover(const rapidjson::Value &json)
+		explicit Hover(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -444,7 +444,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Signature_help {
-		explicit Signature_help(const rapidjson::Value &json)
+		explicit Signature_help(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -457,7 +457,7 @@ struct Text_document_client_capabilities {
 		}
 
 		struct Signature_information {
-			explicit Signature_information(const rapidjson::Value &json)
+			explicit Signature_information(const rapidjson::Value& json)
 			{
 				if (json.HasMember("documentationFormat") && !json["documentationFormat"].IsNull())
 				{
@@ -478,7 +478,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct References {
-		explicit References(const rapidjson::Value &json)
+		explicit References(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -490,7 +490,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Document_highlight {
-		explicit Document_highlight(const rapidjson::Value &json)
+		explicit Document_highlight(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -502,7 +502,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Document_symbol {
-		explicit Document_symbol(const rapidjson::Value &json)
+		explicit Document_symbol(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -515,7 +515,7 @@ struct Text_document_client_capabilities {
 		}
 
 		struct Symbol_kind {
-			explicit Symbol_kind(const rapidjson::Value &json)
+			explicit Symbol_kind(const rapidjson::Value& json)
 			{
 				if (json.HasMember("valueSet") && !json["valueSet"].IsNull())
 				{
@@ -536,7 +536,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Formatting {
-		explicit Formatting(const rapidjson::Value &json)
+		explicit Formatting(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -548,7 +548,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Range_formatting {
-		explicit Range_formatting(const rapidjson::Value &json)
+		explicit Range_formatting(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -560,7 +560,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct On_type_formatting {
-		explicit On_type_formatting(const rapidjson::Value &json)
+		explicit On_type_formatting(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -572,7 +572,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Definition {
-		explicit Definition(const rapidjson::Value &json)
+		explicit Definition(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -584,7 +584,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Type_definition {
-		explicit Type_definition(const rapidjson::Value &json)
+		explicit Type_definition(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -596,7 +596,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Implementation {
-		explicit Implementation(const rapidjson::Value &json)
+		explicit Implementation(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -608,7 +608,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Code_action {
-		explicit Code_action(const rapidjson::Value &json)
+		explicit Code_action(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -620,7 +620,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Code_lens {
-		explicit Code_lens(const rapidjson::Value &json)
+		explicit Code_lens(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -632,7 +632,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Document_link {
-		explicit Document_link(const rapidjson::Value &json)
+		explicit Document_link(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -644,7 +644,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Color_provider {
-		explicit Color_provider(const rapidjson::Value &json)
+		explicit Color_provider(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -656,7 +656,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Rename {
-		explicit Rename(const rapidjson::Value &json)
+		explicit Rename(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -668,7 +668,7 @@ struct Text_document_client_capabilities {
 	};
 
 	struct Publish_diagnostics {
-		explicit Publish_diagnostics(const rapidjson::Value &json)
+		explicit Publish_diagnostics(const rapidjson::Value& json)
 		{
 			if (json.HasMember("relatedInformation") && !json["relatedInformation"].IsNull())
 			{
@@ -703,7 +703,7 @@ struct Text_document_client_capabilities {
 
 struct Workspace_client_capabilities {
 
-	explicit Workspace_client_capabilities(const rapidjson::Value &json)
+	explicit Workspace_client_capabilities(const rapidjson::Value& json)
 	{
 		if (json.HasMember("applyEdit") && !json["applyEdit"].IsNull())
 		{
@@ -740,7 +740,7 @@ struct Workspace_client_capabilities {
 	}
 
 	struct Workspace_edit {
-		explicit Workspace_edit(const rapidjson::Value &json)
+		explicit Workspace_edit(const rapidjson::Value& json)
 		{
 			if (json.HasMember("documentChanges") && !json["documentChanges"].IsNull())
 			{
@@ -751,7 +751,7 @@ struct Workspace_client_capabilities {
 	};
 
 	struct Did_change_configuration {
-		explicit Did_change_configuration(const rapidjson::Value &json)
+		explicit Did_change_configuration(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -762,7 +762,7 @@ struct Workspace_client_capabilities {
 	};
 
 	struct Did_change_watched_files {
-		explicit Did_change_watched_files(const rapidjson::Value &json)
+		explicit Did_change_watched_files(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -773,7 +773,7 @@ struct Workspace_client_capabilities {
 	};
 
 	struct Execute_command {
-		explicit Execute_command(const rapidjson::Value &json)
+		explicit Execute_command(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -784,7 +784,7 @@ struct Workspace_client_capabilities {
 	};
 
 	struct Symbol {
-		explicit Symbol(const rapidjson::Value &json)
+		explicit Symbol(const rapidjson::Value& json)
 		{
 			if (json.HasMember("dynamicRegistration") && !json["dynamicRegistration"].IsNull())
 			{
@@ -797,7 +797,7 @@ struct Workspace_client_capabilities {
 		}
 
 		struct Symbol_kind {
-			explicit Symbol_kind(const rapidjson::Value &json)
+			explicit Symbol_kind(const rapidjson::Value& json)
 			{
 				if (json.HasMember("valueSet") && !json["valueSet"].IsNull())
 				{
@@ -839,7 +839,7 @@ struct Workspace_client_capabilities {
 
 struct Client_capabilities {
 
-	void set(const rapidjson::Value &json)
+	void set(const rapidjson::Value& json)
 	{
 		if (json.HasMember("workspace") && !json["workspace"].IsNull())
 		{
@@ -858,14 +858,14 @@ struct Client_capabilities {
 
 struct Server_capabilities {
 
-	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator);
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator);
 
 	struct Text_document_sync_options {
 
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator);
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator);
 
 		struct Save_options {
-			rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+			rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 			{
 				rapidjson::Value result(rapidjson::kObjectType);
 				if (_include_text)
@@ -886,7 +886,7 @@ struct Server_capabilities {
 	};
 
 	struct Completion_options {
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 		{
 			rapidjson::Value result(rapidjson::kObjectType);
 			if (_resolve_provider)
@@ -905,7 +905,7 @@ struct Server_capabilities {
 	};
 
 	struct Signature_help_options {
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 		{
 			rapidjson::Value result(rapidjson::kObjectType);
 			if (_trigger_characters)
@@ -919,7 +919,7 @@ struct Server_capabilities {
 	};
 
 	struct Code_lens_options {
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 		{
 			rapidjson::Value result(rapidjson::kObjectType);
 			if (_resolve_provider)
@@ -933,7 +933,7 @@ struct Server_capabilities {
 	};
 
 	struct Document_on_type_formatting_options {
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 		{
 			rapidjson::Value result(rapidjson::kObjectType);
 			result.AddMember("firstTriggerCharacter", rapidjson::StringRef(_first_trigger_character.c_str()), allocator);
@@ -949,7 +949,7 @@ struct Server_capabilities {
 	};
 
 	struct Document_link_options {
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 		{
 			rapidjson::Value result(rapidjson::kObjectType);
 			if (resolve_provider)
@@ -963,10 +963,10 @@ struct Server_capabilities {
 	};
 
 	struct Execute_command_options {
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 		{
 			rapidjson::Value a(rapidjson::kArrayType);
-			for (auto &it : _commands)
+			for (auto& it : _commands)
 			{
 				a.PushBack(rapidjson::StringRef(it.c_str()), allocator);
 			}
@@ -979,7 +979,7 @@ struct Server_capabilities {
 	};
 
 	struct Workspace_folders {
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 		{
 			rapidjson::Value result(rapidjson::kObjectType);
 			if (_supported)
@@ -998,7 +998,7 @@ struct Server_capabilities {
 	};
 
 	struct Workspace {
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 		{
 			rapidjson::Value result(rapidjson::kObjectType);
 			if (_workspace_folders)
@@ -1012,7 +1012,7 @@ struct Server_capabilities {
 	};
 
 	struct Color_provider_options {
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 		{
 			rapidjson::Value result(rapidjson::kObjectType);
 			return result;
@@ -1052,7 +1052,7 @@ struct Position {
 		, _character(position.getColumnNumber())
 	{}
 
-	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 	{
 		rapidjson::Value result(rapidjson::kObjectType);
 		result.AddMember("line", _line, allocator);
@@ -1060,7 +1060,7 @@ struct Position {
 		return result;
 	}
 
-	bool set(const rapidjson::Value &json)
+	bool set(const rapidjson::Value& json)
 	{
 		if (json.HasMember("line") && json.HasMember("character"))
 		{
@@ -1102,7 +1102,7 @@ struct Range {
 		_end._character = info.getEnd().getColumnNumber();
 	}
 
-	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 	{
 		rapidjson::Value result(rapidjson::kObjectType);
 		result.AddMember("start", _start.get_json(allocator), allocator);
@@ -1114,7 +1114,7 @@ struct Range {
 	Position _end;		// the range's end position
 };
 
-std::ostream &operator<<(std::ostream &os, const Range &range);
+std::ostream& operator<<(std::ostream& os, const Range& range);
 bool operator<(const Range& lhs, const Range& rhs);
 bool operator&(const Range& lhs, const Range& rhs);
 
@@ -1124,7 +1124,7 @@ bool operator&(const Range& lhs, const Range& rhs);
  * text file.
  */
 struct Location {
-	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 	{
 		rapidjson::Value result(rapidjson::kObjectType);
 		result.AddMember("uri", rapidjson::StringRef(_uri.c_str()), allocator);
@@ -1136,7 +1136,7 @@ struct Location {
 	Range _range;
 };
 
-std::ostream &operator<<(std::ostream &os, const Location &location);
+std::ostream& operator<<(std::ostream& os, const Location& location);
 bool operator==(const Location& lhs, const Location& rhs);
 bool operator<(const Location& lhs, const Location& rhs);
 
@@ -1154,7 +1154,7 @@ struct Symbol_information {
 		, _container_name(std::move(container))
 	{}
 
-	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 	{
 		rapidjson::Value result(rapidjson::kObjectType);
 		result.AddMember("name", rapidjson::StringRef(_name.c_str()), allocator);
@@ -1195,7 +1195,7 @@ struct Symbol_information {
 
 struct Text_document_item {
 
-	bool set(const rapidjson::Value &json)
+	bool set(const rapidjson::Value& json)
 	{
 		if (!json.HasMember("uri") || !json.HasMember("languageId") || !json.HasMember("version") || !json.HasMember("text"))
 		{
@@ -1217,7 +1217,7 @@ struct Text_document_item {
 
 struct Text_document_identifier {
 
-	bool set(const rapidjson::Value &json)
+	bool set(const rapidjson::Value& json)
 	{
 		if (!json.HasMember("uri"))
 		{
@@ -1231,24 +1231,8 @@ struct Text_document_identifier {
 };
 
 
-struct Text_document_position {
-
-	bool set(const rapidjson::Value &json)
-	{
-		if (json.HasMember("textDocument") && json.HasMember("position"))
-		{
-			return _text_document.set(json["textDocument"]) && _position.set(json["position"]);
-		}
-		return false;
-	}
-
-	Text_document_identifier _text_document;
-	Position _position;
-};
-
-
 struct Markup_content {
-	rapidjson::Value get_json(rapidjson::Document::AllocatorType &allocator)
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 	{
 		rapidjson::Value result(rapidjson::kObjectType);
 		result.AddMember("kind", rapidjson::StringRef(convert_markup_kind_to_string(_kind)), allocator);
@@ -1264,7 +1248,7 @@ struct Markup_content {
 struct Params_exit {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_exit &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_exit& params);
 
 struct Params_initialize {
 	int _process_id;
@@ -1275,142 +1259,147 @@ struct Params_initialize {
 	boost::optional<std::vector<Workspace_folder>> _workspace_folders;
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_initialize &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_initialize& params);
 
 struct Params_shutdown {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_shutdown &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_shutdown& params);
+
+struct Params_text_document_position {
+
+	bool set(const rapidjson::Value& json)
+	{
+		if (json.HasMember("textDocument") && json.HasMember("position"))
+		{
+			return _text_document.set(json["textDocument"]) && _position.set(json["position"]);
+		}
+		return false;
+	}
+
+	Text_document_identifier _text_document;
+	Position _position;
+};
+
+bool set_params_from_json(const rapidjson::Value& json, Params_text_document_position& params);
 
 struct Params_textDocument_codeAction {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_codeAction &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_codeAction& params);
 
 struct Params_textDocument_codeLens {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_codeLens &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_codeLens& params);
 
 struct Params_codeLens_resolve {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_codeLens_resolve &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_codeLens_resolve& params);
 
 struct Params_textDocument_completion {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_completion &params);
-
-struct Params_textDocument_definition {
-};
-
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_definition &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_completion& params);
 
 struct Params_textDocument_didChange {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didChange &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_didChange& params);
 
 struct Params_textDocument_didClose {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didClose &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_didClose& params);
 
 struct Params_textDocument_didOpen {
 	Text_document_item _text_document;
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didOpen &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_didOpen& params);
 
-struct Params_textDocument_documentHighlight {
+struct Params_textDocument_didSave {
+	Text_document_identifier _text_document;
+	boost::optional<std::string> _text;
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentHighlight &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_didSave& params);
 
 struct Params_textDocument_documentSymbol {
 	Text_document_identifier _text_document;
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentSymbol &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_documentSymbol& params);
 
 struct Params_textDocument_formatting {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_formatting &params);
-
-struct Params_textDocument_hover {
-	Text_document_position _text_document_position;
-};
-
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_hover &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_formatting& params);
 
 struct Params_textDocument_onTypeFormatting {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_onTypeFormatting &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_onTypeFormatting& params);
 
 struct Params_textDocument_rangeFormatting {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_rangeFormatting &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_rangeFormatting& params);
 
 struct Params_textDocument_rename {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_rename &params);
-
-struct Params_textDocument_signatureHelp {
-};
-
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_signatureHelp &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_rename& params);
 
 struct Params_textDocument_switchSourceHeader {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_switchSourceHeader &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_switchSourceHeader& params);
 
 struct Params_workspace_didChangeConfiguration {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_workspace_didChangeConfiguration &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_workspace_didChangeConfiguration& params);
 
 struct Params_workspace_didChangeWatchedFiles {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_workspace_didChangeWatchedFiles &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_workspace_didChangeWatchedFiles& params);
 
 struct Params_workspace_executeCommand {
 };
 
-bool set_params_from_json(const rapidjson::Value &json, Params_workspace_executeCommand &params);
+bool set_params_from_json(const rapidjson::Value& json, Params_workspace_executeCommand& params);
 
 class Protocol {
 public:
 	virtual ~Protocol() = default;
 
-	virtual void on_exit(Params_exit &params) = 0;
-	virtual void on_initialize(Params_initialize &params) = 0;
-	virtual void on_shutdown(Params_shutdown &params) = 0;
-	virtual void on_textDocument_codeAction(Params_textDocument_codeAction &params) = 0;
-	virtual void on_textDocument_codeLens(Params_textDocument_codeLens &params) = 0;
-	virtual void on_codeLens_resolve(Params_codeLens_resolve &params) = 0;
-	virtual void on_textDocument_completion(Params_textDocument_completion &params) = 0;
-	virtual void on_textDocument_definition(Params_textDocument_definition &params) = 0;
-	virtual void on_textDocument_didChange(Params_textDocument_didChange &params) = 0;
-	virtual void on_textDocument_didClose(Params_textDocument_didClose &params) = 0;
-	virtual void on_textDocument_didOpen(Params_textDocument_didOpen &params) = 0;
-	virtual void on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params) = 0;
-	virtual void on_textDocument_documentSymbol(Params_textDocument_documentSymbol &params) = 0;
-	virtual void on_textDocument_formatting(Params_textDocument_formatting &params) = 0;
-	virtual void on_textDocument_hover(Params_textDocument_hover &params) = 0;
-	virtual void on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting &params) = 0;
-	virtual void on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting &params) = 0;
-	virtual void on_textDocument_rename(Params_textDocument_rename &params) = 0;
-	virtual void on_textDocument_signatureHelp(Params_textDocument_signatureHelp &params) = 0;
-	virtual void on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader &params) = 0;
-	virtual void on_textDocument_typeDefinition(Params_textDocument_definition &params) = 0;
-	virtual void on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration &params) = 0;
-	virtual void on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles &params) = 0;
-	virtual void on_workspace_executeCommand(Params_workspace_executeCommand &params) = 0;
+	virtual void on_exit(Params_exit& params) = 0;
+	virtual void on_initialize(Params_initialize& params) = 0;
+	virtual void on_shutdown(Params_shutdown& params) = 0;
+	virtual void on_textDocument_codeAction(Params_textDocument_codeAction& params) = 0;
+	virtual void on_textDocument_codeLens(Params_textDocument_codeLens& params) = 0;
+	virtual void on_codeLens_resolve(Params_codeLens_resolve& params) = 0;
+	virtual void on_textDocument_completion(Params_textDocument_completion& params) = 0;
+	virtual void on_textDocument_definition(Params_text_document_position& params) = 0;
+	virtual void on_textDocument_didChange(Params_textDocument_didChange& params) = 0;
+	virtual void on_textDocument_didClose(Params_textDocument_didClose& params) = 0;
+	virtual void on_textDocument_didOpen(Params_textDocument_didOpen& params) = 0;
+	virtual void on_textDocument_didSave(Params_textDocument_didSave& params) = 0;
+	virtual void on_textDocument_documentHighlight(Params_text_document_position& params) = 0;
+	virtual void on_textDocument_documentSymbol(Params_textDocument_documentSymbol& params) = 0;
+	virtual void on_textDocument_formatting(Params_textDocument_formatting& params) = 0;
+	virtual void on_textDocument_hover(Params_text_document_position& params) = 0;
+	virtual void on_textDocument_implementation(Params_text_document_position& params) = 0;
+	virtual void on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting& params) = 0;
+	virtual void on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting& params) = 0;
+	virtual void on_textDocument_rename(Params_textDocument_rename& params) = 0;
+	virtual void on_textDocument_signatureHelp(Params_text_document_position& params) = 0;
+	virtual void on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader& params) = 0;
+	virtual void on_textDocument_typeDefinition(Params_text_document_position& params) = 0;
+	virtual void on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration& params) = 0;
+	virtual void on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles& params) = 0;
+	virtual void on_workspace_executeCommand(Params_workspace_executeCommand& params) = 0;
 };

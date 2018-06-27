@@ -239,6 +239,18 @@ bool set_params_from_json(const rapidjson::Value &json, Params_shutdown &params)
 	return true;
 }
 
+bool set_params_from_json(const rapidjson::Value &json, Params_text_document_position &params)
+{
+#if LOGGING_ENABLED
+	BOOST_LOG_TRIVIAL(info) << "Processing TextDocumentPositionParams";
+#endif
+	auto result = params.set(json);
+#if LOGGING_ENABLED
+	BOOST_LOG_TRIVIAL(info) << "Processed TextDocumentPositionParams " << result;
+#endif
+	return result;
+}
+
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_codeAction &params)
 {
 	return true;
@@ -255,11 +267,6 @@ bool set_params_from_json(const rapidjson::Value &json, Params_codeLens_resolve 
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_completion &params)
-{
-	return true;
-}
-
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_definition &params)
 {
 	return true;
 }
@@ -290,9 +297,24 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didO
 	return result;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentHighlight &params)
+bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didSave &params)
 {
-	return true;
+	auto result = false;
+#if LOGGING_ENABLED
+	BOOST_LOG_TRIVIAL(info) << "Processing params for textDocument/didSave notification";
+#endif
+	if (json.HasMember("textDocument"))
+	{
+		result = params._text_document.set(json["textDocument"]);
+	}
+	if (json.HasMember("text"))
+	{
+		params._text.emplace(json["text"].GetString());
+	}
+#if LOGGING_ENABLED
+	BOOST_LOG_TRIVIAL(info) << "Processed params for textDocument/didSave notification " << result;
+#endif
+	return result;
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentSymbol &params)
@@ -316,18 +338,6 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_form
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_hover &params)
-{
-#if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << "Start processing params for textDocument/hover request";
-#endif
-	auto result = params._text_document_position.set(json);
-#if LOGGING_ENABLED
-	BOOST_LOG_TRIVIAL(info) << "Finish processing params for textDocument/hover request " << result;
-#endif
-	return result;
-}
-
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_onTypeFormatting &params)
 {
 	return true;
@@ -339,11 +349,6 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_rang
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_rename &params)
-{
-	return true;
-}
-
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_signatureHelp &params)
 {
 	return true;
 }

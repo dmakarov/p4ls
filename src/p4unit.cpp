@@ -134,7 +134,7 @@ SYMBOL_KIND Symbol_collector::get_symbol_kind(const IR::Node* node)
 	return SYMBOL_KIND::Null;
 }
 
-P4_file::P4_file(const std::string &command, const std::string &unit_path, const std::string &text)
+P4_file::P4_file(const std::string &command, const std::string &unit_path)
 	: _p4(new P4CContextWithOptions<p4options>)
 	, _options(P4CContextWithOptions<p4options>::get().options())
 	, _unit_path(unit_path)
@@ -157,11 +157,6 @@ P4_file::P4_file(const std::string &command, const std::string &unit_path, const
 			auto arg = new char[temp.size() + 1];
 			strncpy(arg, temp.c_str(), temp.size() + 1);
 			argv.emplace_back(arg);
-			std::ofstream ofs(temp);
-			ofs << text;
-#if LOGGING_ENABLED
-			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Wrote document " << _unit_path << " text to a temporary file " << temp;
-#endif
 		}
 		else
 		{
@@ -176,14 +171,28 @@ P4_file::P4_file(const std::string &command, const std::string &unit_path, const
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Processed options, number of errors " << ::errorCount() << " input file " << _options.file;
 #endif
+}
+
+void P4_file::compile(const std::string& text)
+{
+	std::ofstream ofs(_options.file);
+	ofs << text;
+	ofs.close();
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Wrote document " << _unit_path << " text to a temporary file " << _options.file;
+#endif
 	_program.reset(P4::parseP4File(_options));
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Compiled p4 source file, number of errors " << ::errorCount();
 #endif
+	boost::filesystem::path temp_file_path(_options.file);
 	if (exists(temp_file_path))
 	{
 		remove(temp_file_path);
 	}
+	_symbols.clear();
+	_definitions.clear();
+	_locations.clear();
 	Collected_data output{_symbols, _definitions, _locations};
 	Outline outline(_options, _unit_path, output);
 	outline.process(_program);

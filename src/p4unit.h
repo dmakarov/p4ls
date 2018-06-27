@@ -85,10 +85,12 @@ public:
  */
 class P4_file {
 public:
-	P4_file() : _p4(new P4CContextWithOptions<p4options>), _options(P4CContextWithOptions<p4options>::get().options())
+	P4_file() : _p4(new P4CContextWithOptions<p4options>)
+			  , _options(P4CContextWithOptions<p4options>::get().options())
 	{}
-	P4_file(const std::string &command, const std::string &unit_path, const std::string &text);
+	P4_file(const std::string &command, const std::string &unit_path);
 	~P4_file() = default;
+	void compile(const std::string& text);
 	std::vector<Symbol_information>& get_symbols();
 	boost::optional<std::string> get_hover(const Location& location);
 

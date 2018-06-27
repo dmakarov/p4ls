@@ -83,7 +83,7 @@ int LSP_server::run()
 	return 0;
 }
 
-void LSP_server::on_exit(Params_exit &params)
+void LSP_server::on_exit(Params_exit& params)
 {
 	_is_done = true;
 #if LOGGING_ENABLED
@@ -91,7 +91,7 @@ void LSP_server::on_exit(Params_exit &params)
 #endif
 }
 
-void LSP_server::on_initialize(Params_initialize &params)
+void LSP_server::on_initialize(Params_initialize& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -103,7 +103,7 @@ void LSP_server::on_initialize(Params_initialize &params)
 	reply(result);
 }
 
-void LSP_server::on_shutdown(Params_shutdown &params)
+void LSP_server::on_shutdown(Params_shutdown& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -112,23 +112,14 @@ void LSP_server::on_shutdown(Params_shutdown &params)
 	reply(result);
 }
 
-void LSP_server::on_textDocument_codeAction(Params_textDocument_codeAction &params)
+void LSP_server::on_textDocument_codeAction(Params_textDocument_codeAction& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
-void LSP_server::on_textDocument_codeLens(Params_textDocument_codeLens &params)
-{
-#if LOGGING_ENABLED
-	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
-	rapidjson::Value result(rapidjson::kNullType);
-	reply(result);
-}
-
-void LSP_server::on_codeLens_resolve(Params_codeLens_resolve &params)
+void LSP_server::on_textDocument_codeLens(Params_textDocument_codeLens& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -137,7 +128,16 @@ void LSP_server::on_codeLens_resolve(Params_codeLens_resolve &params)
 	reply(result);
 }
 
-void LSP_server::on_textDocument_completion(Params_textDocument_completion &params)
+void LSP_server::on_codeLens_resolve(Params_codeLens_resolve& params)
+{
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
+#endif
+	rapidjson::Value result(rapidjson::kNullType);
+	reply(result);
+}
+
+void LSP_server::on_textDocument_completion(Params_textDocument_completion& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -146,7 +146,7 @@ void LSP_server::on_textDocument_completion(Params_textDocument_completion &para
 	reply(null);
 }
 
-void LSP_server::on_textDocument_definition(Params_textDocument_definition &params)
+void LSP_server::on_textDocument_definition(Params_text_document_position& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -155,21 +155,21 @@ void LSP_server::on_textDocument_definition(Params_textDocument_definition &para
 	reply(null);
 }
 
-void LSP_server::on_textDocument_didChange(Params_textDocument_didChange &params)
+void LSP_server::on_textDocument_didChange(Params_textDocument_didChange& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
-void LSP_server::on_textDocument_didClose(Params_textDocument_didClose &params)
+void LSP_server::on_textDocument_didClose(Params_textDocument_didClose& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
-void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen &params)
+void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -182,11 +182,19 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen &params)
 	auto command = find_command_for_path(path);
 	if (!command.empty())
 	{
-		_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(command, path, text));
+		_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(command, path));
+		_files[path].compile(text);
 	}
 }
 
-void LSP_server::on_textDocument_documentHighlight(Params_textDocument_documentHighlight &params)
+void LSP_server::on_textDocument_didSave(Params_textDocument_didSave& params)
+{
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
+#endif
+}
+
+void LSP_server::on_textDocument_documentHighlight(Params_text_document_position& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -195,7 +203,7 @@ void LSP_server::on_textDocument_documentHighlight(Params_textDocument_documentH
 	reply(null);
 }
 
-void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymbol &params)
+void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymbol& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -218,7 +226,7 @@ void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymb
 	reply(result);
 }
 
-void LSP_server::on_textDocument_formatting(Params_textDocument_formatting &params)
+void LSP_server::on_textDocument_formatting(Params_textDocument_formatting& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -227,19 +235,18 @@ void LSP_server::on_textDocument_formatting(Params_textDocument_formatting &para
 	reply(null);
 }
 
-void LSP_server::on_textDocument_hover(Params_textDocument_hover &params)
+void LSP_server::on_textDocument_hover(Params_text_document_position& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__
-	<< "(document " << params._text_document_position._text_document._uri._path
-	<< ", line " << params._text_document_position._position._line
-	<< ", character " << params._text_document_position._position._character << ")";
+	<< "(document " << params._text_document._uri._path
+	<< ", line " << params._position._line << ", character " << params._position._character << ")";
 #endif
-	auto &path = params._text_document_position._text_document._uri._path;
+	auto &path = params._text_document._uri._path;
 	Location location;
 	location._uri = path;
-	location._range._start = params._text_document_position._position;
-	location._range._end = params._text_document_position._position;
+	location._range._start = params._position;
+	location._range._end = params._position;
 	auto file = _files.find(path);
 	if (file != _files.end())
 	{
@@ -263,7 +270,7 @@ void LSP_server::on_textDocument_hover(Params_textDocument_hover &params)
 	reply(null);
 }
 
-void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting &params)
+void LSP_server::on_textDocument_implementation(Params_text_document_position& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -272,7 +279,7 @@ void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeForm
 	reply(null);
 }
 
-void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting &params)
+void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -281,7 +288,7 @@ void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormat
 	reply(null);
 }
 
-void LSP_server::on_textDocument_rename(Params_textDocument_rename &params)
+void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -290,7 +297,7 @@ void LSP_server::on_textDocument_rename(Params_textDocument_rename &params)
 	reply(null);
 }
 
-void LSP_server::on_textDocument_signatureHelp(Params_textDocument_signatureHelp &params)
+void LSP_server::on_textDocument_rename(Params_textDocument_rename& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -299,14 +306,7 @@ void LSP_server::on_textDocument_signatureHelp(Params_textDocument_signatureHelp
 	reply(null);
 }
 
-void LSP_server::on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader &params)
-{
-#if LOGGING_ENABLED
-	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
-}
-
-void LSP_server::on_textDocument_typeDefinition(Params_textDocument_definition &params)
+void LSP_server::on_textDocument_signatureHelp(Params_text_document_position& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
@@ -315,21 +315,37 @@ void LSP_server::on_textDocument_typeDefinition(Params_textDocument_definition &
 	reply(null);
 }
 
-void LSP_server::on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration &params)
+void LSP_server::on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
-void LSP_server::on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles &params)
+void LSP_server::on_textDocument_typeDefinition(Params_text_document_position& params)
+{
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
+#endif
+	rapidjson::Value null(rapidjson::kNullType);
+	reply(null);
+}
+
+void LSP_server::on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
 }
 
-void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand &params)
+void LSP_server::on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles& params)
+{
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
+#endif
+}
+
+void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand& params)
 {
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
