@@ -1231,6 +1231,18 @@ struct Text_document_identifier {
 };
 
 
+struct Versioned_text_document_identifier : public Text_document_identifier {
+	boost::optional<int> _version;
+};
+
+
+struct Text_document_content_change_event {
+	boost::optional<Range> _range;       /// the range of the document that changed
+	boost::optional<int> _range_length;  /// the length of the range that got replaced
+	std::string _text;                   /// the new text of the range/document
+};
+
+
 struct Markup_content {
 	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 	{
@@ -1304,6 +1316,8 @@ struct Params_textDocument_completion {
 bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_completion& params);
 
 struct Params_textDocument_didChange {
+	Versioned_text_document_identifier _text_document;
+	std::vector<Text_document_content_change_event> _content_changes;
 };
 
 bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_didChange& params);
