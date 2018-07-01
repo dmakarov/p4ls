@@ -27,6 +27,7 @@ import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
+@SuppressWarnings("restriction")
 public class TestLSPIntegration extends AbstractP4langTest {
 
 	@Test

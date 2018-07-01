@@ -11,6 +11,7 @@ import org.eclipse.ui.internal.genericeditor.ExtensionBasedTextEditor;
 import org.junit.Assert;
 import org.junit.Test;
 
+@SuppressWarnings("restriction")
 public class TestIDEIntegration extends AbstractP4langTest {
 
 	@Test
