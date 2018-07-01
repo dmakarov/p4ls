@@ -277,7 +277,14 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_comp
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didChange &params)
 {
-	return true;
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "Processing DidChangeTextDocumentParams";
+#endif
+	auto result = params.set(json);
+#if LOGGING_ENABLED
+	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "Processed DidChangeTextDocumentParams " << result;
+#endif
+	return result;
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didClose &params)

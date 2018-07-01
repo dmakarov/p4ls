@@ -1052,6 +1052,11 @@ struct Position {
 		, _character(position.getColumnNumber())
 	{}
 
+	Position(const rapidjson::Value& json)
+		: _line(json["line"].GetInt())
+		, _character(json["character"].GetInt())
+	{}
+
 	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
 	{
 		rapidjson::Value result(rapidjson::kObjectType);
@@ -1092,6 +1097,9 @@ struct Range {
 	{
 		set(info);
 	}
+
+	Range(const rapidjson::Value& json) : _start(json["start"]), _end(json["end"])
+	{}
 
 	void set(const Util::SourceInfo& info)
 	{
@@ -1237,6 +1245,28 @@ struct Versioned_text_document_identifier : public Text_document_identifier {
 
 
 struct Text_document_content_change_event {
+
+	bool set(const rapidjson::Value& json)
+	{
+		auto it = json.FindMember("text");
+		if (it == json.MemberEnd())
+		{
+			return false;
+		}
+		_text = it->value.GetString();
+		it = json.FindMember("range");
+		if (it != json.MemberEnd())
+		{
+			_range.emplace(it->value);
+		}
+		it = json.FindMember("rangeLength");
+		if (it != json.MemberEnd())
+		{
+			_range_length.emplace(it->value.GetInt());
+		}
+		return true;
+	}
+
 	boost::optional<Range> _range;       /// the range of the document that changed
 	boost::optional<int> _range_length;  /// the length of the range that got replaced
 	std::string _text;                   /// the new text of the range/document
@@ -1316,6 +1346,23 @@ struct Params_textDocument_completion {
 bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_completion& params);
 
 struct Params_textDocument_didChange {
+
+	bool set(const rapidjson::Value& json)
+	{
+		auto result = true;
+		if (json.HasMember("textDocument") && json.HasMember("contentChanges"))
+		{
+			result = _text_document.set(json["textDocument"]);
+			for (auto& it : json["contentChanges"].GetArray())
+			{
+				Text_document_content_change_event event;
+				result = result && event.set(it);
+				_content_changes.emplace_back(event);
+			}
+		}
+		return result;
+	}
+
 	Versioned_text_document_identifier _text_document;
 	std::vector<Text_document_content_change_event> _content_changes;
 };

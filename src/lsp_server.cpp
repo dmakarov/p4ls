@@ -355,7 +355,7 @@ void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand& pa
 boost::optional<std::string> LSP_server::read_message()
 {
 #if LOGGING_ENABLED
-	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Start reading a new message";
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: reading a new message";
 #endif
 	// process a set of HTTP headers of an LSP message
 	unsigned long long content_length = 0;
@@ -370,51 +370,48 @@ boost::optional<std::string> LSP_server::read_message()
 			line.pop_back();
 		}
 #if LOGGING_ENABLED
-		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Current line '" << line << "'";
+		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: got a line '" << line << "'";
 #endif
 		if (!_input_stream.good() && errno == EINTR)
 		{
+#if LOGGING_ENABLED
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: input error, clearing the stream";
+#endif
 			_input_stream.clear();
 			continue;
 		}
 		if (0 == line.find_first_of('#'))
 		{
 #if LOGGING_ENABLED
-			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Skipping a comment line";
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: skipping a comment";
 #endif
-			continue;
 		}
 		if (std::regex_match(line, match, content_length_regex))
 		{
-#if LOGGING_ENABLED
-			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Regex match " << match[1].str();
-#endif
 			content_length = std::stoull(match[1].str());
-			continue;
+#if LOGGING_ENABLED
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: content length " << content_length;
+#endif
 		}
 		else if (!line.empty())
 		{
 #if LOGGING_ENABLED
-			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Ignoring another header line";
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: ignoring another header line";
 #endif
-			continue;
 		}
 		else
 		{
 #if LOGGING_ENABLED
-			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Empty line, header ended";
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: an empty line, finished reading a message header";
 #endif
 			break;
 		}
 	}
 	// discard unrealistically large requests
-#if LOGGING_ENABLED
-	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Content length " << content_length;
-#endif
 	if (content_length > 1 << 30)
 	{
 #if LOGGING_ENABLED
-		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Huge message size " << content_length;
+		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: Huge message size " << content_length;
 #endif
 		_input_stream.ignore(content_length);
 		return boost::none;
@@ -427,12 +424,12 @@ boost::optional<std::string> LSP_server::read_message()
 		if (!_input_stream)
 		{
 #if LOGGING_ENABLED
-			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Read " << _input_stream.gcount() << " bytes, expected " << content_length << " content <" << content << ">";
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: got " << _input_stream.gcount() << " bytes, expected " << content_length << " content <" << content << ">";
 #endif
 			return boost::none;
 		}
 #if LOGGING_ENABLED
-		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Received request " << content;
+		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: received message " << content;
 #endif
 		return std::move(content);
 	}
