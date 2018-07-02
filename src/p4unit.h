@@ -88,9 +88,10 @@ public:
 	P4_file() : _p4(new P4CContextWithOptions<p4options>)
 			  , _options(P4CContextWithOptions<p4options>::get().options())
 	{}
-	P4_file(const std::string &command, const std::string &unit_path);
+	P4_file(const std::string &command, const std::string &unit_path, const std::string& text);
 	~P4_file() = default;
-	void compile(const std::string& text);
+	void compile();
+	void change_source_code(const std::vector<Text_document_content_change_event>& content_changes);
 	std::vector<Symbol_information>& get_symbols();
 	boost::optional<std::string> get_hover(const Location& location);
 
@@ -99,6 +100,7 @@ private:
 	p4options& _options;
 	std::unique_ptr<const IR::P4Program> _program;
 	std::string _unit_path;
+	std::string _source_code;
 	std::vector<Symbol_information> _symbols;
 	std::unordered_map<std::string, std::string> _definitions;
 	std::unordered_map<std::string, std::map<Range, std::string>> _locations;

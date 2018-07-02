@@ -1225,13 +1225,14 @@ struct Text_document_item {
 
 struct Text_document_identifier {
 
-	bool set(const rapidjson::Value& json)
+	virtual bool set(const rapidjson::Value& json)
 	{
-		if (!json.HasMember("uri"))
+		auto it = json.FindMember("uri");
+		if (it == json.MemberEnd())
 		{
 			return false;
 		}
-		_uri.set_from_uri(json["uri"].GetString());
+		_uri.set_from_uri(it->value.GetString());
 		return true;
 	}
 
@@ -1240,6 +1241,21 @@ struct Text_document_identifier {
 
 
 struct Versioned_text_document_identifier : public Text_document_identifier {
+
+	bool set(const rapidjson::Value& json) override
+	{
+		if (!Text_document_identifier::set(json))
+		{
+			return false;
+		}
+		auto it = json.FindMember("version");
+		if (it != json.MemberEnd())
+		{
+			_version.emplace(it->value.GetInt());
+		}
+		return true;
+	}
+
 	boost::optional<int> _version;
 };
 
@@ -1349,18 +1365,30 @@ struct Params_textDocument_didChange {
 
 	bool set(const rapidjson::Value& json)
 	{
-		auto result = true;
-		if (json.HasMember("textDocument") && json.HasMember("contentChanges"))
+		auto it = json.FindMember("textDocument");
+		if (it == json.MemberEnd())
 		{
-			result = _text_document.set(json["textDocument"]);
-			for (auto& it : json["contentChanges"].GetArray())
-			{
-				Text_document_content_change_event event;
-				result = result && event.set(it);
-				_content_changes.emplace_back(event);
-			}
+			return false;
 		}
-		return result;
+		if (!_text_document.set(it->value))
+		{
+			return false;
+		}
+		it = json.FindMember("contentChanges");
+		if (it == json.MemberEnd())
+		{
+			return false;
+		}
+		for (auto& e : it->value.GetArray())
+		{
+			Text_document_content_change_event event;
+			if (!event.set(e))
+			{
+				return false;
+			}
+			_content_changes.emplace_back(event);
+		}
+		return true;
 	}
 
 	Versioned_text_document_identifier _text_document;

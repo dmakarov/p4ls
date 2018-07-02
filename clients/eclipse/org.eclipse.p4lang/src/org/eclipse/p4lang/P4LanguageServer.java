@@ -33,19 +33,16 @@ public class P4LanguageServer extends ProcessStreamConnectionProvider {
 	private boolean setSystemProperties() {
 		return true;
 		/*
-		String sysrootPath = getSysRoot();
-		if (!sysrootPath.isEmpty()) {
-			System.setProperty("SYS_ROOT", sysrootPath);
-			System.setProperty("LD_LIBRARY_PATH", sysrootPath + "/lib");
-			String sysRoot = System.getProperty("SYS_ROOT");
-			String ldLibraryPath = System.getProperty("LD_LIBRARY_PATH");
-			if (!(sysRoot == null || sysRoot.isEmpty() || ldLibraryPath == null || ldLibraryPath.isEmpty())) {
-				return true;
-			}
-		}
-		P4langPlugin.logError("Was unable to set the `SYS_ROOT` and `LD_LIBRARY_PATH` environment variables. Please do so manually.");
-		return false;
-        */
+		 * String sysrootPath = getSysRoot(); if (!sysrootPath.isEmpty()) {
+		 * System.setProperty("SYS_ROOT", sysrootPath);
+		 * System.setProperty("LD_LIBRARY_PATH", sysrootPath + "/lib"); String sysRoot =
+		 * System.getProperty("SYS_ROOT"); String ldLibraryPath =
+		 * System.getProperty("LD_LIBRARY_PATH"); if (!(sysRoot == null ||
+		 * sysRoot.isEmpty() || ldLibraryPath == null || ldLibraryPath.isEmpty())) {
+		 * return true; } } P4langPlugin.
+		 * logError("Was unable to set the `SYS_ROOT` and `LD_LIBRARY_PATH` environment variables. "
+		 * + "Please do so manually."); return false;
+		 */
 	}
 
 	private List<String> getP4LS() {
@@ -74,9 +71,13 @@ public class P4LanguageServer extends ProcessStreamConnectionProvider {
 			return;
 		}
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		int dialogResponse = MessageDialog.open(MessageDialog.CONFIRM, shell, "P4 Support Not Found", "Requirments for P4 editing were not found. Install the required components or input their paths in the P4 Preferences.", SWT.NONE, "Open Preferences", "Cancel");
+		int dialogResponse = MessageDialog.open(MessageDialog.CONFIRM, shell, "P4 Support Not Found",
+				"Requirments for P4 editing were not found. "
+						+ "Install the required components or input their paths in the P4 Preferences.",
+				SWT.NONE, "Open Preferences", "Cancel");
 		if (dialogResponse == 0) {
-			PreferenceDialog preferenceDialog = PreferencesUtil.createPreferenceDialogOn(shell, P4langPreferencePage.PAGE_ID, new String[] { P4langPreferencePage.PAGE_ID }, null);
+			PreferenceDialog preferenceDialog = PreferencesUtil.createPreferenceDialogOn(shell,
+					P4langPreferencePage.PAGE_ID, new String[] { P4langPreferencePage.PAGE_ID }, null);
 			preferenceDialog.setBlockOnOpen(true);
 			preferenceDialog.open();
 		} else {

@@ -160,6 +160,12 @@ void LSP_server::on_textDocument_didChange(Params_textDocument_didChange& params
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
+	auto& path = params._text_document._uri._path;
+	auto file = _files.find(path);
+	if (file != _files.end())
+	{
+		file->second.change_source_code(params._content_changes);
+	}
 }
 
 void LSP_server::on_textDocument_didClose(Params_textDocument_didClose& params)
@@ -174,16 +180,16 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen& params)
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
 #endif
-	auto &path = params._text_document._uri._path;
-	auto &text = params._text_document._text;
+	auto& path = params._text_document._uri._path;
+	auto& text = params._text_document._text;
 #if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Create new P4_file " << path;
 #endif
 	auto command = find_command_for_path(path);
 	if (!command.empty())
 	{
-		_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(command, path));
-		_files[path].compile(text);
+		_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(command, path, text));
+		_files[path].compile();
 	}
 }
 
