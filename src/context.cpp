@@ -2,35 +2,66 @@
 
 boost::log::sources::severity_logger<int> Context::_logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
 
-static Context &create_empty_context() {
-#if LOGGING_ENABLED
-	BOOST_LOG_SEV(Context::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
-	thread_local static auto context = Context::get_empty();
+static Context& get_instance() {
+	thread_local static auto context = Context::create_empty();
 	return context;
 }
 
-Context Context::get_empty()
+Context Context::create_empty()
 {
-#if LOGGING_ENABLED
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	return Context(nullptr);
 }
 
-const Context &Context::get_current()
+const Context& Context::get_current()
 {
-#if LOGGING_ENABLED
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
-	return create_empty_context();
+	return get_instance();
 }
 
 Context Context::swap_current(Context other)
 {
-#if LOGGING_ENABLED
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
-	std::swap(other, create_empty_context());
+	std::swap(other, get_instance());
 	return other;
+}
+
+std::ostream& operator<<(std::ostream& os, const Context::Data& data)
+{
+	os << "key \"" << data._key << "\" value \"";
+	if (data._value)
+	{
+		os << data._value->to_string();
+	}
+	else
+	{
+		os << "(null)";
+	}
+	os << "\" parent {";
+	if (data._parent)
+	{
+		os << *data._parent;
+	}
+	else
+	{
+		os << "(null)";
+	}
+	os << "}";
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Context& context)
+{
+	if (context._data)
+	{
+		os << "{" << *context._data << "}";
+	}
+	else
+	{
+		os << "{(null)}";
+	}
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Scoped_context& context)
+{
+	os << context._previous;
+	return os;
 }
