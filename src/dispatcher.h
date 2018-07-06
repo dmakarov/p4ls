@@ -25,7 +25,7 @@ public:
 	void call(std::string content, std::ostream &output_stream) const;
 
 private:
-
+	static const std::string _JSONRPC_VERSION;
 	std::unordered_map<std::string, handler_type> _handlers;
 	handler_type _error_handler;
 };

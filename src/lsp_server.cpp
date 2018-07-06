@@ -442,7 +442,7 @@ boost::optional<std::string> LSP_server::read_message()
 	return boost::none;
 }
 
-std::string LSP_server::find_command_for_path(std::string& file)
+std::string LSP_server::find_command_for_path(const std::string& file)
 {
 	auto result = _commands.find(file);
 	if (result != _commands.end())
