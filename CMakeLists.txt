@@ -46,8 +46,6 @@ if(LIBGMP_FOUND)
     set(LIBGMP_LIBRARIES ${LIBGMP_LIBRARY} ${LIBGMPXX_LIBRARY})
 endif()
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLOGGING_ENABLED=1")
-
 add_subdirectory(vendor/p4c p4c)
 add_subdirectory(src)
 if (ENABLE_UNITTESTS)

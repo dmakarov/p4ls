@@ -24,8 +24,6 @@ public:
 
 class Context {
 	struct Data;
-	class Anything;
-	template <class T> class Something;
 
 	friend std::ostream& operator<<(std::ostream& os, const Context& context);
 	friend std::ostream& operator<<(std::ostream& os, const Context::Data& data);
@@ -64,12 +62,12 @@ public:
 
 	template <class T> Context derive(const Key<T>& key, typename std::decay<T>::type value) const &
 	{
-		return Context(std::make_shared<Data>(Data{_data, &key, std::make_unique<Something<typename std::decay<T>::type>>(std::move(value))}));
+		return Context(std::make_shared<Data>(Data{_data, std::make_unique<Something<typename std::decay<T>::type>>(std::move(value)), &key}));
 	}
 
 	template <class T> Context derive(const Key<T>& key, typename std::decay<T>::type value) &&
 	{
-		return Context(std::make_shared<Data>(Data{std::move(_data), &key, std::make_unique<Something<typename std::decay<T>::type>>(std::move(value))}));
+		return Context(std::make_shared<Data>(Data{std::move(_data), std::make_unique<Something<typename std::decay<T>::type>>(std::move(value)), &key}));
 	}
 
 	template <class T> Context derive(T&& value) const &
@@ -119,9 +117,12 @@ private:
 	};
 
 	struct Data {
+		// _parent must be destroyed last after destruction of _value.
+		// objects stored in Context's child layers may store
+		// references to the data in the parent layers.
 		std::shared_ptr<const Data> _parent;
-		const void* _key;
 		std::unique_ptr<Anything> _value;
+		const void* _key;
 	};
 
 	std::shared_ptr<const Data> _data;

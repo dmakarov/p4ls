@@ -18,11 +18,9 @@ find_package(Boost CONFIG REQUIRED COMPONENTS date_time system thread filesystem
 find_package(RapidJSON CONFIG REQUIRED)
 
 set (P4C_LIB_DEPS "${Boost_LIBRARIES};${LIBGMP_LIBRARIES}")
-set (P4C_LIBRARIES controlplane midend p4ctoolkit frontend ir)
+set (P4C_LIBRARIES p4ctoolkit frontend ir)
 
-message("P4C_LIB_DEPS is ${P4C_LIB_DEPS}")
-
-include_directories(../vendor/p4c ../vendor/p4c/test/frameworks/gtest/googletest/include ${CMAKE_BINARY_DIR}/p4c)
+include_directories(${CMAKE_BINARY_DIR}/p4c ../vendor/p4c ../vendor/p4c/test/frameworks/gtest/googletest/include)
 
 target_link_libraries(p4ls
   PUBLIC
