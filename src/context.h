@@ -129,7 +129,7 @@ private:
 
 	Context(std::shared_ptr<const Data> data) : _data(std::move(data))
 	{
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "created new " << *this;
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "constructed, current " << *this;
 	}
 
 };
@@ -138,27 +138,18 @@ class Scoped_context {
 public:
 	template <typename T> Scoped_context(const Key<T>& key, typename std::decay<T>::type value)
 		: _previous(Context::swap_current(std::move(Context::get_current().derive(key, std::move(value)))))
-	{
-		BOOST_LOG_SEV(Context::_logger, boost::log::sinks::syslog::debug)
-			<< "constructed \"Scoped_context\", current "
-			<< Context::get_current();
-	}
+	{}
 
 	// Anonymous values can be used for the destructor side-effect.
 	template <typename T> Scoped_context(T&& value)
 		: _previous(Context::swap_current(std::move(Context::get_current().derive(std::forward<T>(value)))))
-	{
-		BOOST_LOG_SEV(Context::_logger, boost::log::sinks::syslog::debug)
-			<< "constructed \"Scoped_context\", current "
-			<< Context::get_current();
-	}
+	{}
 
 	~Scoped_context()
 	{
 		Context::swap_current(std::move(_previous));
 		BOOST_LOG_SEV(Context::_logger, boost::log::sinks::syslog::debug)
-			<< "destroyed \"Scoped_context\", current "
-			<< Context::get_current();
+			<< "destroyed, current " << Context::get_current();
 
 	}
 	Scoped_context(const Scoped_context&) = delete;
