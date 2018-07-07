@@ -39,12 +39,12 @@ struct registration_helper {
 
 void send(rapidjson::Document& document, rapidjson::Value& value)
 {
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "get request_id from context.";
+	BOOST_LOG(Dispatcher::_logger) << "get request_id from context.";
 	auto id = Context::get_current().get_value(request_id);
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "got id " << (id ? std::to_string(*id) : std::string("(null)"));
+	BOOST_LOG(Dispatcher::_logger) << "got id " << (id ? std::to_string(*id) : std::string("(null)"));
 	if (!id)
 	{
-		BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "does not reply.";
+		BOOST_LOG(Dispatcher::_logger) << "does not reply.";
 		return;
 	}
 	auto &allocator = document.GetAllocator();
@@ -58,7 +58,7 @@ void send(rapidjson::Document& document, rapidjson::Value& value)
 	std::string message("Content-Length: ");
 	message += std::to_string(content.size()) + "\r\n\r\n" + content;
 	*(Context::get_current().get_existing(request_output_stream)) << message << std::flush;
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "sent message\n" << message;
+	BOOST_LOG(Dispatcher::_logger) << "sent message\n" << message;
 }
 
 } // namespace
@@ -66,7 +66,7 @@ void send(rapidjson::Document& document, rapidjson::Value& value)
 void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
 {
 	registration_helper register_handler{dispatcher, &protocol};
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
+	BOOST_LOG(Dispatcher::_logger) << __PRETTY_FUNCTION__;
 	register_handler("exit", &Protocol::on_exit);
 	register_handler("initialize", &Protocol::on_initialize);
 	register_handler("shutdown", &Protocol::on_shutdown);
@@ -122,11 +122,11 @@ void Dispatcher::call(std::string content, std::ostream &output_stream) const
 	if (it != msg.MemberEnd())
 	{
 		id = it->value.IsString() ? std::stoi(it->value.GetString()) : it->value.GetInt();
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "message is a request with id " << *id;
+		BOOST_LOG(_logger) << "message is a request with id " << *id;
 	}
 	else
 	{
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "message is a note without id.";
+		BOOST_LOG(_logger) << "message is a note without id.";
 	}
 	it = msg.FindMember("method");
 	if (it == msg.MemberEnd() || !it->value.IsString())
@@ -147,21 +147,21 @@ void Dispatcher::call(std::string content, std::ostream &output_stream) const
 		it = msg.FindMember("params");
 		if (it == msg.MemberEnd() || it->value.IsNull())
 		{
-			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "invoke method \"" << method << "\" without parameters.";
+			BOOST_LOG(_logger) << "invoke method \"" << method << "\" without parameters.";
 			handler->second(std::move(rapidjson::Value(rapidjson::kObjectType)));
 		}
 		else
 		{
-			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "invoke method \"" << method << "\" with parameters.";
+			BOOST_LOG(_logger) << "invoke method \"" << method << "\" with parameters.";
 			handler->second(std::move(msg["params"].GetObject()));
 		}
 	}
 	else
 	{
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "did not find method \"" << method << "\"";
+		BOOST_LOG(_logger) << "did not find method \"" << method << "\"";
 		_error_handler(rapidjson::Value(rapidjson::kObjectType));
 	}
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "finished processing method \"" << method << "\"";
+	BOOST_LOG(_logger) << "finished processing method \"" << method << "\"";
 }
 
 void reply(rapidjson::Value& result)

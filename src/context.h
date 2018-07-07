@@ -49,7 +49,7 @@ public:
 				return static_cast<const T*>(it->_value->get_value());
 			}
 		}
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "did not find a value for key \"" << &key << "\"";
+		BOOST_LOG(_logger) << "did not find a value for key \"" << &key << "\"";
 		return nullptr;
 	}
 
@@ -129,7 +129,7 @@ private:
 
 	Context(std::shared_ptr<const Data> data) : _data(std::move(data))
 	{
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "constructed, current " << *this;
+		BOOST_LOG(_logger) << "constructed, current " << *this;
 	}
 
 };
@@ -148,7 +148,7 @@ public:
 	~Scoped_context()
 	{
 		Context::swap_current(std::move(_previous));
-		BOOST_LOG_SEV(Context::_logger, boost::log::sinks::syslog::debug)
+		BOOST_LOG(Context::_logger)
 			<< "destroyed, current " << Context::get_current();
 
 	}

@@ -25,7 +25,17 @@
 #include <execinfo.h>
 #include <unistd.h>
 
-
+/**
+   Severity levels
+   level 0 boost::log::sinks::syslog::emergency
+   level 1 boost::log::sinks::syslog::alert
+   level 2 boost::log::sinks::syslog::critical
+   level 3 boost::log::sinks::syslog::error
+   level 4 boost::log::sinks::syslog::warning
+   level 5 boost::log::sinks::syslog::notice
+   level 6 boost::log::sinks::syslog::info
+   level 7 boost::log::sinks::syslog::debug
+*/
 namespace {
 boost::optional<boost::shared_ptr<std::ofstream>> log_file_stream;
 boost::log::sources::severity_logger<int> logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
@@ -43,7 +53,7 @@ void signal_handler(int signo)
 {
 	if (log_file_stream)
 	{
-		BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "TERMINATED " << signals[signo] << "(" << signo << ")";
+		BOOST_LOG(logger) << "TERMINATED " << signals[signo] << "(" << signo << ")";
 		log_file_stream.get()->close();
 	}
 	if (signo == SIGSEGV || signo == SIGBUS)
@@ -55,13 +65,13 @@ void signal_handler(int signo)
 		{
 			for (int i = 1; i < size; ++i)
 			{
-				BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << strings[i];
+				BOOST_LOG(logger) << strings[i];
 			}
 			free(strings);
 		}
 		if (size < 1)
 		{
-			BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "backtrace failed";
+			BOOST_LOG(logger) << "backtrace failed";
 		}
 	}
 	std::exit(0);
@@ -72,6 +82,7 @@ void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& 
 	boost::log::add_common_attributes();
 	using ts = boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>;
 	boost::shared_ptr<ts> sink(new ts());
+	sink->set_filter(boost::log::expressions::attr<int>("Severity") <= boost::log::sinks::syslog::debug);
 	sink->set_formatter(boost::log::expressions::stream
 						<< std::setw(6) << boost::log::expressions::attr<unsigned int>("LineID")
 						<< ":" << boost::log::expressions::attr<boost::log::attributes::current_process_id::value_type>("ProcessID")
@@ -125,7 +136,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	init_logging_sink(log_file_stream);
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "STARTED";
+	BOOST_LOG(logger) << "STARTED";
 	LSP_server the_server(*input, std::cout);
 	auto status = the_server.run();
 	if (log_file_stream)
