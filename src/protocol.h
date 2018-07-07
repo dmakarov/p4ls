@@ -131,9 +131,7 @@ COMPLETION_ITEM_KIND convert_int_to_completion_item_kind(const int v)
 	case 24: return COMPLETION_ITEM_KIND::Operator;
 	case 25: return COMPLETION_ITEM_KIND::TypeParameter;
 	}
-#if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(error) << "Unknown completion item kind " << v;
-#endif
 	return COMPLETION_ITEM_KIND::Text;
 }
 
@@ -168,9 +166,7 @@ SYMBOL_KIND convert_int_to_symbol_kind(const int v)
 	case 25: return SYMBOL_KIND::Operator;
 	case 26: return SYMBOL_KIND::TypeParameter;
 	}
-#if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(error) << "Unknown symbol kind " << v;
-#endif
 	return SYMBOL_KIND::File;
 }
 
@@ -178,9 +174,7 @@ MARKUP_KIND convert_string_to_markup_kind(const std::string& v)
 {
 	if (v == "plaintext") return MARKUP_KIND::plaintext;
 	if (v == "markdown") return MARKUP_KIND::markdown;
-#if LOGGING_ENABLED
 	BOOST_LOG_TRIVIAL(error) << "Unknown markup kind " << v;
-#endif
 	return MARKUP_KIND::plaintext;
 }
 
@@ -191,9 +185,7 @@ const char* convert_markup_kind_to_string(const MARKUP_KIND kind)
 	case MARKUP_KIND::plaintext: return "plaintext";
 	case MARKUP_KIND::markdown: return "markdown";
 	default:;
-#if LOGGING_ENABLED
 		BOOST_LOG_TRIVIAL(error) << "Unknown markup kind " << static_cast<int>(kind);
-#endif
 	}
 	return "plaintext";
 }

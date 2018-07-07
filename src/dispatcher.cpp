@@ -73,7 +73,6 @@ void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
 void Dispatcher::register_handler(const std::string &method, handler_type handler)
 {
 	_handlers[method] = std::move(handler);
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__ << " registered method " << method;
 }
 
 void Dispatcher::call(std::string content, std::ostream &output_stream) const

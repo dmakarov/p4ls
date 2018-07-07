@@ -69,15 +69,11 @@ int LSP_server::run()
 		}
 		else
 		{
-#if LOGGING_ENABLED
-			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "read_message didn't return a valid json object.";
-#endif
+			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::error) << "read_message didn't return a valid json object.";
 		}
 	}
 	_is_done = true;
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "FINISHED";
-#endif
 	_work.reset();
 	_worker_thread.join();
 	return 0;
@@ -86,16 +82,12 @@ int LSP_server::run()
 void LSP_server::on_exit(Params_exit& params)
 {
 	_is_done = true;
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 }
 
 void LSP_server::on_initialize(Params_initialize& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Document json_document;
 	auto &allocator = json_document.GetAllocator();
 	rapidjson::Value result(rapidjson::kObjectType);
@@ -105,61 +97,47 @@ void LSP_server::on_initialize(Params_initialize& params)
 
 void LSP_server::on_shutdown(Params_shutdown& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value result(rapidjson::kNullType);
 	reply(result);
 }
 
 void LSP_server::on_textDocument_codeAction(Params_textDocument_codeAction& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 }
 
 void LSP_server::on_textDocument_codeLens(Params_textDocument_codeLens& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value result(rapidjson::kNullType);
 	reply(result);
 }
 
 void LSP_server::on_codeLens_resolve(Params_codeLens_resolve& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value result(rapidjson::kNullType);
 	reply(result);
 }
 
 void LSP_server::on_textDocument_completion(Params_textDocument_completion& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
 void LSP_server::on_textDocument_definition(Params_text_document_position& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
 void LSP_server::on_textDocument_didChange(Params_textDocument_didChange& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	auto& path = params._text_document._uri._path;
 	auto file = _files.find(path);
 	if (file != _files.end())
@@ -170,21 +148,15 @@ void LSP_server::on_textDocument_didChange(Params_textDocument_didChange& params
 
 void LSP_server::on_textDocument_didClose(Params_textDocument_didClose& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 }
 
 void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	auto& path = params._text_document._uri._path;
 	auto& text = params._text_document._text;
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Create new P4_file " << path;
-#endif
 	auto command = find_command_for_path(path);
 	if (!command.empty())
 	{
@@ -195,25 +167,19 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen& params)
 
 void LSP_server::on_textDocument_didSave(Params_textDocument_didSave& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 }
 
 void LSP_server::on_textDocument_documentHighlight(Params_text_document_position& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
 void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymbol& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Document json_document;
 	auto &allocator = json_document.GetAllocator();
 	rapidjson::Value result(rapidjson::kArrayType);
@@ -234,20 +200,18 @@ void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymb
 
 void LSP_server::on_textDocument_formatting(Params_textDocument_formatting& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
 void LSP_server::on_textDocument_hover(Params_text_document_position& params)
 {
-#if LOGGING_ENABLED
-	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__
-	<< "(document " << params._text_document._uri._path
-	<< ", line " << params._position._line << ", character " << params._position._character << ")";
-#endif
+	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug)
+		<< __PRETTY_FUNCTION__
+		<< "(document " << params._text_document._uri._path
+		<< ", line " << params._position._line
+		<< ", character " << params._position._character << ")";
 	auto &path = params._text_document._uri._path;
 	Location location;
 	location._uri = path;
@@ -258,9 +222,7 @@ void LSP_server::on_textDocument_hover(Params_text_document_position& params)
 	{
 		if (auto hover_content = file->second.get_hover(location))
 		{
-#if LOGGING_ENABLED
 			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "Found hover content " << *hover_content;
-#endif
 			std::ostringstream os;
 			os << "```p4\n" << *hover_content << "\n```";
 			Markup_content contents{MARKUP_KIND::markdown, os.str()};
@@ -278,91 +240,69 @@ void LSP_server::on_textDocument_hover(Params_text_document_position& params)
 
 void LSP_server::on_textDocument_implementation(Params_text_document_position& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
 void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
 void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
 void LSP_server::on_textDocument_rename(Params_textDocument_rename& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
 void LSP_server::on_textDocument_signatureHelp(Params_text_document_position& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
 void LSP_server::on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 }
 
 void LSP_server::on_textDocument_typeDefinition(Params_text_document_position& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
 void LSP_server::on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 }
 
 void LSP_server::on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 }
 
 void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand& params)
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << __PRETTY_FUNCTION__;
-#endif
 }
 
 boost::optional<std::string> LSP_server::read_message()
 {
-#if LOGGING_ENABLED
 	BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: reading a new message";
-#endif
 	// process a set of HTTP headers of an LSP message
 	unsigned long long content_length = 0;
 	std::regex content_length_regex("Content-Length: ([0-9]+)", std::regex::extended);
@@ -375,50 +315,36 @@ boost::optional<std::string> LSP_server::read_message()
 		{
 			line.pop_back();
 		}
-#if LOGGING_ENABLED
 		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: got a line '" << line << "'";
-#endif
 		if (!_input_stream.good() && errno == EINTR)
 		{
-#if LOGGING_ENABLED
 			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: input error, clearing the stream";
-#endif
 			_input_stream.clear();
 			continue;
 		}
 		if (0 == line.find_first_of('#'))
 		{
-#if LOGGING_ENABLED
 			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: skipping a comment";
-#endif
 		}
 		if (std::regex_match(line, match, content_length_regex))
 		{
 			content_length = std::stoull(match[1].str());
-#if LOGGING_ENABLED
 			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: content length " << content_length;
-#endif
 		}
 		else if (!line.empty())
 		{
-#if LOGGING_ENABLED
 			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: ignoring another header line";
-#endif
 		}
 		else
 		{
-#if LOGGING_ENABLED
 			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: an empty line, finished reading a message header";
-#endif
 			break;
 		}
 	}
 	// discard unrealistically large requests
 	if (content_length > 1 << 30)
 	{
-#if LOGGING_ENABLED
 		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: Huge message size " << content_length;
-#endif
 		_input_stream.ignore(content_length);
 		return boost::none;
 	}
@@ -429,14 +355,10 @@ boost::optional<std::string> LSP_server::read_message()
 		_input_stream.read(&content[0], content_length);
 		if (!_input_stream)
 		{
-#if LOGGING_ENABLED
 			BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: got " << _input_stream.gcount() << " bytes, expected " << content_length << " content <" << content << ">";
-#endif
 			return boost::none;
 		}
-#if LOGGING_ENABLED
 		BOOST_LOG_SEV(LSP_server::_logger, boost::log::sinks::syslog::debug) << "LSP::READ: received message " << content;
-#endif
 		return std::move(content);
 	}
 	return boost::none;
