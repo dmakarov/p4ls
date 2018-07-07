@@ -25,16 +25,9 @@ Context Context::swap_current(Context other)
 
 std::ostream& operator<<(std::ostream& os, const Context::Data& data)
 {
-	os << "key \"" << data._key << "\" value \"";
-	if (data._value)
-	{
-		os << data._value->to_string();
-	}
-	else
-	{
-		os << "(null)";
-	}
-	os << "\" parent {";
+	os << "key:\"" << data._key
+	   << "\", value:\"" << (data._value ? data._value->to_string() : "(null)")
+	   << "\", parent:{";
 	if (data._parent)
 	{
 		os << *data._parent;
@@ -57,11 +50,5 @@ std::ostream& operator<<(std::ostream& os, const Context& context)
 	{
 		os << "{(null)}";
 	}
-	return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const Scoped_context& context)
-{
-	os << context._previous;
 	return os;
 }

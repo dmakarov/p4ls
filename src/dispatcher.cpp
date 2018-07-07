@@ -107,8 +107,8 @@ void Dispatcher::call(std::string content, std::ostream &output_stream) const
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "DISPATCHER did not find a method member in the json message.";
 		return;
 	}
-	Scoped_context_with_value context_with_request_output_stream(request_output_stream, &output_stream);
-	boost::optional<Scoped_context_with_value> context_with_id;
+	Scoped_context context_with_request_output_stream(request_output_stream, &output_stream);
+	boost::optional<Scoped_context> context_with_id;
 	if (id)
 	{
 		context_with_id.emplace(request_id, *id);

@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <ostream>
+#include <sstream>
 #include <type_traits>
 
 template <class T> class Key {
@@ -23,52 +24,13 @@ public:
 
 class Context {
 	struct Data;
+	class Anything;
+	template <class T> class Something;
 
 	friend std::ostream& operator<<(std::ostream& os, const Context& context);
 	friend std::ostream& operator<<(std::ostream& os, const Context::Data& data);
 
-private:
-
-	class Anything {
-	public:
-		virtual ~Anything() = default;
-		virtual void* get_value() = 0;
-		virtual std::string to_string() = 0;
-	};
-
-	template <class T> class Something : public Anything {
-		static_assert(std::is_same<typename std::decay<T>::type, T>::value, "");
-	public:
-		Something(T&& value) : _value(std::move(value)) {}
-		void* get_value() override
-		{
-			return &_value;
-		}
-		std::string to_string() override
-		{
-			std::stringstream ss;
-			ss << _value;
-			return ss.str();
-		}
-	private:
-		T _value;
-	};
-
-	struct Data {
-		std::shared_ptr<const Data> _parent;
-		const void* _key;
-		std::unique_ptr<Anything> _value;
-	};
-
-	std::shared_ptr<const Data> _data;
-
-	Context(std::shared_ptr<const Data> data) : _data(std::move(data))
-	{
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "CONTEXT created new " << *this;
-	}
-
 public:
-
 	static Context create_empty();
 	static const Context& get_current();
 	static Context swap_current(Context other);
@@ -127,16 +89,63 @@ public:
 		return Context(_data);
 	}
 
+private:
+	class Anything {
+	public:
+		virtual ~Anything() = default;
+		virtual void* get_value() = 0;
+		virtual std::string to_string() = 0;
+	};
+
+	template <class T> class Something : public Anything {
+		static_assert(std::is_same<typename std::decay<T>::type, T>::value, "");
+	public:
+		Something(T&& value) : _value(std::move(value)) {}
+
+		void* get_value() override
+		{
+			return &_value;
+		}
+
+		std::string to_string() override
+		{
+			std::stringstream ss;
+			ss << _value;
+			return ss.str();
+		}
+
+	private:
+		T _value;
+	};
+
+	struct Data {
+		std::shared_ptr<const Data> _parent;
+		const void* _key;
+		std::unique_ptr<Anything> _value;
+	};
+
+	std::shared_ptr<const Data> _data;
+
+	Context(std::shared_ptr<const Data> data) : _data(std::move(data))
+	{
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "CONTEXT created new " << *this;
+	}
+
 };
 
-std::ostream& operator<<(std::ostream& os, const Context::Data& data);
-std::ostream& operator<<(std::ostream& os, const Context& context);
-
 class Scoped_context {
-	friend std::ostream& operator<<(std::ostream& os, const Scoped_context& context);
-
 public:
-	Scoped_context(Context context) : _previous(Context::swap_current(std::move(context)))
+	template <typename T> Scoped_context(const Key<T>& key, typename std::decay<T>::type value)
+		: _previous(Context::swap_current(std::move(Context::get_current().derive(key, std::move(value)))))
+	{
+		BOOST_LOG_SEV(Context::_logger, boost::log::sinks::syslog::debug)
+			<< "CONTEXT constructed \"Scoped_context\", current "
+			<< Context::get_current();
+	}
+
+	// Anonymous values can be used for the destructor side-effect.
+	template <typename T> Scoped_context(T&& value)
+		: _previous(Context::swap_current(std::move(Context::get_current().derive(std::forward<T>(value)))))
 	{
 		BOOST_LOG_SEV(Context::_logger, boost::log::sinks::syslog::debug)
 			<< "CONTEXT constructed \"Scoped_context\", current "
@@ -160,19 +169,5 @@ private:
 	Context _previous;
 };
 
-std::ostream& operator<<(std::ostream& os, const Scoped_context& context);
-
-class Scoped_context_with_value {
-public:
-	template <typename T> Scoped_context_with_value(const Key<T>& key, typename std::decay<T>::type value)
-		: _previous(Context::get_current().derive(key, std::move(value)))
-	{}
-
-	// Anonymous values can be used for the destructor side-effect.
-	template <typename T> Scoped_context_with_value(T&& value)
-		: _previous(Context::get_current().derive(std::forward<T>(value)))
-	{}
-
-private:
-	Scoped_context _previous;
-};
+std::ostream& operator<<(std::ostream& os, const Context::Data& data);
+std::ostream& operator<<(std::ostream& os, const Context& context);
