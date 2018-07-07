@@ -26,17 +26,24 @@
 #include <unistd.h>
 
 
-namespace
-{
-	boost::optional<boost::shared_ptr<std::ofstream>> log_file_stream;
-	boost::log::sources::severity_logger<int> logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
-}
+namespace {
+boost::optional<boost::shared_ptr<std::ofstream>> log_file_stream;
+boost::log::sources::severity_logger<int> logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
+const char* signals[] = { "", "SIGHUP", "SIGINT", "SIGQUIT",
+						  "SIGILL", "SIGTRAP", "SIGABRT", "SIGEMT",
+						  "SIGFPE", "SIGKILL", "SIGBUS", "SIGSEGV",
+						  "SIGSYS", "SIGPIPE", "SIGALRM", "SIGTERM",
+						  "SIGURG", "SIGSTOP", "SIGTSTP", "SIGCONT",
+						  "SIGCHLD", "SIGTTIN", "SIGTTOU", "SIGIO"
+						  "SIGZCPU", "SIGXFSZ", "SIGVTALRM", "SIGPROF"
+						  "SIGWINCH", "SIGINFO", "SIGUSR1", "SIGUSR2"};
+} // namespace
 
 void signal_handler(int signo)
 {
 	if (log_file_stream)
 	{
-		BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "TERMINATED " << signo;
+		BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "TERMINATED " << signals[signo] << "(" << signo << ")";
 		log_file_stream.get()->close();
 	}
 	if (signo == SIGSEGV || signo == SIGBUS)
@@ -63,38 +70,28 @@ void signal_handler(int signo)
 void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& file_stream)
 {
 	boost::log::add_common_attributes();
-	if (false)
+	using ts = boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>;
+	boost::shared_ptr<ts> sink(new ts());
+	sink->set_formatter(boost::log::expressions::stream
+						<< std::setw(6) << boost::log::expressions::attr<unsigned int>("LineID")
+						<< ":" << boost::log::expressions::attr<boost::log::attributes::current_process_id::value_type>("ProcessID")
+						<< ":" << boost::log::expressions::attr<boost::log::attributes::current_thread_id::value_type>("ThreadID")
+						<< " " << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
+						<< " [" << boost::log::expressions::attr<int>("Severity") << "] "
+						<< boost::log::expressions::attr<std::string>("Tag") << ": "
+						<< boost::log::expressions::smessage);
+	if (file_stream)
 	{
-		// Create a syslog sink
-		using ss = boost::log::sinks::synchronous_sink<boost::log::sinks::syslog_backend>;
-		boost::shared_ptr<ss> sink(new ss(boost::log::keywords::use_impl = boost::log::sinks::syslog::native, boost::log::keywords::facility = boost::log::sinks::syslog::local7));
-		sink->set_formatter(boost::log::expressions::format("%1%: %2%") % boost::log::expressions::attr<unsigned int>("LineID") % boost::log::expressions::smessage);
-		sink->locked_backend()->set_severity_mapper(boost::log::sinks::syslog::direct_severity_mapping<int>("Severity"));
-		boost::log::core::get()->add_sink(sink);
+		sink->locked_backend()->add_stream(file_stream.get());
 	}
 	else
 	{
-		using ts = boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>;
-		boost::shared_ptr<ts> sink(new ts());
-		sink->set_formatter(boost::log::expressions::stream
-							<< std::setw(6) << boost::log::expressions::attr<unsigned int>("LineID")
-							<< ":" << boost::log::expressions::attr<boost::log::attributes::current_process_id::value_type>("ProcessID")
-							<< ":" << boost::log::expressions::attr<boost::log::attributes::current_thread_id::value_type>("ThreadID")
-							<< " " << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
-							<< " [" << boost::log::expressions::attr<int>("Severity") << "] "
-							<< boost::log::expressions::smessage);
-		if (file_stream)
-		{
-			sink->locked_backend()->add_stream(file_stream.get());
-		}
-		else
-		{
-			boost::shared_ptr<std::ostream> clog_stream(&std::clog, boost::null_deleter());
-			sink->locked_backend()->add_stream(clog_stream);
-		}
-		sink->locked_backend()->auto_flush(true);
-		boost::log::core::get()->add_sink(sink);
+		boost::shared_ptr<std::ostream> clog_stream(&std::clog, boost::null_deleter());
+		sink->locked_backend()->add_stream(clog_stream);
 	}
+	sink->locked_backend()->auto_flush(true);
+	boost::log::core::get()->add_sink(sink);
+	logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("P$LSD"));
 }
 
 

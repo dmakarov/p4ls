@@ -4,6 +4,7 @@
 #include <frontends/common/parseInput.h>
 #include <lib/error.h>
 
+#include <boost/log/attributes/constant.hpp>
 #include <boost/log/sinks/syslog_backend.hpp>
 #include <boost/tokenizer.hpp>
 
@@ -22,7 +23,7 @@ std::string::size_type get_position_index(const std::string& content, const Posi
 		auto next_index = content.find_first_of(newline, index);
 		if (next_index == std::string::npos)
 		{
-			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "P4UNIT has " << it + 1 << " lines, but changes requested on line " << position._line;
+			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "has " << it + 1 << " lines, but changes requested on line " << position._line;
 			return std::string::npos;
 		}
 		index = next_index + 1;
@@ -36,7 +37,7 @@ std::string::size_type get_position_index(const std::string& content, const Posi
 	{
 		return index + position._character;
 	}
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "P4UNIT line " << position._line << " is shorter than " << position._character << " characters";
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "line " << position._line << " is shorter than " << position._character << " characters";
 	return std::string::npos;
 }
 
@@ -110,7 +111,7 @@ void Symbol_collector::postorder(const IR::Node* node)
 {
 	if (auto ctxt = getContext())
 	{
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Exit from " << ctxt->depth << " " << node->node_type_name();
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "exit from " << ctxt->depth << " " << node->node_type_name();
 		if (ctxt->depth < _max_depth)
 		{
 			--_max_depth;
@@ -162,14 +163,15 @@ P4_file::P4_file(const std::string &command, const std::string &unit_path, const
 	, _unit_path(unit_path)
 	, _source_code(text)
 {
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "P4_file constructor started";
+	_logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("P4UNIT"));
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "constructor started";
 	auto temp_file_path = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.p4");
 	boost::char_separator<char> separator(" ");
 	boost::tokenizer<boost::char_separator<char>> tokens(command, separator);
 	std::vector<char*> argv;
 	for (auto it = tokens.begin(); it != tokens.end(); ++it)
 	{
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Token " << *it;
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "process token " << *it;
 		if (*it == _unit_path)
 		{
 			auto temp = temp_file_path.native();
@@ -187,7 +189,7 @@ P4_file::P4_file(const std::string &command, const std::string &unit_path, const
 	_options.langVersion = CompilerOptions::FrontendVersion::P4_16;
 	_options.process(argv.size(), argv.data());
 	_options.setInputFile();
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Processed options, number of errors " << ::errorCount() << " input file " << _options.file;
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "processed options, number of errors " << ::errorCount() << " input file " << _options.file;
 }
 
 void P4_file::compile()
@@ -195,9 +197,9 @@ void P4_file::compile()
 	std::ofstream ofs(_options.file);
 	ofs << _source_code;
 	ofs.close();
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Wrote document " << _unit_path << " text to a temporary file " << _options.file;
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "wrote document " << _unit_path << " text to a temporary file " << _options.file;
 	_program.reset(P4::parseP4File(_options));
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Compiled p4 source file, number of errors " << ::errorCount();
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "compiled p4 source file, number of errors " << ::errorCount();
 	boost::filesystem::path temp_file_path(_options.file);
 	if (exists(temp_file_path))
 	{
@@ -218,7 +220,7 @@ void P4_file::change_source_code(const std::vector<Text_document_content_change_
 		if (!it._range)
 		{
 			_source_code = it._text;
-			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "P4UNIT replaced entire source code with new content";
+			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "replaced entire source code with new content";
 		}
 		else
 		{
@@ -233,11 +235,11 @@ void P4_file::change_source_code(const std::vector<Text_document_content_change_
 				content += it._text;
 				content += _source_code.substr(end);
 				_source_code = std::move(content);
-				BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "P4UNIT applied content change in range " << *it._range;
+				BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "applied content change in range " << *it._range;
 			}
 			else
 			{
-				BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "P4UNIT ignore invalid content change in range " << *it._range;
+				BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "ignore invalid content change in range " << *it._range;
 			}
 		}
 	}
@@ -250,10 +252,10 @@ std::vector<Symbol_information>& P4_file::get_symbols()
 
 boost::optional<std::string> P4_file::get_hover(const Location& location)
 {
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Searching hover for " << location;
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "search hover for " << location;
 	for (const auto& it : _locations[location._uri])
 	{
-	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "Checking location " << it.first;
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "check location " << it.first;
 		if (it.first & location._range)
 		{
 			return _definitions[it.second];

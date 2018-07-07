@@ -6,6 +6,7 @@
 
 #include "protocol.h"
 
+#include <boost/log/attributes/constant.hpp>
 #include <boost/log/common.hpp>
 
 #include <rapidjson/document.h>
@@ -21,7 +22,10 @@ public:
 	static boost::log::sources::severity_logger<int> _logger;
 	static const std::string _JSONRPC_VERSION;
 
-	Dispatcher(handler_type error_handler) : _error_handler(error_handler) {}
+	Dispatcher(handler_type error_handler) : _error_handler(error_handler)
+	{
+		_logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("DISPATCHER"));
+	}
 	void register_handler(const std::string &method, handler_type handler);
 	void call(std::string content, std::ostream &output_stream) const;
 

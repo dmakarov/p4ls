@@ -49,7 +49,7 @@ public:
 				return static_cast<const T*>(it->_value->get_value());
 			}
 		}
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "CONTEXT did not find a value for key \"" << &key << "\"";
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "did not find a value for key \"" << &key << "\"";
 		return nullptr;
 	}
 
@@ -129,7 +129,7 @@ private:
 
 	Context(std::shared_ptr<const Data> data) : _data(std::move(data))
 	{
-		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "CONTEXT created new " << *this;
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "created new " << *this;
 	}
 
 };
@@ -140,7 +140,7 @@ public:
 		: _previous(Context::swap_current(std::move(Context::get_current().derive(key, std::move(value)))))
 	{
 		BOOST_LOG_SEV(Context::_logger, boost::log::sinks::syslog::debug)
-			<< "CONTEXT constructed \"Scoped_context\", current "
+			<< "constructed \"Scoped_context\", current "
 			<< Context::get_current();
 	}
 
@@ -149,7 +149,7 @@ public:
 		: _previous(Context::swap_current(std::move(Context::get_current().derive(std::forward<T>(value)))))
 	{
 		BOOST_LOG_SEV(Context::_logger, boost::log::sinks::syslog::debug)
-			<< "CONTEXT constructed \"Scoped_context\", current "
+			<< "constructed \"Scoped_context\", current "
 			<< Context::get_current();
 	}
 
@@ -157,7 +157,7 @@ public:
 	{
 		Context::swap_current(std::move(_previous));
 		BOOST_LOG_SEV(Context::_logger, boost::log::sinks::syslog::debug)
-			<< "CONTEXT destroyed \"Scoped_context\", current "
+			<< "destroyed \"Scoped_context\", current "
 			<< Context::get_current();
 
 	}

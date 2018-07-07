@@ -8,6 +8,7 @@
 
 #include <rapidjson/document.h>
 
+#include <boost/log/sinks/syslog_backend.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/optional.hpp>
 
@@ -1455,6 +1456,7 @@ bool set_params_from_json(const rapidjson::Value& json, Params_workspace_execute
 
 class Protocol {
 public:
+	static boost::log::sources::severity_logger<int> _logger;
 	virtual ~Protocol() = default;
 
 	virtual void on_exit(Params_exit& params) = 0;

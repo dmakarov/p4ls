@@ -1,15 +1,11 @@
 #include "protocol.h"
 
-#include <boost/log/sinks/syslog_backend.hpp>
-
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
 #include <sstream>
 
-namespace {
-boost::log::sources::severity_logger<int> logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
-}
+boost::log::sources::severity_logger<int> Protocol::_logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
 
 std::ostream &operator<<(std::ostream &os, const URI &item)
 {
@@ -188,7 +184,7 @@ bool set_params_from_json(const rapidjson::Value &json, Params_exit &params)
 
 bool set_params_from_json(const rapidjson::Value &json, Params_initialize &params)
 {
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Start processing params for initialize request";
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processing params for initialize request";
 	if (json.HasMember("processId") && !json["processId"].IsNull())
 	{
 		params._process_id = json["processId"].GetInt();
@@ -230,7 +226,7 @@ bool set_params_from_json(const rapidjson::Value &json, Params_initialize &param
 		}
 		params._workspace_folders.emplace(folders);
 	}
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Finish processing params for initialize request";
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processed params for initialize request";
 	return true;
 }
 
@@ -241,9 +237,9 @@ bool set_params_from_json(const rapidjson::Value &json, Params_shutdown &params)
 
 bool set_params_from_json(const rapidjson::Value &json, Params_text_document_position &params)
 {
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Processing TextDocumentPositionParams";
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processing TextDocumentPositionParams";
 	auto result = params.set(json);
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Processed TextDocumentPositionParams " << result;
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processed TextDocumentPositionParams " << result;
 	return result;
 }
 
@@ -269,9 +265,9 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_comp
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didChange &params)
 {
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Processing DidChangeTextDocumentParams";
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processing DidChangeTextDocumentParams";
 	auto result = params.set(json);
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Processed DidChangeTextDocumentParams " << result;
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processed DidChangeTextDocumentParams " << result;
 	return result;
 }
 
@@ -283,19 +279,19 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didC
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didOpen &params)
 {
 	auto result = false;
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Start processing params for textDocument/didOpen notification";
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processing params for textDocument/didOpen notification";
 	if (json.HasMember("textDocument"))
 	{
 		result = params._text_document.set(json["textDocument"]);
 	}
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Finish processing params for textDocument/didOpen notification " << result;
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processed params for textDocument/didOpen notification " << result;
 	return result;
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didSave &params)
 {
 	auto result = false;
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Processing params for textDocument/didSave notification";
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processing params for textDocument/didSave notification";
 	if (json.HasMember("textDocument"))
 	{
 		result = params._text_document.set(json["textDocument"]);
@@ -304,19 +300,19 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didS
 	{
 		params._text.emplace(json["text"].GetString());
 	}
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Processed params for textDocument/didSave notification " << result;
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processed params for textDocument/didSave notification " << result;
 	return result;
 }
 
 bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentSymbol &params)
 {
 	auto result = false;
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Start processing params for textDocument/documentSymbol request";
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processing params for textDocument/documentSymbol request";
 	if (json.HasMember("textDocument"))
 	{
 		result = params._text_document.set(json["textDocument"]);
 	}
-	BOOST_LOG_SEV(logger, boost::log::sinks::syslog::debug) << "PROTOCOL Finish processing params for textDocument/documentSymbol request " << result;
+	BOOST_LOG_SEV(Protocol::_logger, boost::log::sinks::syslog::debug) << "processed params for textDocument/documentSymbol request " << result;
 	return result;
 }
 

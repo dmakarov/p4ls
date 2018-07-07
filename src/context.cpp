@@ -1,5 +1,7 @@
 #include "context.h"
 
+#include <boost/log/attributes/constant.hpp>
+
 boost::log::sources::severity_logger<int> Context::_logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
 
 static Context& get_instance() {
@@ -9,6 +11,7 @@ static Context& get_instance() {
 
 Context Context::create_empty()
 {
+	Context::_logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("CONTEXT"));
 	return Context(nullptr);
 }
 
