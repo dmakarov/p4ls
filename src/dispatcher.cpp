@@ -36,6 +36,31 @@ struct registration_helper {
 	Dispatcher &dispatcher;
 	Protocol *protocol;
 };
+
+void send(rapidjson::Document& document, rapidjson::Value& value)
+{
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER get request_id from context.";
+	auto id = Context::get_current().get_value(request_id);
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER got id " << (id ? std::to_string(*id) : std::string("(null)"));
+	if (!id)
+	{
+		BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER does not reply.";
+		return;
+	}
+	auto &allocator = document.GetAllocator();
+	value.AddMember("jsonrpc", rapidjson::Value(rapidjson::StringRef(Dispatcher::_JSONRPC_VERSION.c_str())).Move(), allocator);
+	value.AddMember("id", rapidjson::Value(*id).Move(), allocator);
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	value.Accept(writer);
+	std::string content(buffer.GetString());
+	content.append("\r\n");
+	std::string message("Content-Length: ");
+	message += std::to_string(content.size()) + "\r\n\r\n" + content;
+	*(Context::get_current().get_existing(request_output_stream)) << message << std::flush;
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent message\n" << message;
+}
+
 } // namespace
 
 void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol)
@@ -136,55 +161,23 @@ void Dispatcher::call(std::string content, std::ostream &output_stream) const
 	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::debug) << "DISPATCHER finished processing method \"" << method << "\"";
 }
 
-void reply(rapidjson::Value &result)
+void reply(rapidjson::Value& result)
 {
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER get request_id from context.";
-	auto id = Context::get_current().get_value(request_id);
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER got id " << (id ? std::to_string(*id) : std::string("(null)"));
-	if (!id)
-	{
-		BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER does not reply.";
-		return;
-	}
-	rapidjson::Document json_document;
-	auto &allocator = json_document.GetAllocator();
-	rapidjson::Value root(rapidjson::kObjectType);
-	root.AddMember("jsonrpc", rapidjson::Value("2.0").Move(), allocator);
-	root.AddMember("id", rapidjson::Value(*id).Move(), allocator);
-	root.AddMember("result", result, allocator);
-	rapidjson::StringBuffer buffer;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-	root.Accept(writer);
-	std::string content(buffer.GetString());
-	auto content_length = content.size() + 2;
-	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content_length << "\r\n\r\n" << content << "\r\n" << std::flush;
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent response " << "Content-Length: " << content_length << "\r\n\r\n" << content << "\r\n";
+	rapidjson::Document document;
+	auto& allocator = document.GetAllocator();
+	rapidjson::Value value(rapidjson::kObjectType);
+	value.AddMember("result", result, allocator);
+	send(document, value);
 }
 
-void reply(ERROR_CODES code, const std::string &msg)
+void reply(ERROR_CODES code, const std::string& msg)
 {
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER get request_id from context.";
-	auto id = Context::get_current().get_value(request_id);
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER got id " << (id ? std::to_string(*id) : std::string("(null)"));
-	if (!id)
-	{
-		BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER does not reply.";
-		return;
-	}
-	rapidjson::Document json_document;
-	auto &allocator = json_document.GetAllocator();
+	rapidjson::Document document;
+	auto& allocator = document.GetAllocator();
 	rapidjson::Value result(rapidjson::kObjectType);
 	result.AddMember("code", rapidjson::Value(static_cast<int>(code)).Move(), allocator);
 	result.AddMember("message", rapidjson::Value(rapidjson::StringRef(msg.c_str())).Move(), allocator);
-	rapidjson::Value root(rapidjson::kObjectType);
-	root.AddMember("jsonrpc", rapidjson::Value("2.0").Move(), allocator);
-	root.AddMember("id", rapidjson::Value(*id).Move(), allocator);
-	root.AddMember("error", result, allocator);
-	rapidjson::StringBuffer buffer;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-	root.Accept(writer);
-	std::string content(buffer.GetString());
-	auto content_length = content.size() + 2;
-	*(Context::get_current().get_existing(request_output_stream)) << "Content-Length: " << content_length << "\r\n\r\n" << content << "\r\n" << std::flush;
-	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::debug) << "DISPATCHER Sent response " << "Content-Length: " << content_length << "\r\n\r\n" << content << "\r\n";
+	rapidjson::Value value(rapidjson::kObjectType);
+	value.AddMember("error", result, allocator);
+	send(document, value);
 }
