@@ -158,12 +158,11 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen& params)
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	auto& path = params._text_document._uri._path;
 	auto& text = params._text_document._text;
-	BOOST_LOG(_logger) << "Create new P4_file " << path;
+	BOOST_LOG(_logger) << "create new P4_file \"" << path << "\"";
 	auto command = find_command_for_path(path);
 	if (!command.empty())
 	{
 		_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(command, path, text));
-		_files[path].compile();
 	}
 }
 
@@ -209,11 +208,10 @@ void LSP_server::on_textDocument_formatting(Params_textDocument_formatting& para
 
 void LSP_server::on_textDocument_hover(Params_text_document_position& params)
 {
-	BOOST_LOG(_logger)
-		<< __PRETTY_FUNCTION__
-		<< "(document " << params._text_document._uri._path
-		<< ", line " << params._position._line
-		<< ", character " << params._position._character << ")";
+	BOOST_LOG(_logger) << __PRETTY_FUNCTION__
+					   << "(document: \"" << params._text_document._uri._path
+					   << "\", line: " << params._position._line
+					   << ", character: " << params._position._character << ")";
 	auto &path = params._text_document._uri._path;
 	Location location;
 	location._uri = path;
@@ -224,7 +222,7 @@ void LSP_server::on_textDocument_hover(Params_text_document_position& params)
 	{
 		if (auto hover_content = file->second.get_hover(location))
 		{
-			BOOST_LOG(_logger) << "Found hover content " << *hover_content;
+			BOOST_LOG(_logger) << "found hover content\n\"" << *hover_content << "\"";
 			std::ostringstream os;
 			os << "```p4\n" << *hover_content << "\n```";
 			Markup_content contents{MARKUP_KIND::markdown, os.str()};

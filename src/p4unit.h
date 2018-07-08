@@ -90,12 +90,13 @@ public:
 	{}
 	P4_file(const std::string &command, const std::string &unit_path, const std::string& text);
 	~P4_file() = default;
-	void compile();
 	void change_source_code(const std::vector<Text_document_content_change_event>& content_changes);
 	std::vector<Symbol_information>& get_symbols();
 	boost::optional<std::string> get_hover(const Location& location);
 
 private:
+	void compile();
+
 	AutoCompileContext _p4;
 	p4options& _options;
 	std::unique_ptr<const IR::P4Program> _program;
