@@ -10,6 +10,11 @@ Build
 =====
 
 ```
-$ cmake -G Ninja /path/to/repository/p4ls
-$ cmake --build .
+$ git clone https://github.com/dmakarov/p4ls.git
+$ cd p4ls
+$ git submodule update --init --recursive
+$ mkdir -p build/ninja/release
+$ cd build/ninja/release
+$ cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=<path where to install> -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF <path to repository p4ls>
+$ cmake --build . --target install
 ```
