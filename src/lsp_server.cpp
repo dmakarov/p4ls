@@ -159,10 +159,9 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen& params)
 	auto& path = params._text_document._uri._path;
 	auto& text = params._text_document._text;
 	BOOST_LOG(_logger) << "create new P4_file \"" << path << "\"";
-	auto command = find_command_for_path(path);
-	if (!command.empty())
+	if (auto command = find_command_for_path(path))
 	{
-		_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(command, path, text));
+		_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(*command, path, text));
 	}
 }
 
@@ -364,12 +363,14 @@ boost::optional<std::string> LSP_server::read_message()
 	return boost::none;
 }
 
-std::string LSP_server::find_command_for_path(const std::string& file)
+boost::optional<std::string> LSP_server::find_command_for_path(const std::string& file)
 {
-	auto result = _commands.find(file);
-	if (result != _commands.end())
+	boost::optional<std::string> result;
+	auto search = _commands.find(file);
+	if (search != _commands.end())
 	{
-		return result->second;
+		result.emplace(search->second);
+		return result;
 	}
 	for (boost::filesystem::path path(file); path.has_parent_path();)
 	{
@@ -383,8 +384,10 @@ std::string LSP_server::find_command_for_path(const std::string& file)
 			json.ParseStream(isw);
 			if (json.HasParseError() || !json.IsArray())
 			{
-				BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "JSON parse error: " << rapidjson::GetParseError_En(json.GetParseError()) << " (" << json.GetErrorOffset() << ")";
-				return std::string();
+				BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error)
+					<< "JSON parse error: " << rapidjson::GetParseError_En(json.GetParseError())
+					<< " (" << json.GetErrorOffset() << ")";
+				return result;
 			}
 			boost::char_separator<char> separator(" ");
 			boost::tokenizer<boost::char_separator<char>> tokens(std::string(json.GetArray()[0]["command"].GetString()), separator);
@@ -414,13 +417,14 @@ std::string LSP_server::find_command_for_path(const std::string& file)
 				}
 				_commands.emplace(the_file, the_command);
 			}
-			auto result = _commands.find(file);
-			if (result != _commands.end())
+			search = _commands.find(file);
+			if (search != _commands.end())
 			{
-				return result->second;
+				result.emplace(search->second);
+				return result;
 			}
-			return std::string();
+			return result;
 		}
 	}
-	return std::string();
+	return result;
 }

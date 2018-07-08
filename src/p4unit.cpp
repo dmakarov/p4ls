@@ -162,6 +162,7 @@ P4_file::P4_file(const std::string &command, const std::string &unit_path, const
 	, _options(P4CContextWithOptions<p4options>::get().options())
 	, _unit_path(unit_path)
 	, _source_code(text)
+	, _changed(true)
 {
 	_logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("P4UNIT"));
 	BOOST_LOG(_logger) << "constructor started";
@@ -195,6 +196,7 @@ P4_file::P4_file(const std::string &command, const std::string &unit_path, const
 
 void P4_file::change_source_code(const std::vector<Text_document_content_change_event>& content_changes)
 {
+	_changed = true;
 	for (auto& it : content_changes)
 	{
 		if (!it._range)
@@ -227,6 +229,10 @@ void P4_file::change_source_code(const std::vector<Text_document_content_change_
 
 std::vector<Symbol_information>& P4_file::get_symbols()
 {
+	if (_changed)
+	{
+		compile();
+	}
 	return _symbols;
 }
 
@@ -263,4 +269,5 @@ void P4_file::compile()
 	Collected_data output{_symbols, _definitions, _locations};
 	Outline outline(_options, _unit_path, output);
 	outline.process(_program);
+	_changed = false;
 }

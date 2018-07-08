@@ -105,4 +105,5 @@ private:
 	std::vector<Symbol_information> _symbols;
 	std::unordered_map<std::string, std::string> _definitions;
 	std::unordered_map<std::string, std::map<Range, std::string>> _locations;
+	bool _changed;
 };

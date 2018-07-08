@@ -54,7 +54,7 @@ private:
 	void on_workspace_executeCommand(Params_workspace_executeCommand& params) override;
 
 	boost::optional<std::string> read_message();
-	std::string find_command_for_path(const std::string& file);
+	boost::optional<std::string> find_command_for_path(const std::string& file);
 
 	Server_capabilities _capabilities;
 	std::istream& _input_stream;
