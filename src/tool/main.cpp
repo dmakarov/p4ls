@@ -77,12 +77,11 @@ void signal_handler(int signo)
 	std::exit(0);
 }
 
-void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& file_stream)
+void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& file_stream, const boost::optional<int>& severity_limit)
 {
 	boost::log::add_common_attributes();
 	using ts = boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>;
 	boost::shared_ptr<ts> sink(new ts());
-	sink->set_filter(boost::log::expressions::attr<int>("Severity") <= boost::log::sinks::syslog::debug);
 	sink->set_formatter(boost::log::expressions::stream
 						<< std::setw(6) << boost::log::expressions::attr<unsigned int>("LineID")
 						<< ":" << boost::log::expressions::attr<boost::log::attributes::current_process_id::value_type>("ProcessID")
@@ -91,6 +90,14 @@ void init_logging_sink(const boost::optional<boost::shared_ptr<std::ofstream>>& 
 						<< " [" << boost::log::expressions::attr<int>("Severity") << "] "
 						<< boost::log::expressions::attr<std::string>("Tag") << ": "
 						<< boost::log::expressions::smessage);
+	if (severity_limit)
+	{
+		sink->set_filter(boost::log::expressions::attr<int>("Severity") <= *severity_limit);
+	}
+	else
+	{
+		sink->set_filter(boost::log::expressions::attr<int>("Severity") <= boost::log::sinks::syslog::error);
+	}
 	if (file_stream)
 	{
 		sink->locked_backend()->add_stream(file_stream.get());
@@ -115,16 +122,14 @@ int main(int argc, char* argv[])
 	std::signal(SIGKILL, signal_handler);
 	std::signal(SIGSEGV, signal_handler);
 	std::signal(SIGTERM, signal_handler);
+	boost::optional<int> log_severity_limit;
 	boost::optional<std::istream&> input(std::cin);
 	std::ifstream ifs;
 	for (auto index = 1; index < argc; ++index)
 	{
-		if (std::string("-l") == argv[index])
+		if (std::string("-d") == argv[index])
 		{
-			if (++index < argc)
-			{
-				log_file_stream.emplace(boost::make_shared<std::ofstream>(argv[index], std::ios::app));
-			}
+			log_severity_limit.emplace(boost::log::sinks::syslog::debug);
 		}
 		else if (std::string("-i") == argv[index])
 		{
@@ -134,8 +139,15 @@ int main(int argc, char* argv[])
 				input.emplace(ifs);
 			}
 		}
+		else if (std::string("-l") == argv[index])
+		{
+			if (++index < argc)
+			{
+				log_file_stream.emplace(boost::make_shared<std::ofstream>(argv[index], std::ios::app));
+			}
+		}
 	}
-	init_logging_sink(log_file_stream);
+	init_logging_sink(log_file_stream, log_severity_limit);
 	BOOST_LOG(logger) << "STARTED";
 	LSP_server the_server(*input, std::cout);
 	auto status = the_server.run();
