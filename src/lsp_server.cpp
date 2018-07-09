@@ -357,7 +357,7 @@ boost::optional<std::string> LSP_server::read_message()
 			BOOST_LOG(_logger) << "got " << _input_stream.gcount() << " bytes, expected " << content_length << " content <" << content << ">";
 			return boost::none;
 		}
-		BOOST_LOG(_logger) << "received message " << content;
+		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::info) << "<--\n" << "Content-Length: " << content_length << "\r\n\r\n" << content;
 		return std::move(content);
 	}
 	return boost::none;

@@ -20,7 +20,7 @@ class Dispatcher {
 public:
 	using handler_type = std::function<void (const rapidjson::Value&)>;
 	static boost::log::sources::severity_logger<int> _logger;
-	static const std::string _JSONRPC_VERSION;
+	static const char* _JSONRPC_VERSION;
 
 	Dispatcher(handler_type error_handler) : _error_handler(error_handler)
 	{

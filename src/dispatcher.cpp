@@ -9,7 +9,7 @@
 #include <rapidjson/writer.h>
 
 boost::log::sources::severity_logger<int> Dispatcher::_logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
-const std::string Dispatcher::_JSONRPC_VERSION("2.0");
+const char* Dispatcher::_JSONRPC_VERSION = "2.0";
 
 namespace {
 
@@ -51,18 +51,17 @@ void send(T&& field, rapidjson::Value& result)
 	rapidjson::Document document;
 	auto& allocator = document.GetAllocator();
 	rapidjson::Value value(rapidjson::kObjectType);
-	value.AddMember("jsonrpc", rapidjson::Value(rapidjson::StringRef(Dispatcher::_JSONRPC_VERSION.c_str())).Move(), allocator);
+	value.AddMember("jsonrpc", rapidjson::Value(rapidjson::StringRef(Dispatcher::_JSONRPC_VERSION)).Move(), allocator);
 	value.AddMember("id", rapidjson::Value(*id).Move(), allocator);
 	value.AddMember(std::forward<T>(field), result, allocator);
 	rapidjson::StringBuffer buffer;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 	value.Accept(writer);
 	std::string content(buffer.GetString());
-	content.append("\r\n");
 	std::string message("Content-Length: ");
 	message += std::to_string(content.size()) + "\r\n\r\n" + content;
 	*(Context::get_current().get_existing(request_output_stream)) << message << std::flush;
-	BOOST_LOG(Dispatcher::_logger) << "sent message\n" << message;
+	BOOST_LOG_SEV(Dispatcher::_logger, boost::log::sinks::syslog::info) << "-->\n" << message;
 }
 
 } // namespace
@@ -116,7 +115,7 @@ void Dispatcher::call(std::string content, std::ostream &output_stream) const
 		return;
 	}
 	auto it = msg.FindMember("jsonrpc");
-	if (it == msg.MemberEnd() || !it->value.IsString() || it->value.GetString() != _JSONRPC_VERSION)
+	if (it == msg.MemberEnd() || !it->value.IsString() || std::strcmp(it->value.GetString(), _JSONRPC_VERSION))
 	{
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "did not find a valid jsonrpc message.";
 		return;
