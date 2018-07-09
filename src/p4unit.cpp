@@ -166,32 +166,26 @@ P4_file::P4_file(const std::string &command, const std::string &unit_path, const
 {
 	_logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("P4UNIT"));
 	BOOST_LOG(_logger) << "constructor started";
-	auto temp_file_path = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.p4");
 	boost::char_separator<char> separator(" ");
 	boost::tokenizer<boost::char_separator<char>> tokens(command, separator);
 	std::vector<char*> argv;
 	for (auto it = tokens.begin(); it != tokens.end(); ++it)
 	{
 		BOOST_LOG(_logger) << "process token " << *it;
-		if (*it == _unit_path)
-		{
-			auto temp = temp_file_path.native();
-			auto arg = new char[temp.size() + 1];
-			strncpy(arg, temp.c_str(), temp.size() + 1);
-			argv.emplace_back(arg);
-		}
-		else
-		{
-			auto arg = new char[it->size() + 1];
-			strncpy(arg, it->c_str(), it->size() + 1);
-			argv.emplace_back(arg);
-		}
+		auto arg = new char[it->size() + 1];
+		strncpy(arg, it->c_str(), it->size() + 1);
+		argv.emplace_back(arg);
 	}
+	argv.emplace_back(new char[3]);
+	strncpy(argv.back(), "-v", 3);
 	_options.langVersion = CompilerOptions::FrontendVersion::P4_16;
 	_options.process(argv.size(), argv.data());
-	_options.setInputFile();
 	BOOST_LOG(_logger) << "processed options, number of errors " << ::errorCount() << " input file " << _options.file;
 	compile();
+	for (auto arg : argv)
+	{
+		delete [] arg;
+	}
 }
 
 void P4_file::change_source_code(const std::vector<Text_document_content_change_event>& content_changes)
@@ -252,22 +246,25 @@ boost::optional<std::string> P4_file::get_hover(const Location& location)
 
 void P4_file::compile()
 {
+	auto temp_file_path = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.p4");
+	_options.file = temp_file_path.native();
 	std::ofstream ofs(_options.file);
 	ofs << _source_code;
 	ofs.close();
-	BOOST_LOG(_logger) << "wrote document " << _unit_path << " text to a temporary file " << _options.file;
+	BOOST_LOG(_logger) << "wrote document \"" << _unit_path << "\" to a temporary file \"" << _options.file << "\"";
 	_program.reset(P4::parseP4File(_options));
-	BOOST_LOG(_logger) << "compiled p4 source file, number of errors " << ::errorCount();
-	boost::filesystem::path temp_file_path(_options.file);
-	if (exists(temp_file_path))
+	auto error_count = ::errorCount();
+	BOOST_LOG(_logger) << "compiled p4 source file, number of errors " << error_count;
+	auto existed = remove(temp_file_path);
+	BOOST_LOG(_logger) << "removed temporary file " << temp_file_path << " " << existed;
+	if (_program && error_count == 0)
 	{
-		remove(temp_file_path);
+		_symbols.clear();
+		_definitions.clear();
+		_locations.clear();
+		Collected_data output{_symbols, _definitions, _locations};
+		Outline outline(_options, _unit_path, output);
+		outline.process(_program);
+		_changed = false;
 	}
-	_symbols.clear();
-	_definitions.clear();
-	_locations.clear();
-	Collected_data output{_symbols, _definitions, _locations};
-	Outline outline(_options, _unit_path, output);
-	outline.process(_program);
-	_changed = false;
 }
