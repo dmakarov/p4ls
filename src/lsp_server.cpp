@@ -71,7 +71,7 @@ int LSP_server::run()
 		}
 		else
 		{
-			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::error) << "did not read a valid message.";
+			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::warning) << "did not read a valid message.";
 		}
 	}
 	_is_done = true;

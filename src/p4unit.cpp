@@ -41,7 +41,7 @@ std::string::size_type get_position_index(const std::string& content, const Posi
 	return std::string::npos;
 }
 
-}
+} // namespace
 
 bool Symbol_collector::preorder(const IR::Node* node)
 {
