@@ -158,34 +158,26 @@ SYMBOL_KIND Symbol_collector::get_symbol_kind(const IR::Node* node)
 }
 
 P4_file::P4_file(const std::string &command, const std::string &unit_path, const std::string& text)
-	: _p4(new P4CContextWithOptions<p4options>)
-	, _options(P4CContextWithOptions<p4options>::get().options())
+	: _command(std::make_unique<char[]>(command.size() + 1))
 	, _unit_path(unit_path)
 	, _source_code(text)
 	, _changed(true)
 {
 	_logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("P4UNIT"));
-	BOOST_LOG(_logger) << "constructor started";
+	BOOST_LOG(_logger) << "constructor started.";
 	boost::char_separator<char> separator(" ");
 	boost::tokenizer<boost::char_separator<char>> tokens(command, separator);
-	std::vector<char*> argv;
+	auto arg = _command.get();
 	for (auto it = tokens.begin(); it != tokens.end(); ++it)
 	{
 		BOOST_LOG(_logger) << "process token " << *it;
-		auto arg = new char[it->size() + 1];
-		strncpy(arg, it->c_str(), it->size() + 1);
-		argv.emplace_back(arg);
+		auto size = it->size() + 1;
+		strncpy(arg, it->c_str(), size);
+		_argv.emplace_back(arg);
+		arg += size;
 	}
-	argv.emplace_back(new char[3]);
-	strncpy(argv.back(), "-v", 3);
-	_options.langVersion = CompilerOptions::FrontendVersion::P4_16;
-	_options.process(argv.size(), argv.data());
-	BOOST_LOG(_logger) << "processed options, number of errors " << ::errorCount() << " input file " << _options.file;
 	compile();
-	for (auto arg : argv)
-	{
-		delete [] arg;
-	}
+	BOOST_LOG(_logger) << "constructed.";
 }
 
 void P4_file::change_source_code(const std::vector<Text_document_content_change_event>& content_changes)
@@ -196,7 +188,7 @@ void P4_file::change_source_code(const std::vector<Text_document_content_change_
 		if (!it._range)
 		{
 			_source_code = it._text;
-			BOOST_LOG(_logger) << "replaced entire source code with new content";
+			BOOST_LOG(_logger) << "replaced entire source code with new content.";
 		}
 		else
 		{
@@ -246,13 +238,18 @@ boost::optional<std::string> P4_file::get_hover(const Location& location)
 
 void P4_file::compile()
 {
+	AutoCompileContext p4c_context(new P4CContextWithOptions<p4options>);
+	p4options& p4c_options(P4CContextWithOptions<p4options>::get().options());
+	p4c_options.langVersion = CompilerOptions::FrontendVersion::P4_16;
+	p4c_options.process(_argv.size(), _argv.data());
+	BOOST_LOG(_logger) << "processed options, number of errors " << ::errorCount();
 	auto temp_file_path = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.p4");
-	_options.file = temp_file_path.native();
-	std::ofstream ofs(_options.file);
+	p4c_options.file = temp_file_path.native();
+	std::ofstream ofs(p4c_options.file);
 	ofs << _source_code;
 	ofs.close();
-	BOOST_LOG(_logger) << "wrote document \"" << _unit_path << "\" to a temporary file \"" << _options.file << "\"";
-	_program.reset(P4::parseP4File(_options));
+	BOOST_LOG(_logger) << "wrote document \"" << _unit_path << "\" to a temporary file \"" << p4c_options.file << "\"";
+	_program.reset(P4::parseP4File(p4c_options));
 	auto error_count = ::errorCount();
 	BOOST_LOG(_logger) << "compiled p4 source file, number of errors " << error_count;
 	auto existed = remove(temp_file_path);
@@ -263,7 +260,7 @@ void P4_file::compile()
 		_definitions.clear();
 		_locations.clear();
 		Collected_data output{_symbols, _definitions, _locations};
-		Outline outline(_options, _unit_path, output);
+		Outline outline(p4c_options, _unit_path, output);
 		outline.process(_program);
 		_changed = false;
 	}
