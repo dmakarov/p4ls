@@ -39,14 +39,10 @@
 namespace {
 boost::optional<boost::shared_ptr<std::ofstream>> log_file_stream;
 boost::log::sources::severity_logger<int> logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
-const char* signals[] = { "", "SIGHUP", "SIGINT", "SIGQUIT",
-						  "SIGILL", "SIGTRAP", "SIGABRT", "SIGEMT",
-						  "SIGFPE", "SIGKILL", "SIGBUS", "SIGSEGV",
-						  "SIGSYS", "SIGPIPE", "SIGALRM", "SIGTERM",
-						  "SIGURG", "SIGSTOP", "SIGTSTP", "SIGCONT",
-						  "SIGCHLD", "SIGTTIN", "SIGTTOU", "SIGIO"
-						  "SIGZCPU", "SIGXFSZ", "SIGVTALRM", "SIGPROF"
-						  "SIGWINCH", "SIGINFO", "SIGUSR1", "SIGUSR2"};
+const char* signals[] = {    "NONE",  "SIGHUP",    "SIGINT", "SIGQUIT",   "SIGILL", "SIGTRAP", "SIGABRT",  "SIGEMT",
+						   "SIGFPE", "SIGKILL",    "SIGBUS", "SIGSEGV",   "SIGSYS", "SIGPIPE", "SIGALRM", "SIGTERM",
+						   "SIGURG", "SIGSTOP",   "SIGTSTP", "SIGCONT",  "SIGCHLD", "SIGTTIN", "SIGTTOU",   "SIGIO",
+						  "SIGZCPU", "SIGXFSZ", "SIGVTALRM", "SIGPROF", "SIGWINCH", "SIGINFO", "SIGUSR1", "SIGUSR2"};
 } // namespace
 
 void signal_handler(int signo)
