@@ -26,15 +26,15 @@ public:
 	{
 		_logger.add_attribute("Tag", boost::log::attributes::constant<std::string>("DISPATCHER"));
 	}
-	void register_handler(const std::string &method, handler_type handler);
-	void call(std::string content, std::ostream &output_stream) const;
+	void register_handler(const std::string& method, handler_type handler);
+	void call(std::string content, std::ostream& output_stream) const;
 
 private:
 	std::unordered_map<std::string, handler_type> _handlers;
 	handler_type _error_handler;
 };
 
-void register_protocol_handlers(Dispatcher &dispatcher, Protocol &protocol);
+void register_protocol_handlers(Dispatcher& dispatcher, Protocol& protocol);
 
-void reply(rapidjson::Value &result);
-void reply(ERROR_CODES code, const std::string &msg);
+void reply(rapidjson::Value& result);
+void reply(ERROR_CODES code, const char* msg);

@@ -37,7 +37,8 @@ struct registration_helper {
 	Protocol *protocol;
 };
 
-void send(rapidjson::Document& document, rapidjson::Value& value)
+template<typename T>
+void send(T&& field, rapidjson::Value& result)
 {
 	BOOST_LOG(Dispatcher::_logger) << "get request_id from context.";
 	auto id = Context::get_current().get_value(request_id);
@@ -47,9 +48,12 @@ void send(rapidjson::Document& document, rapidjson::Value& value)
 		BOOST_LOG(Dispatcher::_logger) << "does not reply.";
 		return;
 	}
-	auto &allocator = document.GetAllocator();
+	rapidjson::Document document;
+	auto& allocator = document.GetAllocator();
+	rapidjson::Value value(rapidjson::kObjectType);
 	value.AddMember("jsonrpc", rapidjson::Value(rapidjson::StringRef(Dispatcher::_JSONRPC_VERSION.c_str())).Move(), allocator);
 	value.AddMember("id", rapidjson::Value(*id).Move(), allocator);
+	value.AddMember(std::forward<T>(field), result, allocator);
 	rapidjson::StringBuffer buffer;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 	value.Accept(writer);
@@ -166,21 +170,15 @@ void Dispatcher::call(std::string content, std::ostream &output_stream) const
 
 void reply(rapidjson::Value& result)
 {
-	rapidjson::Document document;
-	auto& allocator = document.GetAllocator();
-	rapidjson::Value value(rapidjson::kObjectType);
-	value.AddMember("result", result, allocator);
-	send(document, value);
+	send("result", result);
 }
 
-void reply(ERROR_CODES code, const std::string& msg)
+void reply(ERROR_CODES code, const char* msg)
 {
 	rapidjson::Document document;
 	auto& allocator = document.GetAllocator();
 	rapidjson::Value result(rapidjson::kObjectType);
 	result.AddMember("code", rapidjson::Value(static_cast<int>(code)).Move(), allocator);
-	result.AddMember("message", rapidjson::Value(rapidjson::StringRef(msg.c_str())).Move(), allocator);
-	rapidjson::Value value(rapidjson::kObjectType);
-	value.AddMember("error", result, allocator);
-	send(document, value);
+	result.AddMember("message", rapidjson::Value(rapidjson::StringRef(msg)).Move(), allocator);
+	send("error", result);
 }
