@@ -45,6 +45,7 @@ mark_as_advanced(LIBGMP_INCLUDE_DIR LIBGMP_LIBRARY LIBGMPXX_LIBRARY)
 if(LIBGMP_FOUND)
     set(LIBGMP_LIBRARIES ${LIBGMP_LIBRARY} ${LIBGMPXX_LIBRARY})
 endif()
+include_directories(${LIBGMP_INCLUDE_DIR})
 
 add_subdirectory(vendor/p4c p4c)
 add_subdirectory(src)
