@@ -25,14 +25,17 @@ class p4options : public CompilerOptions {
 struct Collected_data {
 	Collected_data(std::vector<Symbol_information>& symbols,
 				   std::unordered_map<std::string, std::string>& definitions,
-				   std::unordered_map<std::string, std::map<Range, std::string>>& locations)
+				   std::unordered_map<std::string, std::map<Range, std::string>>& locations,
+				   std::unordered_map<std::string, std::vector<Symbol_information>::size_type>& indexes)
 		: _symbols(symbols)
 		, _definitions(definitions)
 		, _locations(locations)
+		, _indexes(indexes)
 	{}
 	std::vector<Symbol_information>& _symbols;
 	std::unordered_map<std::string, std::string>& _definitions;
 	std::unordered_map<std::string, std::map<Range, std::string>>& _locations;
+	std::unordered_map<std::string, std::vector<Symbol_information>::size_type>& _indexes;
 };
 
 
@@ -45,6 +48,7 @@ public:
 		, _symbols(output._symbols)
 		, _definitions(output._definitions)
 		, _locations(output._locations)
+		, _indexes(output._indexes)
 	{
 		setName("Symbol_collector");
 	}
@@ -62,6 +66,7 @@ private:
 	std::vector<Symbol_information>& _symbols;
 	std::unordered_map<std::string, std::string>& _definitions;
 	std::unordered_map<std::string, std::map<Range, std::string>>& _locations;
+	std::unordered_map<std::string, std::vector<Symbol_information>::size_type>& _indexes;
 };
 
 
@@ -103,5 +108,6 @@ private:
 	std::vector<Symbol_information> _symbols;
 	std::unordered_map<std::string, std::string> _definitions;
 	std::unordered_map<std::string, std::map<Range, std::string>> _locations;
+	std::unordered_map<std::string, std::vector<Symbol_information>::size_type> _indexes;
 	bool _changed;
 };

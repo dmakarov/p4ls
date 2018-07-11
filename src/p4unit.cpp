@@ -58,8 +58,8 @@ bool Symbol_collector::preorder(const IR::Node* node)
 			range.set(info);
 			file = info.getSourceFile().c_str();
 		}
-		auto* path = _temp_path == file ? _unit_path.c_str() : file;
-		Location location{path, range};
+		auto unit = _temp_path == file ? _unit_path.c_str() : file;
+		Location location{unit, range};
 		BOOST_LOG(_logger)
 			<< ctxt->depth
 			<< " " << node->node_type_name()
@@ -71,16 +71,25 @@ bool Symbol_collector::preorder(const IR::Node* node)
 			definition << node->toString() << " {\n";
 			for (auto it : node->to<IR::Type_Header>()->fields)
 			{
-				definition << "  " << it->type->toString() << " " << it->toString() << ";\n";
+				definition << "  " << it->type << " " << it << ";\n";
 			}
 			definition << "}";
-			auto* name = node->to<IR::IDeclaration>()->getName().toString().c_str();
+			auto name = node->to<IR::IDeclaration>()->getName().toString().c_str();
 			_definitions.emplace(name, definition.str());
-			BOOST_LOG(_logger) << definition.str();
+			BOOST_LOG(_logger) << "Header:\n" << definition.str();
 		}
+		else if (node->is<IR::Type_Typedef>())
+		{
+			auto name = node->to<IR::IDeclaration>()->getName().toString().c_str();
+			std::ostringstream definition;
+			definition << "typedef " << node->to<IR::Type_Typedef>()->type << " " << name << ";";
+			_definitions.emplace(name, definition.str());
+			BOOST_LOG(_logger) << "Typedef:" << definition.str();
+		}
+
 		if (node->is<IR::Type_Name>())
 		{
-			_locations[path].emplace(std::make_pair(range, node->toString().c_str()));
+			_locations[unit].emplace(std::make_pair(range, node->toString().c_str()));
 		}
 		else if (ctxt->depth == _max_depth
 			&& node->is<IR::IDeclaration>()
@@ -92,7 +101,8 @@ bool Symbol_collector::preorder(const IR::Node* node)
 			{
 				container.emplace(_container.back());
 			}
-			auto* name = node->to<IR::IDeclaration>()->getName().toString().c_str();
+			auto name = node->to<IR::IDeclaration>()->getName().toString().c_str();
+			_indexes[name] = _symbols.size();
 			_symbols.emplace_back(name, get_symbol_kind(node), location, container);
 			if (node->is<IR::Type_Header>()
 				|| node->is<IR::Type_Struct>()
@@ -259,7 +269,8 @@ void P4_file::compile()
 		_symbols.clear();
 		_definitions.clear();
 		_locations.clear();
-		Collected_data output{_symbols, _definitions, _locations};
+		_indexes.clear();
+		Collected_data output{_symbols, _definitions, _locations, _indexes};
 		Outline outline(p4c_options, _unit_path, output);
 		outline.process(_program);
 		_changed = false;
