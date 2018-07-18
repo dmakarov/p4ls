@@ -89,6 +89,8 @@ enum class SYMBOL_KIND {
 	TypeParameter = 26
 };
 
+enum class DOCUMENT_HIGHLIGHT_KIND { Text = 1, Read = 2, Write = 3 };
+
 enum class MARKUP_KIND { plaintext, markdown };
 
 enum class Trace_level { OFF = 0, MESSAGES = 1, VERBOSE = 2 };
@@ -1293,6 +1295,25 @@ struct Markup_content {
 
 	MARKUP_KIND _kind;
 	std::string _value;
+};
+
+
+struct Text_document_highlight {
+	Text_document_highlight(const Range& range, DOCUMENT_HIGHLIGHT_KIND kind)
+		: _range(std::move(range))
+		, _kind(kind)
+	{}
+
+	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
+	{
+		rapidjson::Value result(rapidjson::kObjectType);
+		result.AddMember("range", _range.get_json(allocator), allocator);
+		result.AddMember("kind", static_cast<int>(_kind), allocator);
+		return result;
+	}
+
+	Range _range;
+	DOCUMENT_HIGHLIGHT_KIND _kind;
 };
 
 

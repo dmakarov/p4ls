@@ -65,18 +65,14 @@ bool Symbol_collector::preorder(const IR::Node* node)
 			<< " " << node->node_type_name()
 			<< " " << node->toString()
 			<< " " << location;
-		if (node->is<IR::Type_Header>())
+		// definitions
+		if (node->is<IR::Type_Header>() || node->is<IR::Type_HeaderUnion>() || node->is<IR::Type_Struct>() || node->is<IR::Type_Extern>() || node->is<IR::Type_Enum>())
 		{
 			std::ostringstream definition;
-			definition << node->toString() << " {\n";
-			for (auto it : node->to<IR::Type_Header>()->fields)
-			{
-				definition << "  " << it->type << " " << it << ";\n";
-			}
-			definition << "}";
+			definition << node;
 			auto name = node->to<IR::IDeclaration>()->getName().toString().c_str();
 			_definitions.emplace(name, definition.str());
-			BOOST_LOG(_logger) << "Header:\n" << definition.str();
+			BOOST_LOG(_logger) << "Header or Struct: \"" << name << "\"\n" << definition.str();
 		}
 		else if (node->is<IR::Type_Typedef>())
 		{
@@ -84,9 +80,24 @@ bool Symbol_collector::preorder(const IR::Node* node)
 			std::ostringstream definition;
 			definition << "typedef " << node->to<IR::Type_Typedef>()->type << " " << name << ";";
 			_definitions.emplace(name, definition.str());
-			BOOST_LOG(_logger) << "Typedef:" << definition.str();
+			BOOST_LOG(_logger) << "Typedef:\"" << name << "\"\n" << definition.str();
 		}
-
+		// highlights
+		if (_unit_path == unit)
+		{
+			if (node->is<IR::Parameter>() || node->is<IR::PathExpression>())
+			{
+				auto name = node->toString().c_str();
+				auto it = _highlights.find(name);
+				if (it == _highlights.end())
+				{
+					it = _highlights.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple()).first;
+				}
+				it->second.emplace_back(range, DOCUMENT_HIGHLIGHT_KIND::Text);
+				_locations[unit].emplace(std::make_pair(range, name));
+			}
+		}
+		// locations of types, but need locations for all other interesting items as well
 		if (node->is<IR::Type_Name>())
 		{
 			_locations[unit].emplace(std::make_pair(range, node->toString().c_str()));
@@ -237,10 +248,29 @@ boost::optional<std::string> P4_file::get_hover(const Location& location)
 	BOOST_LOG(_logger) << "search hover for " << location;
 	for (const auto& it : _locations[location._uri])
 	{
-	BOOST_LOG(_logger) << "check location " << it.first;
+		BOOST_LOG(_logger) << "check location " << it.first;
 		if (it.first & location._range)
 		{
-			return _definitions[it.second];
+			auto def = _definitions.find(it.second);
+			if (def != _definitions.end())
+			{
+				return def->second;
+			}
+			return boost::none;
+		}
+	}
+	return boost::none;
+}
+
+boost::optional<std::vector<Text_document_highlight>> P4_file::get_highlights(const Location& location)
+{
+	BOOST_LOG(_logger) << "search highlight for " << location;
+	for (const auto& it : _locations[location._uri])
+	{
+		BOOST_LOG(_logger) << "check location " << it.first;
+		if (it.first & location._range)
+		{
+			return _highlights[it.second];
 		}
 	}
 	return boost::none;
@@ -266,11 +296,12 @@ void P4_file::compile()
 	BOOST_LOG(_logger) << "removed temporary file " << temp_file_path << " " << existed;
 	if (_program && error_count == 0)
 	{
-		_symbols.clear();
 		_definitions.clear();
+		_highlights.clear();
 		_locations.clear();
 		_indexes.clear();
-		Collected_data output{_symbols, _definitions, _locations, _indexes};
+		_symbols.clear();
+		Collected_data output{_symbols, _definitions, _highlights, _locations, _indexes};
 		Outline outline(p4c_options, _unit_path, output);
 		outline.process(_program);
 		_changed = false;

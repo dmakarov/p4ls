@@ -172,7 +172,31 @@ void LSP_server::on_textDocument_didSave(Params_textDocument_didSave& params)
 
 void LSP_server::on_textDocument_documentHighlight(Params_text_document_position& params)
 {
-	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
+	BOOST_LOG(_logger) << __PRETTY_FUNCTION__
+					   << "(document: \"" << params._text_document._uri._path
+					   << "\", line: " << params._position._line
+					   << ", character: " << params._position._character << ")";
+	auto &path = params._text_document._uri._path;
+	Location location;
+	location._uri = path;
+	location._range._start = params._position;
+	location._range._end = params._position;
+	auto file = _files.find(path);
+	if (file != _files.end())
+	{
+		if (auto highlights = file->second.get_highlights(location))
+		{
+			rapidjson::Document json_document;
+			auto& allocator = json_document.GetAllocator();
+			rapidjson::Value result(rapidjson::kArrayType);
+			for (auto& it : *highlights)
+			{
+				result.PushBack(it.get_json(allocator), allocator);
+			}
+			reply(result);
+			return;
+		}
+	}
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
@@ -181,7 +205,7 @@ void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymb
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Document json_document;
-	auto &allocator = json_document.GetAllocator();
+	auto& allocator = json_document.GetAllocator();
 	rapidjson::Value result(rapidjson::kArrayType);
 	auto& path = params._text_document._uri._path;
 	auto file = _files.find(path);
@@ -191,7 +215,7 @@ void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymb
 		{
 			if (it._location._uri == path)
 			{
-				result.PushBack(it.get_json(allocator), allocator);
+				result.PushBack(it.get_json(allocator).Move(), allocator);
 			}
 		}
 	}
