@@ -44,19 +44,23 @@ public class AbstractP4langTest {
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	protected IProject provisionProject(String projectName) throws IOException, CoreException {
+	protected IProject provisionProject(String projectName)
+			throws IOException, CoreException {
 		URL url = FileLocator.find(Platform.getBundle("org.eclipse.p4lang.tests"),
-				Path.fromPortableString("projects/" + projectName), Collections.emptyMap());
+				Path.fromPortableString("projects/" + projectName),
+				Collections.emptyMap());
 		url = FileLocator.toFileURL(url);
 		File folder = new File(url.getFile());
 		if (folder != null && folder.exists()) {
 			IProject project = ResourcesPlugin.getWorkspace().getRoot()
-					.getProject(projectName + "_" + getClass().getName() + "_" + System.currentTimeMillis());
+					.getProject(projectName + "_" + getClass().getName()
+							+ "_" + System.currentTimeMillis());
 			project.create(new NullProgressMonitor());
 			this.provisionedProjects.put(projectName, project);
 			FileUtils.copyDirectory(folder, project.getLocation().toFile());
 			project.open(new NullProgressMonitor());
-			project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+			project.refreshLocal(IResource.DEPTH_INFINITE,
+					new NullProgressMonitor());
 			return project;
 		} else {
 			return null;
@@ -72,7 +76,8 @@ public class AbstractP4langTest {
 				e.printStackTrace();
 			}
 		}
-		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(false);
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+		.closeAllEditors(false);
 	}
 
 	/**
@@ -83,7 +88,8 @@ public class AbstractP4langTest {
 	 * @throws CoreException
 	 * @throws IOException
 	 */
-	protected IProject getProject(String projectPrefix) throws IOException, CoreException {
+	protected IProject getProject(String projectPrefix)
+			throws IOException, CoreException {
 		if (!this.provisionedProjects.containsKey(projectPrefix)) {
 			provisionProject(projectPrefix);
 		}

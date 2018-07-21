@@ -20,27 +20,36 @@ public class TestPerspective {
 
 	@Before
 	public void setup() {
-		IPerspectiveDescriptor descriptor = PlatformUI.getWorkbench().getPerspectiveRegistry()
+		IPerspectiveDescriptor descriptor = PlatformUI.getWorkbench()
+				.getPerspectiveRegistry()
 				.findPerspectiveWithId(P4Perspective.ID);
-
-		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().setPerspective(descriptor);
+		PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getActivePage().setPerspective(descriptor);
 	}
 
 	@Test
 	public void testPerspectiveShortcut() {
-		String[] perspectiveShortcutIds = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+		String[] perspectiveShortcutIds = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getActivePage()
 				.getPerspectiveShortcuts();
-		String[] expectedIds = new String[] { "org.eclipse.debug.ui.DebugPerspective",
-				"org.eclipse.ui.resourcePerspective", "org.eclipse.team.ui.TeamSynchronizingPerspective" };
+		String[] expectedIds = new String[] {
+				"org.eclipse.debug.ui.DebugPerspective",
+				"org.eclipse.ui.resourcePerspective",
+				"org.eclipse.team.ui.TeamSynchronizingPerspective" };
 		assertArrayEquals(expectedIds, perspectiveShortcutIds);
 	}
 
 	@Test
 	public void testShowViewShortcuts() {
-		String[] showViewShortcutIds = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+		String[] showViewShortcutIds = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getActivePage()
 				.getShowViewShortcuts();
-		String[] expectedIds = new String[] { IPageLayout.ID_OUTLINE, IPageLayout.ID_PROBLEM_VIEW,
-				IPageLayout.ID_TASK_LIST, NewSearchUI.SEARCH_VIEW_ID, IPageLayout.ID_PROGRESS_VIEW,
+		String[] expectedIds = new String[] {
+				IPageLayout.ID_OUTLINE,
+				IPageLayout.ID_PROBLEM_VIEW,
+				IPageLayout.ID_TASK_LIST,
+				NewSearchUI.SEARCH_VIEW_ID,
+				IPageLayout.ID_PROGRESS_VIEW,
 				IConsoleConstants.ID_CONSOLE_VIEW };
 		assertArrayEquals(expectedIds, showViewShortcutIds);
 	}
@@ -53,12 +62,13 @@ public class TestPerspective {
 		expectedViewIds.add(IPageLayout.ID_TASK_LIST);
 		expectedViewIds.add(IPageLayout.ID_PROGRESS_VIEW);
 		expectedViewIds.add(IConsoleConstants.ID_CONSOLE_VIEW);
-		IViewReference[] viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+		IViewReference[] viewReferences = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getActivePage()
 				.getViewReferences();
 		for (IViewReference viewReference : viewReferences) {
 			expectedViewIds.remove(viewReference.getId());
 		}
-		assertEquals("Not all views present. Missing views: " + String.join(", ", expectedViewIds), 0,
-				expectedViewIds.size());
+		assertEquals("Not all views present. Missing views: " +
+				String.join(", ", expectedViewIds), 0, expectedViewIds.size());
 	}
 }
