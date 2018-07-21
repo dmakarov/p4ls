@@ -3,9 +3,7 @@
     id="org.eclipse.p4lang.feature"
     label="%name"
     version="0.1.0.qualifier"
-    provider-name="Dmitri Makarov"
-    license-feature="org.eclipse.license"
-    license-feature-version="0.0.0">
+    provider-name="Dmitri Makarov">
 
   <description>
     %description
