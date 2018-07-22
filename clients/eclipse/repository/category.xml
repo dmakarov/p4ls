@@ -15,7 +15,7 @@
    <bundle id="org.eclipse.lsp4j.jsonrpc" version="0.0.0">
       <category name="org.eclipse.p4lang.dependecies.category"/>
    </bundle>
-   <category-def name="org.eclipse.p4lang.category" label="P4lang: P4 edition in Eclipse IDE">
+   <category-def name="org.eclipse.p4lang.category" label="P4lang: P4 editing in Eclipse IDE">
       <description>
          P4lang enables P4 application development in the Eclipse IDE.
       </description>

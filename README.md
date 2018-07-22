@@ -41,7 +41,7 @@ with the required dependencies.  To install the plugin in Eclipse
    directory,
    e.g. `/Users/dmakarov/work/try/p4ls/clients/eclipse/repository/target/repository`
    in the _Work with:_ text entry field and click _Add..._ button.
-3. Check _Dependencies_ and _P4lang: P4 edition in Eclipse IDE_
+3. Check _Dependencies_ and _P4lang: P4 editing in Eclipse IDE_
    checkboxes and finish installing.
 
 After restarting the Eclipse a new P4 perspective should be available
