@@ -17,7 +17,7 @@
 	<modules>
 		<module>target-platform</module>
 		<module>org.eclipse.p4lang</module>
-		<!--module>org.eclipse.p4lang.tests</module-->
+		<module>org.eclipse.p4lang.tests</module>
 		<module>org.eclipse.p4lang.feature</module>
 		<module>repository</module>
 	</modules>
@@ -183,9 +183,10 @@
 		</profile>
 		<!-- Automatic profile for Mac-specific settings -->
 		<profile>
-			<id>macos</id>
+			<id>macosx</id>
 			<activation>
 				<os>
+					<name>mac os x</name>
 					<family>mac</family>
 				</os>
 			</activation>
@@ -216,4 +217,12 @@
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 	</distributionManagement>
+	<scm>
+		<url>git@github.com:dmakarov/p4ls.git</url>
+		<developerConnection>Dmitri Makarov</developerConnection>
+	</scm>
+	<issueManagement>
+		<url>https://github.com/dmakarov/p4ls/issues</url>
+		<system>GitHub</system>
+	</issueManagement>
 </project>

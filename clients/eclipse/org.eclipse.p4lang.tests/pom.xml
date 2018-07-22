@@ -22,6 +22,8 @@
 				<configuration>
 					<useUIThread>true</useUIThread>
 					<useUIHarness>true</useUIHarness>
+					<argLine>${ui.test.vmargs}</argLine>
+					<application>org.eclipse.ui.ide.workbench</application>
 				</configuration>
 			</plugin>
 		</plugins>
