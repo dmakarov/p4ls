@@ -10,6 +10,7 @@ Build
 =====
 
 ``` sh
+brew install bison gmp protobuf
 git clone https://github.com/dmakarov/p4ls.git
 cd p4ls
 git submodule update --init --recursive
