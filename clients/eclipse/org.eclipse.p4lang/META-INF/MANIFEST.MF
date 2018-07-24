@@ -6,26 +6,25 @@ Bundle-Version: 0.1.0.qualifier
 Automatic-Module-Name: org.eclipse.p4lang
 Bundle-Activator: org.eclipse.p4lang.P4langPlugin
 Bundle-Vendor: Dmitri Makarov
-Require-Bundle: org.eclipse.core.contenttype,
- org.eclipse.ui.genericeditor,
- org.eclipse.ui,
- org.eclipse.lsp4e,
- org.eclipse.tm4e.core,
- org.eclipse.tm4e.ui,
- org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.swt,
- org.eclipse.ui.ide,
- org.eclipse.debug.ui,
- org.eclipse.core.variables,
+Require-Bundle:  org.eclipse.core.runtime,
  org.eclipse.core.expressions,
- org.eclipse.search,
- org.eclipse.ui.console,
+ org.eclipse.core.resources,
+ org.eclipse.core.variables,
+ org.eclipse.debug.ui,
+ org.eclipse.jface.text,
+ org.eclipse.lsp4e,
  org.eclipse.lsp4j.jsonrpc,
  org.eclipse.lsp4j,
- com.google.gson,
- org.eclipse.jface.text,
- org.eclipse.ui.editors
+ org.eclipse.search,
+ org.eclipse.swt,
+ org.eclipse.tm4e.core,
+ org.eclipse.tm4e.ui,
+ org.eclipse.ui.console,
+ org.eclipse.ui.editors,
+ org.eclipse.ui.genericeditor,
+ org.eclipse.ui.ide,
+ org.eclipse.ui,
+ com.google.gson
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.p4lang;x-friends:="org.eclipse.p4lang.tests"
