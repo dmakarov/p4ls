@@ -48,6 +48,7 @@ install:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       brew install bison
+      brew install gmp
       brew install pkg-config
       brew install protobuf
       if [[ "${COMPILER}" == "g++-7" ]]; then
