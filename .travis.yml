@@ -47,10 +47,9 @@ matrix:
 install:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      brew install bison
-      brew install gmp
-      brew install pkg-config
       brew install protobuf
+      brew install bison
+      brew upgrade gmp
       if [[ "${COMPILER}" == "g++-7" ]]; then
         brew install gcc@7
         brew link --overwrite gcc@7
