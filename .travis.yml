@@ -51,8 +51,11 @@ install:
       brew install bison
       brew upgrade gmp
       if [[ "${COMPILER}" == "g++-7" ]]; then
+        brew install flex
         brew install gcc@7
         brew link --overwrite gcc@7
+        export LDFLAGS="-L/usr/local/opt/flex/lib"
+        export CPPFLAGS="-I/usr/local/opt/flex/include"
       fi
     fi
     if [[ "${TRAVIS_OS_NAME}" = "linux" ]]; then
