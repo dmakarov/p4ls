@@ -53,6 +53,7 @@ install:
       if [[ "${COMPILER}" == "g++-8" ]]; then
         brew install flex
         brew install gcc
+        brew link --overwrite gcc
       fi
     fi
     if [[ "${TRAVIS_OS_NAME}" = "linux" ]]; then
