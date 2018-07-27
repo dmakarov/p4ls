@@ -54,6 +54,8 @@ install:
         brew install flex
         brew install gcc
         brew link --overwrite gcc
+        export CMAKE_INCLUDE_PATH="/usr/local/opt/flex/include"
+        export CMAKE_LIBRARY_PATH="/usr/local/opt/flex/lib"
       fi
     fi
     if [[ "${TRAVIS_OS_NAME}" = "linux" ]]; then
@@ -64,7 +66,7 @@ install:
 
   - export CXX="${COMPILER}"
 
-  - export PATH="/usr/local/opt/bison/bin:$PATH"
+  - export PATH="/usr/local/opt/bison/bin:/usr/local/opt/flex/bin::$PATH"
 
 before_script:
   - mkdir -p build
