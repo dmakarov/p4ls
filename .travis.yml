@@ -34,7 +34,7 @@ matrix:
 #          packages: ["clang-5.0", "g++-7", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex"]
 #          sources: *apt_sources
 
-    - env: COMPILER=g++-7
+    - env: COMPILER=g++-8
       os: osx
       compiler: gcc
       osx_image: xcode9.2
@@ -50,12 +50,9 @@ install:
       brew install protobuf
       brew install bison
       brew upgrade gmp
-      if [[ "${COMPILER}" == "g++-7" ]]; then
+      if [[ "${COMPILER}" == "g++-8" ]]; then
         brew install flex
-        brew install gcc@7
-        brew link --overwrite gcc@7
-        export LDFLAGS="-L/usr/local/opt/flex/lib"
-        export CPPFLAGS="-I/usr/local/opt/flex/include"
+        brew install gcc
       fi
     fi
     if [[ "${TRAVIS_OS_NAME}" = "linux" ]]; then
