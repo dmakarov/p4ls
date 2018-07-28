@@ -30,13 +30,13 @@ matrix:
           packages: ["g++-7", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex"]
           sources: *apt_sources
 
-#    - env: COMPILER=clang++-5.0
-#      os: linux
-#      compiler: clang
-#      addons: &clang50
-#        apt:
-#          packages: ["clang-5.0", "g++-7", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex"]
-#          sources: *apt_sources
+    - env: COMPILER=clang++-6.0
+      os: linux
+      compiler: clang
+      addons: &clang60
+        apt:
+          packages: ["clang-6.0", "g++-7", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex"]
+          sources: *apt_sources
 
     - env: COMPILER=clang++
       os: osx
