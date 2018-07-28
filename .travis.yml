@@ -34,11 +34,6 @@ matrix:
 #          packages: ["clang-5.0", "g++-7", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex"]
 #          sources: *apt_sources
 
-    # - env: COMPILER=g++-8
-    #   os: osx
-    #   compiler: gcc
-    #   osx_image: xcode9.2
-
     - env: COMPILER=clang++
       os: osx
       compiler: clang
@@ -50,13 +45,6 @@ install:
       brew install protobuf
       brew install bison
       brew upgrade gmp
-      if [[ "${COMPILER}" == "g++-8" ]]; then
-        brew install flex
-        brew install gcc
-        brew link --overwrite gcc
-        export CMAKE_INCLUDE_PATH="/usr/local/opt/flex/include"
-        export CMAKE_LIBRARY_PATH="/usr/local/opt/flex/lib"
-      fi
     fi
     if [[ "${TRAVIS_OS_NAME}" = "linux" ]]; then
       wget https://github.com/google/protobuf/releases/download/v3.6.0/protobuf-all-3.6.0.tar.gz
@@ -72,7 +60,7 @@ before_script:
   - mkdir -p build
 
 script:
-  - cd build && cmake -DCMAKE_VERBOSE_MAKEFILE=ON -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF -DENABLE_P4TEST=OFF -DENABLE_UNIFIED_COMPILATION=OFF -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && cd test && ctest
+  - cd build && cmake -DCMAKE_VERBOSE_MAKEFILE=ON -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF -DENABLE_P4TEST=OFF -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && cd test && ctest
 
 notifications:
   email: false
