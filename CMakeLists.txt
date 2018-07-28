@@ -10,9 +10,13 @@ project("p4ls")
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(ENABLE_UNITTESTS "Build all unit tests." OFF)
+
+hunter_add_package(Boost COMPONENTS date_time system thread filesystem iostreams regex log)
+hunter_add_package(RapidJSON)
+find_package(Boost CONFIG REQUIRED COMPONENTS date_time system thread filesystem iostreams regex log)
+find_package(RapidJSON CONFIG REQUIRED)
 
 find_package(PkgConfig QUIET)
 PKG_CHECK_MODULES(PC_LIBGMP QUIET gmp)

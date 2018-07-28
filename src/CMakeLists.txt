@@ -12,11 +12,6 @@ add_library(p4ls
   protocol.cpp
   protocol.h)
 
-hunter_add_package(Boost COMPONENTS date_time system thread filesystem iostreams regex log)
-hunter_add_package(RapidJSON)
-find_package(Boost CONFIG REQUIRED COMPONENTS date_time system thread filesystem iostreams regex log)
-find_package(RapidJSON CONFIG REQUIRED)
-
 set (P4C_LIB_DEPS "${Boost_LIBRARIES};${LIBGMP_LIBRARIES}")
 set (P4C_LIBRARIES p4ctoolkit frontend ir)
 

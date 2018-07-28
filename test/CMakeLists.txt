@@ -13,4 +13,3 @@ target_include_directories(unittests_driver PUBLIC ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(unittests_driver PUBLIC p4ls Boost::unit_test_framework)
 
 add_test(NAME unittests COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittests_driver)
-# WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
