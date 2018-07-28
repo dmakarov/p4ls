@@ -34,10 +34,10 @@ matrix:
 #          packages: ["clang-5.0", "g++-7", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex"]
 #          sources: *apt_sources
 
-    - env: COMPILER=g++-8
-      os: osx
-      compiler: gcc
-      osx_image: xcode9.2
+    # - env: COMPILER=g++-8
+    #   os: osx
+    #   compiler: gcc
+    #   osx_image: xcode9.2
 
     - env: COMPILER=clang++
       os: osx
