@@ -13,7 +13,7 @@ addons:
   apt:
     sources: &apt_sources
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty-5.0
+      - llvm-toolchain-trusty-6.0
 
 cache:
   directories:
