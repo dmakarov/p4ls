@@ -2,6 +2,10 @@ dist: trusty
 sudo: false
 language: c++
 
+env:
+  global:
+    - MAKEFLAGS="-j 2"
+
 git:
   depth: 1
 
