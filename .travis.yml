@@ -22,20 +22,20 @@ cache:
 matrix:
   fast_finish: true
   include:
-    - env: COMPILER=g++-7
+    - env: COMPILER=g++-8
       os: linux
       compiler: gcc
-      addons: &gcc7
+      addons:
         apt:
-          packages: ["g++-7", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex"]
+          packages: ["libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex", "g++-8"]
           sources: *apt_sources
 
     - env: COMPILER=clang++-6.0
       os: linux
       compiler: clang
-      addons: &clang60
+      addons:
         apt:
-          packages: ["clang-6.0", "g++-7", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex"]
+          packages: ["libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex", "clang-6.0"]
           sources: *apt_sources
 
     - env: COMPILER=clang++
@@ -45,13 +45,10 @@ matrix:
 
 install:
   - export CXX="${COMPILER}"
-
   - export PATH="/usr/local/opt/bison/bin:/usr/local/opt/flex/bin::$PATH"
-
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      brew install protobuf
-      brew install bison
+      brew install protobuf bison
       brew upgrade gmp
     fi
     if [[ "${TRAVIS_OS_NAME}" = "linux" ]]; then
