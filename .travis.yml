@@ -27,7 +27,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          packages: ["libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex", "g++-8"]
+          packages: ["bison", "flex", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "g++-8"]
           sources: *apt_sources
 
     - env: COMPILER=clang++-6.0
@@ -35,7 +35,7 @@ matrix:
       compiler: clang
       addons:
         apt:
-          packages: ["libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "bison", "flex", "clang-6.0"]
+          packages: ["bison", "flex", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "clang-6.0"]
           sources: *apt_sources
 
     - env: COMPILER=clang++
@@ -53,7 +53,7 @@ install:
     fi
     if [[ "${TRAVIS_OS_NAME}" = "linux" ]]; then
       wget https://github.com/google/protobuf/releases/download/v3.6.0/protobuf-all-3.6.0.tar.gz
-      tar -xzvf protobuf-all-3.6.0.tar.gz
+      tar -xzf protobuf-all-3.6.0.tar.gz
       pushd protobuf-3.6.0 && ./configure --prefix=/usr && make && sudo make install && popd
     fi
 
@@ -61,7 +61,8 @@ before_script:
   - mkdir -p build
 
 script:
-  - cd build && cmake -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF -DENABLE_P4TEST=OFF -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && cd test && ctest
+#  - cd build && cmake -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF -DENABLE_P4TEST=OFF -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && cd test && ctest
+  - cd build && cmake -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF -DENABLE_P4TEST=OFF -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 ..
 
 notifications:
   email: false
