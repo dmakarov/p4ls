@@ -123,6 +123,11 @@ int main(int argc, char* argv[])
 	std::ifstream ifs;
 	for (auto index = 1; index < argc; ++index)
 	{
+		if (std::string("-v") == argv[index])
+		{
+			std::cout << "p4lsd version 0.1" << std::endl;
+			return 0;
+		}
 		if (std::string("-d") == argv[index])
 		{
 			log_severity_limit.emplace(boost::log::sinks::syslog::debug);
