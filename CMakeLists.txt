@@ -23,6 +23,8 @@ else()
     find_package(RapidJSON CONFIG REQUIRED)
 endif()
 
+include_directories(${RAPIDJSON_INCLUDE_DIRS})
+
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 find_package(LibGmp REQUIRED)
