@@ -21,9 +21,9 @@ if (HUNTER_ENABLED)
 else()
     find_package(Boost REQUIRED COMPONENTS date_time system thread filesystem iostreams regex log)
     find_package(RapidJSON CONFIG REQUIRED)
+    add_library(RapidJSON::rapidjson INTERFACE IMPORTED)
+    set_target_properties(RapidJSON::rapidjson PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${RAPIDJSON_INCLUDE_DIRS}")
 endif()
-
-include_directories(${RAPIDJSON_INCLUDE_DIRS})
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 

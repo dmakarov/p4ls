@@ -13,7 +13,7 @@ add_library(p4ls
   p4unit.h
   protocol.cpp
   protocol.h)
-
 add_dependencies(p4ls ir)
+target_link_libraries(p4ls RapidJSON::rapidjson)
 
 add_subdirectory(tool)
