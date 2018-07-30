@@ -72,9 +72,20 @@ want p4lsd to analyze there should be an entry like the following
   "directory": "/Users/dmakarov/work/try/p4ls/test",
   "command": "/Users/dmakarov/work/try/opt/bin/p4c /Users/dmakarov/work/try/p4ls/test/main.p4",
   "file": "/Users/dmakarov/work/try/p4ls/test/main.p4"
+},
+{
+  "directory": "/Users/dmakarov/work/try/p4ls/test",
+  "command": "/Users/dmakarov/work/try/opt/bin/p4c -I ../include /Users/dmakarov/work/try/p4ls/test/switch.p4",
+  "file": "/Users/dmakarov/work/try/p4ls/test/switch.p4"
 }
 ]
 ```
+
+There can be any number of `{}` blocks between the top-level brackets
+`[]`.  Usually the `compile_commands.json` is created by running
+*cmake* with `-DCMAKE_EXPORT_COMPILE_COMMANDS` command line option, if
+a project build is managed by *cmake*.
+
 
 ### Emacs LSP mode client
 
