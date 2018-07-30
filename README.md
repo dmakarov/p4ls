@@ -9,8 +9,10 @@ server for the [P4](https://p4.org/) programming language.
 Install
 =======
 
-MacOS
------
+P4LSD Server
+-----------
+
+### MacOS
 
 Prebuilt binary packages for installing `p4lsd` server are available
 for MacOS.  To install the homebrew package use the following command
@@ -19,23 +21,16 @@ for MacOS.  To install the homebrew package use the following command
 brew install dmakarov/homebrew-p4/p4ls
 ```
 
+### Linux
 
-Build
-=====
+See Build section in this document for instructions on how to build
+from source.
 
-``` sh
-brew install bison gmp protobuf
-git clone https://github.com/dmakarov/p4ls.git
-cd p4ls
-git submodule update --init --recursive
-mkdir -p build/ninja/release
-cd build/ninja/release
-cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF -DENABLE_P4TEST=OFF <path to p4ls repository>
-cmake --build . --target install
-```
 
-Installing Eclipse P4lang plugin
-================================
+Clients
+-------
+
+### Eclipse P4lang plugin
 
 In addition to the P4 language server, the repository includes two LSP
 clients, one for Eclipse and another for Emacs.  To build and install
@@ -79,4 +74,26 @@ want p4lsd to analyze there should be an entry like the following
   "file": "/Users/dmakarov/work/try/p4ls/test/main.p4"
 }
 ]
+```
+
+### Emacs LSP mode client
+
+Install melpa lsp-p4 package
+
+
+Contribute
+==========
+
+Build
+-----
+
+``` sh
+brew install bison boost cmake ninja pkg-config protobuf rapidjson gmp
+git clone https://github.com/dmakarov/p4ls.git
+cd p4ls
+git submodule update --init --recursive
+mkdir -p build/ninja/release
+cd build/ninja/release
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF -DENABLE_P4TEST=OFF -DHUNTER_ENABLED=OFF -DBoost_USE_STATIC_LIBS=ON <path to p4ls repository>
+cmake --build . --target src/tool/install
 ```
