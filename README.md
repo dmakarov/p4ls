@@ -6,6 +6,20 @@
 P4LS is an implementation of an [LSP](https://microsoft.github.io/language-server-protocol/specification)
 server for the [P4](https://p4.org/) programming language.
 
+Install
+=======
+
+MacOS
+-----
+
+Prebuilt binary packages for installing `p4lsd` server are available
+for MacOS.  To install the homebrew package use the following command
+
+``` sh
+brew install dmakarov/homebrew-p4/p4ls
+```
+
+
 Build
 =====
 
