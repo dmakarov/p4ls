@@ -6,11 +6,9 @@
 P4LS is an implementation of an [LSP](https://microsoft.github.io/language-server-protocol/specification)
 server for the [P4](https://p4.org/) programming language.
 
-Install
-=======
+# Install
 
-P4LSD Server
------------
+## P4LSD Server
 
 ### MacOS
 
@@ -23,12 +21,10 @@ brew install dmakarov/homebrew-p4/p4ls
 
 ### Linux
 
-See Build section in this document for instructions on how to build
+See [Build](#build) section in this document for instructions on how to build
 from source.
 
-
-Clients
--------
+## Clients
 
 ### Eclipse P4lang plugin
 
@@ -92,11 +88,9 @@ a project build is managed by *cmake*.
 Install melpa lsp-p4 package
 
 
-Contribute
-==========
+# Contribute
 
-Build
------
+## Build
 
 ``` sh
 brew install bison boost cmake ninja pkg-config protobuf rapidjson gmp
