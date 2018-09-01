@@ -420,7 +420,18 @@ boost::optional<std::string> LSP_server::find_command_for_path(const std::string
 			if (compiler.has_parent_path() && compiler.parent_path().has_parent_path())
 			{
 				auto std_include_path = compiler.parent_path().parent_path() / "share" / "p4c" / "p4include";
-				std_include = std_include_path.c_str();
+				if (boost::filesystem::exists(std_include_path))
+				{
+					std_include = std_include_path.c_str();
+				}
+				else
+				{
+					std_include_path = compiler.parent_path().parent_path() / "p4include";
+					if (boost::filesystem::exists(std_include_path))
+					{
+						std_include = std_include_path.c_str();
+					}
+				}
 			}
 			for (auto& it : json.GetArray())
 			{
@@ -447,8 +458,11 @@ boost::optional<std::string> LSP_server::find_command_for_path(const std::string
 				result.emplace(search->second);
 				return result;
 			}
+			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::warning)
+				<< "did not find a matching command in \"" << compile_commands_path << "\"";
 			return result;
 		}
 	}
+	BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::warning) << "did not find a compile_commands.json";
 	return result;
 }
