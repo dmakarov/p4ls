@@ -248,6 +248,11 @@ void LSP_server::on_textDocument_hover(Params_text_document_position& params)
 			BOOST_LOG(_logger) << "found hover content\n\"" << *hover_content << "\"";
 			std::ostringstream os;
 			os << "```p4\n" << *hover_content << "\n```";
+#if 0
+			// FIXME remove when settled on formatting the hover content
+			os << "<div style=\"font-family: .SF NS Text; font-size: 10pt;\">\n<pre><code>"
+			   << *hover_content << "\n</code></pre>\n</div>";
+#endif
 			Markup_content contents{MARKUP_KIND::markdown, os.str()};
 			rapidjson::Document json_document;
 			auto &allocator = json_document.GetAllocator();
