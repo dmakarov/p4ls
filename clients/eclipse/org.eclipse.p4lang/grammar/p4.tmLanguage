@@ -41,13 +41,13 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(apply|break|case|continue|default|do|else|for|goto|if|_Pragma|return|switch|while)\b</string>
+			<string>\b(action|apply|break|case|continue|default|do|else|for|goto|if|_Pragma|return|state|switch|table|transition|while)\b</string>
 			<key>name</key>
 			<string>keyword.control.p4</string>
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(asm|__asm__|auto|bit|bool|control|enum|error|header|header_union|int|match_kind|package|parser|struct|table|tuple|typedef|varbit|void)\b</string>
+			<string>\b(asm|__asm__|auto|bit|bool|control|enum|error|header|header_union|int|match_kind|package|parser|struct|tuple|typedef|varbit|void)\b</string>
 			<key>name</key>
 			<string>storage.type.p4</string>
 		</dict>
@@ -79,7 +79,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(NULL|true|false|TRUE|FALSE)\b</string>
+			<string>\b(NULL|true|false|TRUE|FALSE|start|accept)\b</string>
 			<key>name</key>
 			<string>constant.language.p4</string>
 		</dict>
