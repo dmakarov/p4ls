@@ -10,12 +10,14 @@ endif()
 include_directories(../vendor/p4c ../vendor/p4c/test/frameworks/gtest/googletest/include ${CMAKE_BINARY_DIR}/p4c)
 
 add_executable(unittests_driver
+  lexer_test.cpp
   lsp_server_test.cpp
   protocol_test.cpp
   unittests_driver.cpp)
-target_include_directories(unittests_driver PUBLIC ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(unittests_driver PUBLIC ${PROJECT_SOURCE_DIR}/src/lsp ${PROJECT_SOURCE_DIR}/src/p4l)
 target_link_libraries(unittests_driver
-  p4ls
+  lsp
+  p4l
   p4ctoolkit
   frontend
   ir

@@ -1,8 +1,9 @@
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../lsp ${CMAKE_BINARY_DIR}/p4c ../../vendor/p4c ../../vendor/p4c/test/frameworks/gtest/googletest/include)
 add_executable(p4lsd main.cpp)
 
 target_link_libraries(p4lsd
-  p4ls
+  p4l
+  lsp
   p4ctoolkit
   frontend
   ir
