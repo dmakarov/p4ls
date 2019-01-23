@@ -22,7 +22,6 @@
 ;;; Code:
 
 (require 'lsp-mode)
-(require 'lsp-common)
 
 (defgroup lsp-p4 nil
   "Customization variables for lsp-p4."
