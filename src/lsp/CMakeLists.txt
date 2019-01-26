@@ -1,5 +1,3 @@
-set(CMAKE_CXX_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
-
 add_library(lsp
   context.cpp
   context.h
