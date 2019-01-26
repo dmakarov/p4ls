@@ -98,7 +98,12 @@ private:
 	template <class T> class Something : public Anything {
 		static_assert(std::is_same<typename std::decay<T>::type, T>::value, "");
 	public:
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 		Something(T&& value) : _value(std::move(value)) {}
+#pragma GCC diagnostic pop
 
 		void* get_value() override
 		{
