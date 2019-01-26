@@ -13,6 +13,8 @@ add_executable(unittests_driver
   protocol_test.cpp
   unittests_driver.cpp)
 
+target_compile_options(unittests_driver PRIVATE "-Werror" "-Wall" "-Wextra" "-fvisibility=hidden" "-fvisibility-inlines-hidden")
+
 target_include_directories(unittests_driver
   PUBLIC
   ${PROJECT_SOURCE_DIR}/src/lsp

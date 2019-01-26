@@ -177,7 +177,7 @@ rapidjson::Value Server_capabilities::get_json(rapidjson::Document::AllocatorTyp
 	return result;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_exit &params)
+bool set_params_from_json(const rapidjson::Value&, Params_exit&)
 {
 	return true;
 }
@@ -230,12 +230,12 @@ bool set_params_from_json(const rapidjson::Value &json, Params_initialize &param
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_shutdown &params)
+bool set_params_from_json(const rapidjson::Value&, Params_shutdown&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_text_document_position &params)
+bool set_params_from_json(const rapidjson::Value& json, Params_text_document_position& params)
 {
 	BOOST_LOG(Protocol::_logger) << "processing \"TextDocumentPositionParams\"";
 	auto result = params.set(json);
@@ -243,27 +243,27 @@ bool set_params_from_json(const rapidjson::Value &json, Params_text_document_pos
 	return result;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_codeAction &params)
+bool set_params_from_json(const rapidjson::Value&, Params_textDocument_codeAction&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_codeLens &params)
+bool set_params_from_json(const rapidjson::Value&, Params_textDocument_codeLens&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_codeLens_resolve &params)
+bool set_params_from_json(const rapidjson::Value&, Params_codeLens_resolve&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_completion &params)
+bool set_params_from_json(const rapidjson::Value&, Params_textDocument_completion&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didChange &params)
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_didChange& params)
 {
 	BOOST_LOG(Protocol::_logger) << "processing params for method \"textDocument/didChange\"";
 	auto result = params.set(json);
@@ -271,12 +271,12 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didC
 	return result;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didClose &params)
+bool set_params_from_json(const rapidjson::Value&, Params_textDocument_didClose&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didOpen &params)
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_didOpen& params)
 {
 	auto result = false;
 	BOOST_LOG(Protocol::_logger) << "processing params for method \"textDocument/didOpen\"";
@@ -288,7 +288,7 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didO
 	return result;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didSave &params)
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_didSave& params)
 {
 	auto result = false;
 	BOOST_LOG(Protocol::_logger) << "processing params for method \"textDocument/didSave\"";
@@ -304,7 +304,7 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_didS
 	return result;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_documentSymbol &params)
+bool set_params_from_json(const rapidjson::Value& json, Params_textDocument_documentSymbol& params)
 {
 	auto result = false;
 	BOOST_LOG(Protocol::_logger) << "processing params for method \"textDocument/documentSymbol\"";
@@ -316,42 +316,42 @@ bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_docu
 	return result;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_formatting &params)
+bool set_params_from_json(const rapidjson::Value&, Params_textDocument_formatting&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_onTypeFormatting &params)
+bool set_params_from_json(const rapidjson::Value&, Params_textDocument_onTypeFormatting&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_rangeFormatting &params)
+bool set_params_from_json(const rapidjson::Value&, Params_textDocument_rangeFormatting&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_rename &params)
+bool set_params_from_json(const rapidjson::Value&, Params_textDocument_rename&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_textDocument_switchSourceHeader &params)
+bool set_params_from_json(const rapidjson::Value&, Params_textDocument_switchSourceHeader&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_workspace_didChangeConfiguration &params)
+bool set_params_from_json(const rapidjson::Value&, Params_workspace_didChangeConfiguration&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_workspace_didChangeWatchedFiles &params)
+bool set_params_from_json(const rapidjson::Value&, Params_workspace_didChangeWatchedFiles&)
 {
 	return true;
 }
 
-bool set_params_from_json(const rapidjson::Value &json, Params_workspace_executeCommand &params)
+bool set_params_from_json(const rapidjson::Value&, Params_workspace_executeCommand&)
 {
 	return true;
 }

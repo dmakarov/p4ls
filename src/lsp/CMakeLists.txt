@@ -12,6 +12,8 @@ add_library(lsp
 
 add_dependencies(lsp p4l)
 
+target_compile_options(lsp PRIVATE "-Werror" "-Wall" "-Wextra" "-fvisibility=hidden" "-fvisibility-inlines-hidden")
+
 target_include_directories(lsp
   PUBLIC
   ${PROJECT_SOURCE_DIR}/src/p4l)

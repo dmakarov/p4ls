@@ -229,7 +229,7 @@ struct URI {
 std::ostream& operator<<(std::ostream& os, const URI& item);
 
 struct Workspace_folder {
-	Workspace_folder(const rapidjson::Value& json)
+	Workspace_folder(const rapidjson::Value&)
 	{
 	}
 	std::string _uri;
@@ -1007,7 +1007,7 @@ struct Server_capabilities {
 	};
 
 	struct Color_provider_options {
-		rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
+		rapidjson::Value get_json(rapidjson::Document::AllocatorType&)
 		{
 			rapidjson::Value result(rapidjson::kObjectType);
 			return result;
@@ -1230,9 +1230,9 @@ struct Text_document_content_change_event {
 		return true;
 	}
 
-	boost::optional<Range> _range;       /// the range of the document that changed
-	boost::optional<int> _range_length;  /// the length of the range that got replaced
-	std::string _text;                   /// the new text of the range/document
+	boost::optional<Range> _range;                /// the range of the document that changed
+	boost::optional<unsigned int> _range_length;  /// the length of the range that got replaced
+	std::string _text;                            /// the new text of the range/document
 };
 
 

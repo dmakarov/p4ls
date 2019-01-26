@@ -81,13 +81,13 @@ int LSP_server::run()
 	return 0;
 }
 
-void LSP_server::on_exit(Params_exit& params)
+void LSP_server::on_exit(Params_exit&)
 {
 	_is_done = true;
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 }
 
-void LSP_server::on_initialize(Params_initialize& params)
+void LSP_server::on_initialize(Params_initialize&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Document json_document;
@@ -97,40 +97,40 @@ void LSP_server::on_initialize(Params_initialize& params)
 	reply(result);
 }
 
-void LSP_server::on_shutdown(Params_shutdown& params)
+void LSP_server::on_shutdown(Params_shutdown&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value result(rapidjson::kNullType);
 	reply(result);
 }
 
-void LSP_server::on_textDocument_codeAction(Params_textDocument_codeAction& params)
+void LSP_server::on_textDocument_codeAction(Params_textDocument_codeAction&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 }
 
-void LSP_server::on_textDocument_codeLens(Params_textDocument_codeLens& params)
-{
-	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
-	rapidjson::Value result(rapidjson::kNullType);
-	reply(result);
-}
-
-void LSP_server::on_codeLens_resolve(Params_codeLens_resolve& params)
+void LSP_server::on_textDocument_codeLens(Params_textDocument_codeLens&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value result(rapidjson::kNullType);
 	reply(result);
 }
 
-void LSP_server::on_textDocument_completion(Params_textDocument_completion& params)
+void LSP_server::on_codeLens_resolve(Params_codeLens_resolve&)
+{
+	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
+	rapidjson::Value result(rapidjson::kNullType);
+	reply(result);
+}
+
+void LSP_server::on_textDocument_completion(Params_textDocument_completion&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
-void LSP_server::on_textDocument_definition(Params_text_document_position& params)
+void LSP_server::on_textDocument_definition(Params_text_document_position&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value null(rapidjson::kNullType);
@@ -148,7 +148,7 @@ void LSP_server::on_textDocument_didChange(Params_textDocument_didChange& params
 	}
 }
 
-void LSP_server::on_textDocument_didClose(Params_textDocument_didClose& params)
+void LSP_server::on_textDocument_didClose(Params_textDocument_didClose&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 }
@@ -165,7 +165,7 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen& params)
 	}
 }
 
-void LSP_server::on_textDocument_didSave(Params_textDocument_didSave& params)
+void LSP_server::on_textDocument_didSave(Params_textDocument_didSave&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 }
@@ -222,7 +222,7 @@ void LSP_server::on_textDocument_documentSymbol(Params_textDocument_documentSymb
 	reply(result);
 }
 
-void LSP_server::on_textDocument_formatting(Params_textDocument_formatting& params)
+void LSP_server::on_textDocument_formatting(Params_textDocument_formatting&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value null(rapidjson::kNullType);
@@ -266,64 +266,64 @@ void LSP_server::on_textDocument_hover(Params_text_document_position& params)
 	reply(null);
 }
 
-void LSP_server::on_textDocument_implementation(Params_text_document_position& params)
+void LSP_server::on_textDocument_implementation(Params_text_document_position&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
-void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting& params)
+void LSP_server::on_textDocument_onTypeFormatting(Params_textDocument_onTypeFormatting&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
-void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting& params)
+void LSP_server::on_textDocument_rangeFormatting(Params_textDocument_rangeFormatting&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
-void LSP_server::on_textDocument_rename(Params_textDocument_rename& params)
+void LSP_server::on_textDocument_rename(Params_textDocument_rename&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
-void LSP_server::on_textDocument_signatureHelp(Params_text_document_position& params)
+void LSP_server::on_textDocument_signatureHelp(Params_text_document_position&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
-void LSP_server::on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader& params)
+void LSP_server::on_textDocument_switchSourceHeader(Params_textDocument_switchSourceHeader&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 }
 
-void LSP_server::on_textDocument_typeDefinition(Params_text_document_position& params)
+void LSP_server::on_textDocument_typeDefinition(Params_text_document_position&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 	rapidjson::Value null(rapidjson::kNullType);
 	reply(null);
 }
 
-void LSP_server::on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration& params)
+void LSP_server::on_workspace_didChangeConfiguration(Params_workspace_didChangeConfiguration&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 }
 
-void LSP_server::on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles& params)
+void LSP_server::on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 }
 
-void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand& params)
+void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand&)
 {
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 }
