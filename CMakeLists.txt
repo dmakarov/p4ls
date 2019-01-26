@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 include("cmake/HunterGate.cmake")
-HunterGate(URL "https://github.com/ruslo/hunter/archive/v0.20.31.tar.gz" SHA1 "65c8f2292566aedb2fe10e08e09c74dda8e5d07a")
+HunterGate(URL "https://github.com/ruslo/hunter/archive/v0.23.89.tar.gz" SHA1 "a370290a8b32987755a36d64807bf8c7f5b61730")
 
 # Customize compiler flags, in particular suppress variadic macro warnings for Boost::test component
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/clang.cmake CACHE FILEPATH "Default toolchain")
