@@ -27,18 +27,29 @@
   "Customization variables for lsp-p4."
   :group 'tools)
 
-(defcustom lsp-p4lsd-executable
-  "p4lsd"
-  "The p4lsd executable."
-  :type 'string
-  :group 'lsp-p4)
+(defcustom lsp-clients-p4lsd-executable "p4lsd"
+  "The p4lsd executable to use.
+Leave as just the executable name to use the default behavior of
+finding the executable with `exec-path'."
+  :group 'lsp-p4
+  :risky t
+  :type 'file)
 
-(lsp-define-stdio-client lsp-p4
-                         "p4"
-                         (lsp-make-traverser "compile_commands.json")
-                         (list lsp-p4lsd-executable)
-                         :ignore-regexps
-                         '("^Error -[0-9]+: .+$"))
+(defcustom lsp-clients-p4lsd-args '()
+  "Extra arguments for the p4lsd executable."
+  :group 'lsp-p4
+  :risky t
+  :type '(repeat string))
+
+(defun lsp-clients--p4lsd-command ()
+  "Generate the language server startup command."
+  `(,lsp-clients-p4lsd-executable ,@lsp-clients-p4lsd-args))
+
+(lsp-register-client
+ (make-lsp-client :new-connection (lsp-stdio-connection
+                                   'lsp-clients--p4lsd-command)
+                  :major-modes '(p4lang-mode)
+                  :server-id 'p4lsd))
 
 (provide 'lsp-p4)
 
