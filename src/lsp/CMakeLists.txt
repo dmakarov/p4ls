@@ -12,7 +12,7 @@ add_library(lsp
 
 add_dependencies(lsp p4l)
 
-target_compile_options(lsp PRIVATE "-Werror" "-Wall" "-Wextra" "-Wno-error=attributes" "-fvisibility=hidden" "-fvisibility-inlines-hidden")
+target_compile_options(lsp PRIVATE "-Wall" "-Werror" "-Wextra" "-fvisibility=hidden" "-fvisibility-inlines-hidden")
 
 target_include_directories(lsp
   PUBLIC

@@ -1,6 +1,6 @@
 add_executable(p4lsd main.cpp)
 
-target_compile_options(p4lsd PRIVATE "-Werror" "-Wall" "-Wextra" "-fvisibility=hidden" "-fvisibility-inlines-hidden")
+target_compile_options(p4lsd PRIVATE "-Wall" "-Werror" "-Wextra" "-fvisibility=hidden" "-fvisibility-inlines-hidden")
 
 target_include_directories(p4lsd
   PUBLIC

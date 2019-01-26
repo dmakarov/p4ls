@@ -52,8 +52,6 @@ install:
   - export CXX="${COMPILER}"
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "g++-8" ]]; then
-      brew update
-      brew upgrade
       brew link --overwrite gcc
     fi
 

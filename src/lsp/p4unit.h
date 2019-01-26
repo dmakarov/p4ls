@@ -37,15 +37,15 @@ struct Collected_data {
 
 class Symbol_collector {
 public:
-	Symbol_collector(std::string& temp_path, std::string& unit_path, Collected_data& output)
+	Symbol_collector(std::string& temp_path, std::string& unit_path, Collected_data& /*output*/)
 		: _temp_path(temp_path)
 		, _unit_path(unit_path)
-		, _max_depth(1)
-		, _symbols(output._symbols)
-		, _definitions(output._definitions)
-		, _highlights(output._highlights)
-		, _locations(output._locations)
-		, _indexes(output._indexes)
+		  //, _max_depth(1)
+		  //, _symbols(output._symbols)
+		  //, _definitions(output._definitions)
+		  //, _highlights(output._highlights)
+		  //, _locations(output._locations)
+		  //, _indexes(output._indexes)
 	{
 	}
 #if 0
@@ -58,13 +58,13 @@ private:
 #endif
 	std::string _temp_path;
 	std::string _unit_path;
-	int _max_depth __attribute__ ((unused));
-	std::vector<std::string> _container;
-	std::vector<Symbol_information>& _symbols __attribute__ ((unused));
-	std::unordered_map<std::string, std::string>& _definitions __attribute__ ((unused));
-	std::unordered_map<std::string, std::vector<Text_document_highlight>>& _highlights __attribute__ ((unused));
-	std::unordered_map<std::string, std::map<Range, std::string>>& _locations __attribute__ ((unused));
-	std::unordered_map<std::string, std::vector<Symbol_information>::size_type>& _indexes __attribute__ ((unused));
+	//int _max_depth;
+	//std::vector<std::string> _container;
+	//std::vector<Symbol_information>& _symbols;
+	//std::unordered_map<std::string, std::string>& _definitions;
+	//std::unordered_map<std::string, std::vector<Text_document_highlight>>& _highlights;
+	//std::unordered_map<std::string, std::map<Range, std::string>>& _locations;
+	//std::unordered_map<std::string, std::vector<Symbol_information>::size_type>& _indexes;
 };
 
 
