@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <ir/ir.h>
+#include <info.h>
 
 #include <rapidjson/document.h>
 
@@ -1038,57 +1038,10 @@ struct Server_capabilities {
 };
 
 
-struct Position {
-	Position() : _line(0), _character(0)
-	{}
-
-	Position(const Util::SourcePosition& position)
-		: _line(position.getLineNumber())
-		, _character(position.getColumnNumber())
-	{}
-
-	Position(const rapidjson::Value& json)
-		: _line(json["line"].GetInt())
-		, _character(json["character"].GetInt())
-	{}
-
-	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)
-	{
-		rapidjson::Value result(rapidjson::kObjectType);
-		result.AddMember("line", _line, allocator);
-		result.AddMember("character", _character, allocator);
-		return result;
-	}
-
-	bool set(const rapidjson::Value& json)
-	{
-		if (json.HasMember("line") && json.HasMember("character"))
-		{
-			_line = json["line"].GetInt();
-			_character = json["character"].GetInt();
-			return true;
-		}
-		return false;
-	}
-
-	unsigned int _line;	// Line position in a document (zero-based).
-
-	/**
-	 * Character offset on a line in a document (zero-based). Assuming
-	 * that the line is represented as a string, the `character` value
-	 * represents the gap between the `character` and `character + 1`.
-	 *
-	 * If the character value is greater than the line length it
-	 * defaults back to the line length.
-	 */
-	unsigned int _character;
-};
-
-
 struct Range {
 	Range() = default;
 
-	Range(const Util::SourceInfo& info)
+	Range(const Info& info)
 	{
 		set(info);
 	}
@@ -1096,13 +1049,12 @@ struct Range {
 	Range(const rapidjson::Value& json) : _start(json["start"]), _end(json["end"])
 	{}
 
-	void set(const Util::SourceInfo& info)
+	void set(const Info& info)
 	{
-		auto line_adjustment = info.getStart().getLineNumber() - info.toPosition().sourceLine;
-		_start._line = info.toPosition().sourceLine - 1;
-		_start._character = info.getStart().getColumnNumber();
-		_end._line = info.getEnd().getLineNumber() - line_adjustment - 1;
-		_end._character = info.getEnd().getColumnNumber();
+		_start._line = info.get_start().get_line_number() - 1;
+		_start._character = info.get_start().get_column_number();
+		_end._line = info.get_end().get_line_number() - 1;
+		_end._character = info.get_end().get_column_number();
 	}
 
 	rapidjson::Value get_json(rapidjson::Document::AllocatorType& allocator)

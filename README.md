@@ -93,12 +93,11 @@ Install melpa lsp-p4 package
 ## Build
 
 ``` sh
-brew install bison boost cmake ninja pkg-config protobuf rapidjson gmp
+brew install boost cmake ninja pkg-config rapidjson
 git clone https://github.com/dmakarov/p4ls.git
 cd p4ls
-git submodule update --init --recursive
 mkdir -p build/ninja/release
 cd build/ninja/release
-cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF -DENABLE_P4TEST=OFF -DHUNTER_ENABLED=OFF -DBoost_USE_STATIC_LIBS=ON <path to p4ls repository>
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DHUNTER_ENABLED=OFF -DUNITTESTS_ENABLED=OFF <path to p4ls repository>
 cmake --build . --target src/tool/install
 ```

@@ -6,9 +6,6 @@
 
 #include "protocol.h"
 
-#include <frontends/common/options.h>
-#include <ir/ir.h>
-
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 
@@ -16,10 +13,6 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-
-
-class p4options : public CompilerOptions {
-};
 
 
 struct Collected_data {
@@ -42,9 +35,9 @@ struct Collected_data {
 };
 
 
-class Symbol_collector : public Inspector {
+class Symbol_collector {
 public:
-	Symbol_collector(cstring temp_path, std::string& unit_path, Collected_data& output)
+	Symbol_collector(std::string& temp_path, std::string& unit_path, Collected_data& output)
 		: _temp_path(temp_path)
 		, _unit_path(unit_path)
 		, _max_depth(1)
@@ -54,16 +47,16 @@ public:
 		, _locations(output._locations)
 		, _indexes(output._indexes)
 	{
-		setName("Symbol_collector");
 	}
-
+#if 0
 	bool preorder(const IR::Node* node) override;
 	void postorder(const IR::Node* node) override;
-
+#endif
 private:
+#if 0
 	SYMBOL_KIND get_symbol_kind(const IR::Node* node);
-
-	cstring _temp_path;
+#endif
+	std::string _temp_path;
 	std::string _unit_path;
 	int _max_depth;
 	std::vector<std::string> _container;
@@ -75,11 +68,11 @@ private:
 };
 
 
-class Outline : public PassManager {
+class Outline {
 public:
+#if 0
 	Outline(CompilerOptions& options, std::string& unit_path, Collected_data& output)
 	{
-		setName("Outline");
 		addPasses({new Symbol_collector(options.file, unit_path, output)});
 	}
 
@@ -87,6 +80,7 @@ public:
 	{
 		program->apply(*this);
 	}
+#endif
 };
 
 
@@ -108,7 +102,9 @@ private:
 
 	std::unique_ptr<char[]> _command;
 	std::vector<char*> _argv;
+#if 0
 	std::unique_ptr<const IR::P4Program> _program;
+#endif
 	std::string _unit_path;
 	std::string _source_code;
 	std::vector<Symbol_information> _symbols;

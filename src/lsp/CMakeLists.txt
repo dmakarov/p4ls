@@ -1,7 +1,5 @@
 set(CMAKE_CXX_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 
-include_directories(${CMAKE_BINARY_DIR}/p4c ../../vendor/p4c ../../vendor/p4c/test/frameworks/gtest/googletest/include)
-
 add_library(lsp
   context.cpp
   context.h
@@ -13,5 +11,12 @@ add_library(lsp
   p4unit.h
   protocol.cpp
   protocol.h)
-add_dependencies(lsp ir)
-target_link_libraries(lsp RapidJSON::rapidjson)
+
+add_dependencies(lsp p4l)
+
+target_include_directories(lsp
+  PUBLIC
+  ${PROJECT_SOURCE_DIR}/src/p4l)
+
+target_link_libraries(lsp
+  RapidJSON::rapidjson)

@@ -1,9 +1,5 @@
 #include "p4unit.h"
 
-#include <frontends/p4/frontend.h>
-#include <frontends/common/parseInput.h>
-#include <lib/error.h>
-
 #include <boost/log/attributes/constant.hpp>
 #include <boost/log/sinks/syslog_backend.hpp>
 #include <boost/tokenizer.hpp>
@@ -42,7 +38,7 @@ std::string::size_type get_position_index(const std::string& content, const Posi
 }
 
 } // namespace
-
+#if 0
 bool Symbol_collector::preorder(const IR::Node* node)
 {
 	if (!node->is<Util::IHasSourceInfo>())
@@ -177,7 +173,7 @@ SYMBOL_KIND Symbol_collector::get_symbol_kind(const IR::Node* node)
 	}
 	return SYMBOL_KIND::Null;
 }
-
+#endif
 P4_file::P4_file(const std::string &command, const std::string &unit_path, const std::string& text)
 	: _command(std::make_unique<char[]>(command.size() + 1))
 	, _unit_path(unit_path)
@@ -278,6 +274,7 @@ boost::optional<std::vector<Text_document_highlight>> P4_file::get_highlights(co
 
 void P4_file::compile()
 {
+#if 0
 	AutoCompileContext p4c_context(new P4CContextWithOptions<p4options>);
 	p4options& p4c_options(P4CContextWithOptions<p4options>::get().options());
 	p4c_options.langVersion = CompilerOptions::FrontendVersion::P4_16;
@@ -306,4 +303,5 @@ void P4_file::compile()
 		outline.process(_program);
 		_changed = false;
 	}
+#endif
 }

@@ -34,3 +34,6 @@
 # LSP
 .cquery_cached_index/
 compile_commands.json
+
+build/
+

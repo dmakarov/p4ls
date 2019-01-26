@@ -1,4 +1,4 @@
-dist: trusty
+dist: xenial
 sudo: false
 language: c++
 
@@ -13,7 +13,7 @@ addons:
   apt:
     sources: &apt_sources
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty-6.0
+      - llvm-toolchain-xenial-7
 
 cache:
   directories:
@@ -27,41 +27,41 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          packages: ["bison", "flex", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "g++-8"]
+          packages: ["pkg-config", "g++-8"]
           sources: *apt_sources
 
-    - env: COMPILER=clang++-6.0
+    - env: COMPILER=clang++-7
       os: linux
       compiler: clang
       addons:
         apt:
-          packages: ["bison", "flex", "libboost-dev", "libboost-iostreams-dev", "libfl-dev", "libgmp-dev", "pkg-config", "clang-6.0"]
+          packages: ["pkg-config", "clang-7"]
           sources: *apt_sources
+
+    - env: COMPILER=g++-8
+      os: osx
+      compiler: gcc
+      osx_image: xcode10.1
 
     - env: COMPILER=clang++
       os: osx
       compiler: clang
-      osx_image: xcode9.2
+      osx_image: xcode10.1
 
 install:
   - export CXX="${COMPILER}"
-  - export PATH="/usr/local/opt/bison/bin:/usr/local/opt/flex/bin::$PATH"
   - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      brew install protobuf bison
-      brew upgrade gmp
-    fi
-    if [[ "${TRAVIS_OS_NAME}" = "linux" ]]; then
-      wget https://github.com/google/protobuf/releases/download/v3.6.0/protobuf-all-3.6.0.tar.gz
-      tar -xzf protobuf-all-3.6.0.tar.gz
-      pushd protobuf-3.6.0 && ./configure --prefix=/usr && make && sudo make install && popd
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "g++-8" ]]; then
+      brew update
+      brew upgrade
+      brew link --overwrite gcc
     fi
 
 before_script:
   - mkdir -p build
 
 script:
-  - cd build && cmake -DENABLE_GC=OFF -DENABLE_BMV2=OFF -DENABLE_EBPF=OFF -DENABLE_GTESTS=OFF -DENABLE_P4C_GRAPHS=OFF -DENABLE_P4TEST=OFF -DENABLE_UNITTESTS=ON -DCMAKE_BUILD_TYPE=Release -DHUNTER_JOBS_NUMBER=1 .. && cmake --build . && cd test && ctest
+  - cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . && cd test && ctest
 
 notifications:
   email: false

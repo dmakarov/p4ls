@@ -100,7 +100,8 @@ enum class Token {
   SEMICOLON        = -85,
   AT               = -86,
   STRING_LITERAL   = -87,
-  UNEXPECTED_TOKEN = -88
+  START            = -88,
+  UNEXPECTED_TOKEN = -89
 };
 
 class Lexer final {
