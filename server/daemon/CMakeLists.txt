@@ -12,7 +12,8 @@ target_include_directories(p4lsd
   ${PROJECT_SOURCE_DIR}/server/lsp
   ${PROJECT_SOURCE_DIR}/server/p4l)
 
-target_link_libraries(p4lsd
+target_link_libraries(p4lsd PUBLIC
+  coverage_config
   p4l
   lsp
   Boost::boost

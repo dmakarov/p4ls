@@ -9,6 +9,7 @@ language: c++
 env:
   global:
     - MAKEFLAGS="-j 2"
+    - CODECOV_TOKEN="4b009c79-6c51-453f-90b8-c1e8e183a857"
 
 git:
   depth: 1
@@ -55,15 +56,33 @@ matrix:
 install:
   - export CXX="${COMPILER}"
   - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "g++-8" ]]; then
-      brew link --overwrite gcc
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      if [[ "${COMPILER}" == "g++-8" ]]; then
+        brew link --overwrite gcc
+      else
+        brew install lcov
+      fi
     fi
 
 before_script:
   - mkdir -p build
 
 script:
-  - cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . && cd test && ctest
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "clang++" ]]; then
+      cd build && cmake -DCOVERAGE_ENABLED=ON .. && cmake --build . && cd test && ctest
+    else
+      cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . && cd test && ctest
+    fi
+
+after_success:
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "clang++" ]]; then
+      lcov --capture --directory . --output-file coverage.info
+      lcov --remove coverage.info '/usr/*' --output-file coverage.info
+      lcov --list coverage.info
+      bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
+    fi
 
 notifications:
   email: false

@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(UNITTESTS_ENABLED "Build all unit tests." ON)
+option(COVERAGE_ENABLED "Enable coverage reporting" OFF)
 
 if (HUNTER_ENABLED)
   hunter_add_package(Boost COMPONENTS date_time filesystem iostreams log regex system thread wave)
@@ -25,6 +26,17 @@ else()
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+
+add_library(coverage_config INTERFACE)
+
+if (COVERAGE_ENABLED)
+  target_compile_options(coverage_config INTERFACE -O0 -g --coverage)
+  if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
+    target_link_options(coverage_config INTERFACE --coverage)
+  else()
+    target_link_libraries(coverage_config INTERFACE --coverage)
+  endif()
+endif(COVERAGE_ENABLED)
 
 add_subdirectory(server)
 if (UNITTESTS_ENABLED)

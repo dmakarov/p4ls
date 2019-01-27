@@ -1,7 +1,10 @@
 # P4LS
 
-[![Join the chat at https://gitter.im/p4ls/Lobby](https://badges.gitter.im/p4ls/Lobby.svg)](https://gitter.im/p4ls/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/dmakarov/p4ls.svg?branch=master)](https://travis-ci.org/dmakarov/p4ls)
+[![MIT License][license-badge]](LICENSE)
+[![Join the chat at https://gitter.im/p4ls/Lobby][gitter-badge]][gitter-link]
+[![Build Status][travis-badge]][travis-link]
+[![codecov][codecov-badge]][codecov-link]
+
 
 P4LS is an implementation of an [LSP](https://microsoft.github.io/language-server-protocol/specification)
 server for the [P4](https://p4.org/) programming language.
@@ -101,3 +104,11 @@ cd build/ninja/release
 cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DHUNTER_ENABLED=OFF -DUNITTESTS_ENABLED=OFF <path to p4ls repository>
 cmake --build . --target server/daemon/install
 ```
+
+[license-badge]:   https://img.shields.io/badge/license-MIT-007EC7.svg
+[gitter-badge]:    https://badges.gitter.im/p4ls/Lobby.svg
+[gitter-link]:     https://gitter.im/p4ls/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[travis-badge]:    https://travis-ci.org/dmakarov/p4ls.svg?branch=master
+[travis-link]:     https://travis-ci.org/dmakarov/p4ls
+[codecov-badge]:   https://codecov.io/gh/dmakarov/p4ls/branch/master/graph/badge.svg
+[codecov-link]:    https://codecov.io/gh/dmakarov/p4ls
