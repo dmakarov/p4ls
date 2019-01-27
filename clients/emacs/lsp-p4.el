@@ -14,18 +14,15 @@
 ;;; loading lsp-mode
 ;;;
 ;;;    (with-eval-after-load 'lsp-mode
+;;;      (require 'p4lang-mode)
 ;;;      (require 'lsp-p4)
-;;;      (add-hook 'p4-mode-hook #'lsp-p4-enable)
+;;;      (add-hook 'p4lang-mode-hook #'lsp)
 ;;;
-;;; See `lsp-p4lsd-executable' to customize the path to p4lsd.
+;;; See `lsp-clients-p4lsd-executable' to customize the path to p4lsd.
 
 ;;; Code:
 
 (require 'lsp-mode)
-
-(defgroup lsp-p4 nil
-  "Customization variables for lsp-p4."
-  :group 'tools)
 
 (defcustom lsp-clients-p4lsd-executable "p4lsd"
   "The p4lsd executable to use.
@@ -49,6 +46,7 @@ finding the executable with `exec-path'."
  (make-lsp-client :new-connection (lsp-stdio-connection
                                    'lsp-clients--p4lsd-command)
                   :major-modes '(p4lang-mode)
+                  :priority -1
                   :server-id 'p4lsd))
 
 (provide 'lsp-p4)

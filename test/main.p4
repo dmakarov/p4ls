@@ -1,4 +1,4 @@
-/* -*- P4_16 -*- */
+/* -*- p4lang -*- */
 #include <core.p4>
 #include <v1model.p4>
 
