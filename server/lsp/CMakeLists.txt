@@ -23,5 +23,6 @@ target_include_directories(lsp
   PUBLIC
   ${PROJECT_SOURCE_DIR}/server/p4l)
 
-target_link_libraries(lsp
+target_link_libraries(lsp PUBLIC
+  coverage_config
   RapidJSON::rapidjson)

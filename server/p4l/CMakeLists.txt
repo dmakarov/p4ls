@@ -9,4 +9,6 @@ target_compile_options(p4l PRIVATE
   "-fvisibility=hidden"
   "-fvisibility-inlines-hidden")
 
-target_link_libraries(p4l Boost::boost)
+target_link_libraries(p4l PUBLIC
+  coverage_config
+  Boost::boost)
