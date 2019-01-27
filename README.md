@@ -99,5 +99,5 @@ cd p4ls
 mkdir -p build/ninja/release
 cd build/ninja/release
 cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DHUNTER_ENABLED=OFF -DUNITTESTS_ENABLED=OFF <path to p4ls repository>
-cmake --build . --target src/tool/install
+cmake --build . --target server/daemon/install
 ```

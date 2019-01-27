@@ -1,3 +1,3 @@
 add_subdirectory(lsp)
 add_subdirectory(p4l)
-add_subdirectory(tool)
+add_subdirectory(daemon)

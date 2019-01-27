@@ -17,20 +17,21 @@ target_compile_options(unittests_driver PRIVATE "-Wall" "-Werror" "-Wextra" "-fv
 
 target_include_directories(unittests_driver
   PUBLIC
-  ${PROJECT_SOURCE_DIR}/src/lsp
-  ${PROJECT_SOURCE_DIR}/src/p4l)
+  ${PROJECT_SOURCE_DIR}/server/lsp
+  ${PROJECT_SOURCE_DIR}/server/p4l)
 
 target_link_libraries(unittests_driver
   lsp
   p4l
   Boost::boost
-  Boost::log
-  Boost::regex
+  Boost::date_time
   Boost::filesystem
   Boost::iostreams
-  Boost::date_time
-  Boost::thread
+  Boost::log
+  Boost::regex
   Boost::system
-  Boost::unit_test_framework)
+  Boost::thread
+  Boost::unit_test_framework
+  Boost::wave)
 
 add_test(NAME unittests COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittests_driver)
