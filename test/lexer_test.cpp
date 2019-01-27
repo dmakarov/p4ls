@@ -22,35 +22,35 @@ BOOST_AUTO_TEST_CASE(test_numeric_literals)
 	auto token = lexer.next();
 	auto value = lexer.get_value();
 	auto width = lexer.get_width();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::NUMBER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_NUMBER);
 	BOOST_REQUIRE_EQUAL(value, 12345);
 	BOOST_REQUIRE_EQUAL(width, 32);
 	token = lexer.next();
 	value = lexer.get_value();
 	width = lexer.get_width();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::NUMBER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_NUMBER);
 	BOOST_REQUIRE_EQUAL(value, -1);
 	BOOST_REQUIRE_EQUAL(width, 2);
 	token = lexer.next();
 	value = lexer.get_value();
 	width = lexer.get_width();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::NUMBER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_NUMBER);
 	BOOST_REQUIRE_EQUAL(value, 10);
 	BOOST_REQUIRE_EQUAL(width, 8);
 	token = lexer.next();
 	value = lexer.get_value();
 	width = lexer.get_width();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::NUMBER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_NUMBER);
 	BOOST_REQUIRE_EQUAL(value, 10);
 	BOOST_REQUIRE_EQUAL(width, 8);
 	token = lexer.next();
 	value = lexer.get_value();
 	width = lexer.get_width();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::NUMBER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_NUMBER);
 	BOOST_REQUIRE_EQUAL(value, 0);
 	BOOST_REQUIRE_EQUAL(width, 1);
 	token = lexer.next();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::UNEXPECTED_TOKEN);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_UNEXPECTED_TOKEN);
 }
 
 BOOST_AUTO_TEST_CASE(test_operators)
@@ -63,28 +63,28 @@ BOOST_AUTO_TEST_CASE(test_operators)
 	auto value = lexer.get_value();
 	auto width = lexer.get_width();
 	auto text = lexer.get_text();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::IDENTIFIER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_IDENTIFIER);
 	BOOST_REQUIRE_EQUAL(value, 0);
 	BOOST_REQUIRE_EQUAL(width, 32);
 	BOOST_REQUIRE_EQUAL(text, "abc");
 	token = lexer.next();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::BIT_AND);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_BIT_AND);
 	token = lexer.next();
 	value = lexer.get_value();
 	width = lexer.get_width();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::NUMBER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_NUMBER);
 	BOOST_REQUIRE_EQUAL(value, 25);
 	BOOST_REQUIRE_EQUAL(width, 32);
 	token = lexer.next();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::MASK);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_MASK);
 	token = lexer.next();
 	value = lexer.get_value();
 	width = lexer.get_width();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::NUMBER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_NUMBER);
 	BOOST_REQUIRE_EQUAL(value, 15);
 	BOOST_REQUIRE_EQUAL(width, 8);
 	token = lexer.next();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::END);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_END);
 }
 
 BOOST_AUTO_TEST_CASE(test_comments)
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(test_comments)
 	auto text = lexer.get_text();
 	auto row = lexer.get_row();
 	auto col = lexer.get_col();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::IDENTIFIER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_IDENTIFIER);
 	BOOST_REQUIRE_EQUAL(text, "abc");
 	BOOST_REQUIRE_EQUAL(row, 1);
 	BOOST_REQUIRE_EQUAL(col, 4);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(test_comments)
 	text = lexer.get_text();
 	row = lexer.get_row();
 	col = lexer.get_col();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::IDENTIFIER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_IDENTIFIER);
 	BOOST_REQUIRE_EQUAL(text, "def");
 	BOOST_REQUIRE_EQUAL(row, 2);
 	BOOST_REQUIRE_EQUAL(col, 6);
@@ -116,14 +116,14 @@ BOOST_AUTO_TEST_CASE(test_comments)
 	text = lexer.get_text();
 	row = lexer.get_row();
 	col = lexer.get_col();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::IDENTIFIER);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_IDENTIFIER);
 	BOOST_REQUIRE_EQUAL(text, "another_identifier");
 	BOOST_REQUIRE_EQUAL(row, 5);
 	BOOST_REQUIRE_EQUAL(col, 27);
 	token = lexer.next();
 	row = lexer.get_row();
 	col = lexer.get_col();
-	BOOST_REQUIRE_EQUAL(token, p4l::Token::END);
+	BOOST_REQUIRE_EQUAL(token, p4l::Token::P4L_END);
 	BOOST_REQUIRE_EQUAL(row, 5);
 	BOOST_REQUIRE_EQUAL(col, 32);
 }

@@ -8,3 +8,5 @@ target_compile_options(p4l PRIVATE
   "-Wextra"
   "-fvisibility=hidden"
   "-fvisibility-inlines-hidden")
+
+target_link_libraries(p4l Boost::boost)
