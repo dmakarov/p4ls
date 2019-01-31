@@ -11,9 +11,10 @@ add_executable(unittests_driver
   lexer_test.cpp
   lsp_server_test.cpp
   protocol_test.cpp
+  wave_test.cpp
   unittests_driver.cpp)
 
-target_compile_options(unittests_driver PRIVATE "-Wall" "-Werror" "-Wextra" "-fvisibility=hidden" "-fvisibility-inlines-hidden")
+target_compile_options(unittests_driver PRIVATE "-g" "-Wall" "-Werror" "-Wextra" "-fvisibility=hidden" "-fvisibility-inlines-hidden")
 
 target_include_directories(unittests_driver
   PUBLIC
