@@ -1,6 +1,7 @@
 add_executable(p4lsd main.cpp)
 
 target_compile_options(p4lsd PRIVATE
+  "-g"
   "-Wall"
   "-Werror"
   "-Wextra"

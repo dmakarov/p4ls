@@ -5,13 +5,13 @@
 
 namespace p4l {
 
-Token Lexer::next()
+int Lexer::next()
 {
 	while (isspace(last)) {
 		advance();
 	}
 	if (last == EOF) {
-		return Token::P4L_END;
+		return boost::wave::T_END;
 	}
 	if (isalpha(last) || last == '_') {
 		return read_identifier();
@@ -22,7 +22,7 @@ Token Lexer::next()
 	return read_other();
 }
 
-Token Lexer::read_other()
+int Lexer::read_other()
 {
 	auto prev = last;
 	advance();
@@ -30,111 +30,111 @@ Token Lexer::read_other()
 	case '!': // "!=" "!"
 		if (last == '=') {
 			advance();
-			return Token::P4L_NE;
+			return boost::wave::T_NE;
 		}
-		return Token::P4L_NOT;
+		return boost::wave::T_NOT;
 	case '"': return read_string();
 	case '#':
 		read_location();
 		if (last == EOF) {
-			return Token::P4L_END;
+			return boost::wave::T_END;
 		}
 		return next();
-	case '%': return Token::P4L_MOD;
+	case '%': return boost::wave::T_MOD;
 	case '&': // "&&&" "&&" "&"
 		if (last == '&') {
 			if (advance() == '&') {
 				advance();
-				return Token::P4L_MASK;
+				return boost::wave::T_MASK;
 			}
-			return Token::P4L_AND;
+			return boost::wave::T_AND;
 		}
-		return Token::P4L_BIT_AND;
-	case '(': return Token::P4L_L_PAREN;
-	case ')': return Token::P4L_R_PAREN;
-	case '*': return Token::P4L_MUL;
+		return boost::wave::T_BIT_AND;
+	case '(': return boost::wave::T_L_PAREN;
+	case ')': return boost::wave::T_R_PAREN;
+	case '*': return boost::wave::T_MUL;
 	case '+': // "++" "+"
 		if (last == '+') {
 			advance();
-			return Token::P4L_PP;
+			return boost::wave::T_PP;
 		}
-		return Token::P4L_PLUS;
-	case ',': return Token::P4L_COMMA;
-	case '-': return Token::P4L_MINUS;
+		return boost::wave::T_PLUS;
+	case ',': return boost::wave::T_COMMA;
+	case '-': return boost::wave::T_MINUS;
 	case '.': // ".." "."
 		if (last == '.') {
 			advance();
-			return Token::P4L_RANGE;
+			return boost::wave::T_RANGE;
 		}
-		return Token::P4L_DOT;
+		return boost::wave::T_DOT;
 	case '/': // "//" "/*" "/"
 		if (last == '/' || last == '*') {
 			read_comment();
 			return next();
 		}
-		return Token::P4L_DIV;
-	case ':': return Token::P4L_COLON;
-	case ';': return Token::P4L_SEMICOLON;
+		return boost::wave::T_DIV;
+	case ':': return boost::wave::T_COLON;
+	case ';': return boost::wave::T_SEMICOLON;
 	case '<': // "<<" "<=" "<"
 		if (last == '<') {
 			advance();
-			return Token::P4L_SHL;
+			return boost::wave::T_SHL;
 		}
 		if (last == '=') {
 			advance();
-			return Token::P4L_LE;
+			return boost::wave::T_LE;
 		}
-		return Token::P4L_L_ANGLE;
+		return boost::wave::T_L_ANGLE;
 	case '=': // "==" "="
 		if (last == '=') {
 			advance();
-			return Token::P4L_EQ;
+			return boost::wave::T_EQ;
 		}
-		return Token::P4L_ASSIGN;
+		return boost::wave::T_ASSIGN;
 	case '>': // ">=" ">"
 		if (last == '=') {
 			advance();
-			return Token::P4L_GE;
+			return boost::wave::T_GE;
 		}
-		return Token::P4L_R_ANGLE;
-	case '?': return Token::P4L_QUESTION;
+		return boost::wave::T_R_ANGLE;
+	case '?': return boost::wave::T_QUESTION;
 	case '@':
 		if (last == 'p') {
 			return read_pragma();
 		}
-		return Token::P4L_AT;
-	case '[': return Token::P4L_L_BRACKET;
-	case ']': return Token::P4L_R_BRACKET;
-	case '^': return Token::P4L_BIT_XOR;
-	case '{': return Token::P4L_L_BRACE;
+		return boost::wave::T_AT;
+	case '[': return boost::wave::T_L_BRACKET;
+	case ']': return boost::wave::T_R_BRACKET;
+	case '^': return boost::wave::T_BIT_XOR;
+	case '{': return boost::wave::T_L_BRACE;
 	case '|': // "|+|" "|-|" "||" "|"
 		if (last == '+') {
 			if (advance() == '|') {
 				advance();
-				return Token::P4L_PLUS_SAT;
+				return boost::wave::T_PLUS_SAT;
 			}
-			return Token::P4L_UNEXPECTED_TOKEN;
+			return boost::wave::T_UNKNOWN;
 		}
 		if (last == '-') {
 			if (advance() == '|') {
 				advance();
-				return Token::P4L_MINUS_SAT;
+				return boost::wave::T_MINUS_SAT;
 			}
-			return Token::P4L_UNEXPECTED_TOKEN;
+			return boost::wave::T_UNKNOWN;
 		}
 		if (last == '|') {
 			advance();
-			return Token::P4L_OR;
+			return boost::wave::T_OR;
 		}
-		return Token::P4L_BIT_OR;
-	case '}': return Token::P4L_R_BRACE;
-	case '~': return Token::P4L_COMPLEMENT;
+		return boost::wave::T_BIT_OR;
+	case '}': return boost::wave::T_R_BRACE;
+	case '~': return boost::wave::T_COMPLEMENT;
 	default:;
 	}
-	return Token::P4L_UNEXPECTED_TOKEN;
+	return boost::wave::T_UNKNOWN;
 }
 
-Token Lexer::read_number()
+int Lexer::read_number()
 {
 	std::string numstr;
 	do {
@@ -158,7 +158,7 @@ Token Lexer::read_number()
 			sub = sm[3];
 			is_signed = sub.str() == "s";
 			if (is_signed && width < 2) {
-				return Token::P4L_UNEXPECTED_TOKEN;
+				return boost::wave::T_UNKNOWN;
 			}
 		}
 		if (sm[4].matched) {
@@ -179,59 +179,59 @@ Token Lexer::read_number()
 		if (base == 2) {
 			std::regex ex("[01_]+");
 			if (!std::regex_match(str, m, ex)) {
-				return Token::P4L_UNEXPECTED_TOKEN;
+				return boost::wave::T_UNKNOWN;
 			}
 		} else if (base == 8) {
 			std::regex ex("[0-7_]+");
 			if (!std::regex_match(str, m, ex)) {
-				return Token::P4L_UNEXPECTED_TOKEN;
+				return boost::wave::T_UNKNOWN;
 			}
 		} else if (base == 10) {
 			std::regex ex("[0-9_]+");
 			if (!std::regex_match(str, m, ex)) {
-				return Token::P4L_UNEXPECTED_TOKEN;
+				return boost::wave::T_UNKNOWN;
 			}
 		} else if (base == 16) {
 			std::regex ex("[0-9A-Fa-f_]+");
 			if (!std::regex_match(str, m, ex)) {
-				return Token::P4L_UNEXPECTED_TOKEN;
+				return boost::wave::T_UNKNOWN;
 			}
 		}
 		value = mask & std::stoi(str, nullptr, base);
 		if (is_signed) {
 			value = (value & (mask >> 1)) - (value & (1 << (width - 1)));
 		}
-		return Token::P4L_NUMBER;
+		return boost::wave::T_NUMBER;
 	}
-	return Token::P4L_UNEXPECTED_TOKEN;
+	return boost::wave::T_UNKNOWN;
 }
 
-Token Lexer::read_pragma()
+int Lexer::read_pragma()
 {
-	return Token::P4L_END_PRAGMA;
+	return boost::wave::T_END_PRAGMA;
 }
 
-Token Lexer::read_string()
+int Lexer::read_string()
 {
 	text.clear();
 	while (last != '"') {
 		if (last == EOF) {
-			return Token::P4L_UNEXPECTED_TOKEN;
+			return boost::wave::T_UNKNOWN;
 		}
 		if (last == '\\') {
 			last = is.get();
 			if (last ==  EOF) {
-				return Token::P4L_UNEXPECTED_TOKEN;
+				return boost::wave::T_UNKNOWN;
 			}
 			text += '\\';
 		}
 		text += last;
 		last = is.get();
 	}
-	return Token::P4L_STRING_LITERAL;
+	return boost::wave::T_STRING_LITERAL;
 }
 
-Token Lexer::read_identifier()
+int Lexer::read_identifier()
 {
 	text = last;
 	while (isalnum((last = is.get())) || last == '_') {
@@ -240,135 +240,135 @@ Token Lexer::read_identifier()
 	}
 	++col;
 	if (text == "abstract") {
-		return Token::P4L_ABSTRACT;
+		return boost::wave::T_ABSTRACT;
 	}
 	if (text == "action") {
-		return Token::P4L_ACTION;
+		return boost::wave::T_ACTION;
 	}
 	if (text == "actions") {
-		return Token::P4L_ACTIONS;
+		return boost::wave::T_ACTIONS;
 	}
 	if (text == "apply") {
-		return Token::P4L_APPLY;
+		return boost::wave::T_APPLY;
 	}
 	if (text == "bool") {
-		return Token::P4L_BOOL;
+		return boost::wave::T_BOOL;
 	}
 	if (text == "bit") {
-		return Token::P4L_BIT;
+		return boost::wave::T_BIT;
 	}
 	if (text == "const") {
-		return Token::P4L_CONST;
+		return boost::wave::T_CONST;
 	}
 	if (text == "control") {
-		return Token::P4L_CONTROL;
+		return boost::wave::T_CONTROL;
 	}
 	if (text == "default") {
-		return Token::P4L_DEFAULT;
+		return boost::wave::T_DEFAULT;
 	}
 	if (text == "else") {
-		return Token::P4L_ELSE;
+		return boost::wave::T_ELSE;
 	}
 	if (text == "entries") {
-		return Token::P4L_ENTRIES;
+		return boost::wave::T_ENTRIES;
 	}
 	if (text == "enum") {
-		return Token::P4L_ENUM;
+		return boost::wave::T_ENUM;
 	}
 	if (text == "error") {
-		return Token::P4L_ERROR;
+		return boost::wave::T_ERROR;
 	}
 	if (text == "exit") {
-		return Token::P4L_EXIT;
+		return boost::wave::T_EXIT;
 	}
 	if (text == "extern") {
-		return Token::P4L_EXTERN;
+		return boost::wave::T_EXTERN;
 	}
 	if (text == "false") {
-		return Token::P4L_FALSE;
+		return boost::wave::T_FALSE;
 	}
 	if (text == "header") {
-		return Token::P4L_HEADER;
+		return boost::wave::T_HEADER;
 	}
 	if (text == "header_union") {
-		return Token::P4L_HEADER_UNION;
+		return boost::wave::T_HEADER_UNION;
 	}
 	if (text == "if") {
-		return Token::P4L_IF;
+		return boost::wave::T_IF;
 	}
 	if (text == "in") {
-		return Token::P4L_IN;
+		return boost::wave::T_IN;
 	}
 	if (text == "inout") {
-		return Token::P4L_INOUT;
+		return boost::wave::T_INOUT;
 	}
 	if (text == "int") {
-		return Token::P4L_INT;
+		return boost::wave::T_INT;
 	}
 	if (text == "key") {
-		return Token::P4L_KEY;
+		return boost::wave::T_KEY;
 	}
 	if (text == "match_kind") {
-		return Token::P4L_MATCH_KIND;
+		return boost::wave::T_MATCH_KIND;
 	}
 	if (text == "type") {
-		return Token::P4L_TYPE;
+		return boost::wave::T_TYPE;
 	}
 	if (text == "out") {
-		return Token::P4L_OUT;
+		return boost::wave::T_OUT;
 	}
 	if (text == "parser") {
-		return Token::P4L_PARSER;
+		return boost::wave::T_PARSER;
 	}
 	if (text == "package") {
-		return Token::P4L_PACKAGE;
+		return boost::wave::T_PACKAGE;
 	}
 	if (text == "return") {
-		return Token::P4L_RETURN;
+		return boost::wave::T_RETURN;
 	}
 	if (text == "select") {
-		return Token::P4L_SELECT;
+		return boost::wave::T_SELECT;
 	}
 	if (text == "state") {
-		return Token::P4L_STATE;
+		return boost::wave::T_STATE;
 	}
 	if (text == "struct") {
-		return Token::P4L_STRUCT;
+		return boost::wave::T_STRUCT;
 	}
 	if (text == "switch") {
-		return Token::P4L_SWITCH;
+		return boost::wave::T_SWITCH;
 	}
 	if (text == "table") {
-		return Token::P4L_TABLE;
+		return boost::wave::T_TABLE;
 	}
 	if (text == "this") {
-		return Token::P4L_THIS;
+		return boost::wave::T_THIS;
 	}
 	if (text == "transition") {
-		return Token::P4L_TRANSITION;
+		return boost::wave::T_TRANSITION;
 	}
 	if (text == "true") {
-		return Token::P4L_TRUE;
+		return boost::wave::T_TRUE;
 	}
 	if (text == "tuple") {
-		return Token::P4L_TUPLE;
+		return boost::wave::T_TUPLE;
 	}
 	if (text == "typedef") {
-		return Token::P4L_TYPEDEF;
+		return boost::wave::T_TYPEDEF;
 	}
 	if (text == "varbit") {
-		return Token::P4L_VARBIT;
+		return boost::wave::T_VARBIT;
 	}
 	if (text == "value_set") {
-		return Token::P4L_VALUE_SET;
+		return boost::wave::T_VALUE_SET;
 	}
 	if (text == "void") {
-		return Token::P4L_VOID;
+		return boost::wave::T_VOID;
 	}
 	if (text == "_") {
-		return Token::P4L_DONTCARE;
+		return boost::wave::T_DONTCARE;
 	}
-	return Token::P4L_IDENTIFIER;
+	return boost::wave::T_IDENTIFIER;
 }
 
 void Lexer::read_comment()
@@ -401,7 +401,7 @@ void Lexer::read_location()
 
 } // namespace p4l
 
-std::ostream& operator<<(std::ostream& os, const p4l::Token& tok)
+std::ostream& operator<<(std::ostream& os, const boost::wave::token_id& tok)
 {
 	os << static_cast<int>(tok);
 	return os;

@@ -13,6 +13,7 @@ add_library(lsp
 add_dependencies(lsp p4l)
 
 target_compile_options(lsp PRIVATE
+  "-g"
   "-Wall"
   "-Werror"
   "-Wextra"
