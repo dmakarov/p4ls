@@ -42,7 +42,7 @@ public class Snippet {
 			return null;
 		}
 		item.setTextEdit(new TextEdit(r, createReplacement(lineIndentation)));
-		return new LSCompletionProposal(item, offset, info);
+		return new LSCompletionProposal(info.getDocument(), offset, item, null);
 	}
 
 	public boolean matchesPrefix(String prefix) {

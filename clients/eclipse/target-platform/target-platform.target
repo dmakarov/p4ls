@@ -1,15 +1,16 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><?pde version="3.8"?><target name="p4lang" sequenceNumber="38">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?>
+<target name="p4lang" sequenceNumber="38">
 <locations>
 	<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-		<unit id="org.eclipse.platform.feature.group" version="4.8.0.v20180611-0656"/>
-		<unit id="org.eclipse.sdk.ide" version="4.8.0.I20180611-0500"/>
-		<unit id="org.eclipse.sdk.tests.feature.group" version="4.8.0.v20180611-0500"/>
-		<repository location="http://download.eclipse.org/eclipse/updates/4.8"/>
+		<unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
+		<unit id="org.eclipse.sdk.tests.feature.group" version="0.0.0"/>
+		<repository location="http://download.eclipse.org/eclipse/updates/4.13"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-		<unit id="org.eclipse.lsp4e" version="0.6.0.201805171449"/>
-		<unit id="tm-feature.feature.group" version="0.1.0.201802091213"/>
-		<repository location="http://download.eclipse.org/releases/photon"/>
+		<repository location="http://download.eclipse.org/releases/2019-09"/>
+		<unit id="org.eclipse.lsp4e" version="0.11.0.201909090701"/>
+		<unit id="org.eclipse.tm4e.feature.feature.group" version="0.3.4.201909051118"/>
 	</location>
 </locations>
 </target>
