@@ -27,12 +27,12 @@ cache:
 matrix:
   fast_finish: true
   include:
-    - env: COMPILER=g++-8
+    - env: COMPILER=g++-9
       os: linux
       compiler: gcc
       addons:
         apt:
-          packages: ["pkg-config", "g++-8"]
+          packages: ["pkg-config", "g++-9"]
           sources: *apt_sources
 
     - env: COMPILER=clang++-7
@@ -51,7 +51,7 @@ matrix:
     - env: COMPILER=clang++
       os: osx
       compiler: clang
-      osx_image: xcode10.1
+      osx_image: xcode11.2
 
 install:
   - export CXX="${COMPILER}"

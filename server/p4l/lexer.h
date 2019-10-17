@@ -1140,7 +1140,7 @@ template<>
 struct get_byte_aux<1>
 {
     template <typename CharT>
-    unsigned char operator()(CharT c, unsigned int byte)
+    unsigned char operator()(CharT c, unsigned int byte __attribute__ ((unused)))
     {
         BOOST_ASSERT(byte == 0);
         return c;
@@ -1807,7 +1807,7 @@ public:
         : m_stack(the_stack)
         {}
 
-    void operator()(const char_t c) const
+    void operator()(const char_t c __attribute__ ((unused))) const
     {
         BOOST_ASSERT(c == '.');
         do_any_char();
@@ -1948,7 +1948,7 @@ public:
         ScannerT scan (first_, last);
         ++scan.first; // skip over '{'
 
-        unsigned int count;
+        unsigned int count = 0;
         uint_p[assign(count)].parse(scan);
         if (count == 0)
             boost::throw_exception(bad_regex());
@@ -1986,7 +1986,7 @@ public:
         ScannerT scan(first_, last);
         ++scan.first; // skip over '{'
 
-        unsigned int count1, count2;
+        unsigned int count1 = 0, count2 = 0;
         uint_p[assign(count1)].parse(scan);
         if (count1 == 0)
             boost::throw_exception(bad_regex());

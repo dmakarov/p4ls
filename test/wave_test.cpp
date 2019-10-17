@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_SUITE(wave_test_suite);
 
 BOOST_AUTO_TEST_CASE(test_main)
 {
-	std::string input_file_name("main.p4");
+	std::string input_file_name("../../test/main.p4");
 	std::ifstream ifs(input_file_name);
 	BOOST_TEST(ifs.is_open());
 
@@ -29,16 +29,18 @@ BOOST_AUTO_TEST_CASE(test_main)
 
 	context_type::token_type current_token;
 
-	try {
-		for (auto& token : ctx) {
-			std::cout << "matched " << token << std::endl;
+	auto token = ctx.begin();
+	while (token != ctx.end()) {
+		try {
+			std::cout << "matched " << *token << std::endl;
+			++token;
+		} catch (boost::wave::cpp_exception const& e) {
+			std::cerr << e.file_name() << "(" << e.line_no() << "): " << e.description() << std::endl;
+		} catch (std::exception const& e) {
+			std::cerr << current_token.get_position().get_file() << "(" << current_token.get_position().get_line() << "): " << "unexpected exception: " << e.what() << std::endl;
+		} catch (...) {
+			std::cerr << current_token.get_position().get_file() << "(" << current_token.get_position().get_line() << "): " << "unexpected exception." << std::endl;
 		}
-	} catch (boost::wave::cpp_exception const& e) {
-		std::cerr << e.file_name() << "(" << e.line_no() << "): " << e.description() << std::endl;
-	} catch (std::exception const& e) {
-		std::cerr << current_token.get_position().get_file() << "(" << current_token.get_position().get_line() << "): " << "unexpected exception: " << e.what() << std::endl;
-	} catch (...) {
-		std::cerr << current_token.get_position().get_file() << "(" << current_token.get_position().get_line() << "): " << "unexpected exception." << std::endl;
 	}
 }
 
