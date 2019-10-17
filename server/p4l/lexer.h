@@ -179,8 +179,6 @@ class Lexer final {
 
 } // namespace p4l
 
-#if 1
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost {
 namespace spirit {
@@ -3044,10 +3042,6 @@ lexer_control<TokenT>::ignore_current_token_set()
 
 #undef BOOST_SPIRIT_IT_NS
 
-#endif
-
-#if 1
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost {
 namespace wave {
@@ -3769,57 +3763,37 @@ lexer::lexer<IteratorT, PositionT> slex_functor<IteratorT, PositionT>::lexer;
 }   // namespace wave
 }   // namespace boost
 
-#endif
-
 namespace p4l {
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//  The 'new_lexer' function allows the opaque generation of a new lexer object.
-//  It is coupled to the iterator type to allow to decouple the lexer/iterator
-//  configurations at compile time.
-//
-//  This function is declared inside the cpp_slex_token.hpp file, which is
-//  referenced by the source file calling the lexer and the source file, which
-//  instantiates the lex_functor. But it is defined here, so it will be
-//  instantiated only while compiling the source file, which instantiates the
-//  lex_functor. While the cpp_slex_token.hpp file may be included everywhere,
-//  this file (cpp_slex_lexer.hpp) should be included only once. This allows
-//  to decouple the lexer interface from the lexer implementation and reduces
-//  compilation time.
-//
-///////////////////////////////////////////////////////////////////////////////
+/**
+ *  The 'new_lexer' function allows the opaque generation of a new lexer object.
+ *  It is coupled to the iterator type to allow to decouple the lexer/iterator
+ *  configurations at compile time.
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//  The new_lexer_gen<>::new_lexer function (declared in cpp_slex_token.hpp)
-//  should be defined inline, if the lex_functor shouldn't be instantiated
-//  separately from the lex_iterator.
-//
-//  Separate (explicit) instantiation helps to reduce compilation time.
-//
-///////////////////////////////////////////////////////////////////////////////
+ *  This function is declared inside the cpp_slex_token.hpp file, which is
+ *  referenced by the source file calling the lexer and the source file, which
+ *  instantiates the lex_functor. But it is defined here, so it will be
+ *  instantiated only while compiling the source file, which instantiates the
+ *  lex_functor. While the cpp_slex_token.hpp file may be included everywhere,
+ *  this file (cpp_slex_lexer.hpp) should be included only once. This allows
+ *  to decouple the lexer interface from the lexer implementation and reduces
+ *  compilation time.
+ */
 
-#if BOOST_WAVE_SEPARATE_LEXER_INSTANTIATION != 0
-#define BOOST_WAVE_SLEX_NEW_LEXER_INLINE
-#else
-#define BOOST_WAVE_SLEX_NEW_LEXER_INLINE inline
-#endif
+/**
+ *  The new_lexer_gen<>::new_lexer function (declared in cpp_slex_token.hpp)
+ *  should be defined inline, if the lex_functor shouldn't be instantiated
+ *  separately from the lex_iterator.
 
+ *  Separate (explicit) instantiation helps to reduce compilation time.
+ */
 template <typename IteratorT, typename PositionT>
-BOOST_WAVE_SLEX_NEW_LEXER_INLINE
 boost::wave::cpplexer::lex_input_interface<p4lex_token<PositionT>> *
-new_lexer_gen<IteratorT, PositionT>::new_lexer(IteratorT const &first,
-											   IteratorT const &last,
-											   PositionT const &pos,
-											   boost::wave::language_support language)
+new_lexer_gen<IteratorT, PositionT>::new_lexer(IteratorT const& first, IteratorT const& last, PositionT const& pos, boost::wave::language_support language)
 {
 	return new boost::wave::cpplexer::slex::slex_functor<IteratorT, PositionT>(first, last, pos, language);
 }
 
-#undef BOOST_WAVE_SLEX_NEW_LEXER_INLINE
-
 } // namespace p4l
-
 
 std::ostream& operator<<(std::ostream& os, const boost::wave::token_id& tokens);
