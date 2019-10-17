@@ -387,7 +387,7 @@ boost::optional<std::string> LSP_server::read_message()
 			return boost::none;
 		}
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::info) << "<--\n" << "Content-Length: " << content_length << "\r\n\r\n" << content;
-		return std::move(content);
+		return content;
 	}
 	return boost::none;
 }

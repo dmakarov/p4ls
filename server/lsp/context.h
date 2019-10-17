@@ -99,12 +99,12 @@ private:
 		static_assert(std::is_same<typename std::decay<T>::type, T>::value, "");
 	public:
 
-#if __GNUC__ == 8
+#if __GNUC__ == 8 || __GNUC__ == 9
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 		Something(T&& value) : _value(std::move(value)) {}
-#if __GNUC__ == 8
+#if __GNUC__ == 8 || __GNUC__ == 9
 #pragma GCC diagnostic pop
 #endif
 		void* get_value() override
