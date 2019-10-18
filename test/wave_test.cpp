@@ -4,31 +4,22 @@
 #include <sstream>
 
 #include "lexer.h"
+#include "main.p4"
 
 BOOST_AUTO_TEST_SUITE(wave_test_suite);
 
 BOOST_AUTO_TEST_CASE(test_main)
 {
-	std::string input_file_name("../../test/main.p4");
-	std::ifstream ifs(input_file_name);
-	BOOST_TEST(ifs.is_open());
-
-	ifs.unsetf(std::ios::skipws);
-	auto teststr = std::string(std::istreambuf_iterator<char>(ifs.rdbuf()), std::istreambuf_iterator<char>());
-
 	using token_type = p4l::p4lex_token<>;
 	using lexer_type = p4l::p4lex_iterator<token_type>;
 	using context_type = boost::wave::context<std::string::iterator, lexer_type>;
-
-	context_type ctx(teststr.begin(), teststr.end(), input_file_name.c_str());
-
+	std::string teststr(source_code);
+	context_type ctx(teststr.begin(), teststr.end(), "main.p4");
 	ctx.set_language(boost::wave::support_cpp0x);
 	ctx.set_language(boost::wave::enable_preserve_comments(ctx.get_language()));
 	ctx.set_language(boost::wave::enable_prefer_pp_numbers(ctx.get_language()));
 	ctx.set_language(boost::wave::enable_emit_contnewlines(ctx.get_language()));
-
 	context_type::token_type current_token;
-
 	auto token = ctx.begin();
 	while (token != ctx.end()) {
 		try {
