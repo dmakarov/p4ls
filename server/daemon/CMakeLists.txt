@@ -15,8 +15,8 @@ target_include_directories(p4lsd
 
 target_link_libraries(p4lsd PUBLIC
   coverage_config
-  p4l
   lsp
+  p4l
   Boost::boost
   Boost::date_time
   Boost::filesystem

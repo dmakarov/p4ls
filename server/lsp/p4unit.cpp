@@ -7,6 +7,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "../p4l/lexer.h"
+
 namespace {
 boost::log::sources::severity_logger<int> _logger(boost::log::keywords::severity = boost::log::sinks::syslog::debug);
 
@@ -274,10 +276,29 @@ boost::optional<std::vector<Text_document_highlight>> P4_file::get_highlights(co
 
 void P4_file::compile()
 {
+	using token_type = p4l::p4lex_token<>;
+	using lexer_type = p4l::p4lex_iterator<token_type>;
+	using context_type = boost::wave::context<std::string::iterator, lexer_type>;
+	context_type::token_type current_token;
+	context_type ctx(_source_code.begin(), _source_code.end(), _unit_path.c_str());
+	ctx.set_language(boost::wave::support_cpp0x);
+	ctx.set_language(boost::wave::enable_preserve_comments(ctx.get_language()));
+	ctx.set_language(boost::wave::enable_prefer_pp_numbers(ctx.get_language()));
+	ctx.set_language(boost::wave::enable_emit_contnewlines(ctx.get_language()));
+	auto token = ctx.begin();
+	while (token != ctx.end()) {
+		try {
+			std::cout << "matched " << *token << std::endl;
+			++token;
+		} catch (boost::wave::cpp_exception const& e) {
+			std::cerr << e.file_name() << "(" << e.line_no() << "): " << e.description() << std::endl;
+		} catch (std::exception const& e) {
+			std::cerr << current_token.get_position().get_file() << "(" << current_token.get_position().get_line() << "): " << "unexpected exception: " << e.what() << std::endl;
+		} catch (...) {
+			std::cerr << current_token.get_position().get_file() << "(" << current_token.get_position().get_line() << "): " << "unexpected exception." << std::endl;
+		}
+	}
 #if 0
-	AutoCompileContext p4c_context(new P4CContextWithOptions<p4options>);
-	p4options& p4c_options(P4CContextWithOptions<p4options>::get().options());
-	p4c_options.langVersion = CompilerOptions::FrontendVersion::P4_16;
 	p4c_options.process(_argv.size(), _argv.data());
 	BOOST_LOG(_logger) << "processed options, number of errors " << ::errorCount();
 	auto temp_file_path = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.p4");
