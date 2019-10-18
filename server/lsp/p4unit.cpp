@@ -288,7 +288,6 @@ void P4_file::compile()
 	auto token = ctx.begin();
 	while (token != ctx.end()) {
 		try {
-			std::cout << "matched " << *token << std::endl;
 			++token;
 		} catch (boost::wave::cpp_exception const& e) {
 			std::cerr << e.file_name() << "(" << e.line_no() << "): " << e.description() << std::endl;

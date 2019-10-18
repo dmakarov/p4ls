@@ -9,10 +9,10 @@
 
 #include <boost/asio.hpp>
 #include <boost/log/sinks/syslog_backend.hpp>
-#include <boost/optional.hpp>
 #include <rapidjson/document.h>
 
 #include <istream>
+#include <optional>
 #include <string>
 #include <thread>
 #include <vector>
@@ -53,8 +53,8 @@ private:
 	void on_workspace_didChangeWatchedFiles(Params_workspace_didChangeWatchedFiles& params) override;
 	void on_workspace_executeCommand(Params_workspace_executeCommand& params) override;
 
-	boost::optional<std::string> read_message();
-	boost::optional<std::string> find_command_for_path(const std::string& file);
+	std::optional<std::string> read_message();
+	std::string find_command_for_path(const std::string& file);
 
 	Server_capabilities _capabilities;
 	std::istream& _input_stream;

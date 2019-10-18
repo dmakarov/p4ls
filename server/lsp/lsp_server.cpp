@@ -159,10 +159,9 @@ void LSP_server::on_textDocument_didOpen(Params_textDocument_didOpen& params)
 	auto& path = params._text_document._uri._path;
 	auto& text = params._text_document._text;
 	BOOST_LOG(_logger) << "create new P4_file \"" << path << "\"";
-	if (auto command = find_command_for_path(path))
-	{
-		_files.emplace(std::piecewise_construct, std::forward_as_tuple(path), std::forward_as_tuple(*command, path, text));
-	}
+	_files.emplace(std::piecewise_construct,
+				   std::forward_as_tuple(path),
+				   std::forward_as_tuple(find_command_for_path(path), path, text));
 }
 
 void LSP_server::on_textDocument_didSave(Params_textDocument_didSave&)
@@ -328,7 +327,7 @@ void LSP_server::on_workspace_executeCommand(Params_workspace_executeCommand&)
 	BOOST_LOG(_logger) << __PRETTY_FUNCTION__;
 }
 
-boost::optional<std::string> LSP_server::read_message()
+std::optional<std::string> LSP_server::read_message()
 {
 	BOOST_LOG(_logger) << "reading a new message";
 	// process a set of HTTP headers of an LSP message
@@ -374,7 +373,7 @@ boost::optional<std::string> LSP_server::read_message()
 	{
 		BOOST_LOG(_logger) << "message is too big, size " << content_length;
 		_input_stream.ignore(content_length);
-		return boost::none;
+		return std::nullopt;
 	}
 	// parse JSON payload
 	if (content_length > 0)
@@ -384,22 +383,21 @@ boost::optional<std::string> LSP_server::read_message()
 		if (!_input_stream)
 		{
 			BOOST_LOG(_logger) << "got " << _input_stream.gcount() << " bytes, expected " << content_length << " content <" << content << ">";
-			return boost::none;
+			return std::nullopt;
 		}
 		BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::info) << "<--\n" << "Content-Length: " << content_length << "\r\n\r\n" << content;
 		return content;
 	}
-	return boost::none;
+	return std::nullopt;
 }
 
-boost::optional<std::string> LSP_server::find_command_for_path(const std::string& file)
+std::string LSP_server::find_command_for_path(const std::string& file)
 {
-	boost::optional<std::string> result;
+	std::string result;
 	auto search = _commands.find(file);
 	if (search != _commands.end())
 	{
-		result.emplace(search->second);
-		return result;
+		return search->second;
 	}
 	for (boost::filesystem::path path(file); path.has_parent_path();)
 	{
@@ -460,8 +458,7 @@ boost::optional<std::string> LSP_server::find_command_for_path(const std::string
 			search = _commands.find(file);
 			if (search != _commands.end())
 			{
-				result.emplace(search->second);
-				return result;
+				return search->second;
 			}
 			BOOST_LOG_SEV(_logger, boost::log::sinks::syslog::warning)
 				<< "did not find a matching command in \"" << compile_commands_path << "\"";

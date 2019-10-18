@@ -2,7 +2,7 @@ branches:
   only:
     - master
 
-dist: xenial
+dist: bionic
 sudo: false
 language: c++
 
@@ -14,12 +14,6 @@ env:
 git:
   depth: 1
 
-addons:
-  apt:
-    sources: &apt_sources
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-xenial-7
-
 cache:
   directories:
     - ${HOME}/.hunter
@@ -27,37 +21,35 @@ cache:
 matrix:
   fast_finish: true
   include:
-    - env: COMPILER=g++-9
-      os: linux
-      compiler: gcc
-      addons:
-        apt:
-          packages: ["pkg-config", "g++-9"]
-          sources: *apt_sources
-
-    - env: COMPILER=clang++-7
-      os: linux
-      compiler: clang
-      addons:
-        apt:
-          packages: ["pkg-config", "clang-7"]
-          sources: *apt_sources
-
-    - env: COMPILER=g++-8
-      os: osx
-      compiler: gcc
-      osx_image: xcode10.1
-
-    - env: COMPILER=clang++
+    - env: MATRIX_EVAL="CC=clang && CXX=clang++"
       os: osx
       compiler: clang
       osx_image: xcode11.2
 
+    - env: MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+      os: osx
+      compiler: gcc
+      osx_image: xcode10.1
+
+    - env: MATRIX_EVAL="CC=clang-8 && CXX=clang++-8"
+      os: linux
+      compiler: clang
+      addons:
+        apt:
+          packages: ["pkg-config", "clang-8"]
+
+    - env: MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+      os: linux
+      compiler: gcc
+      addons:
+        apt:
+          packages: ["pkg-config", "g++-8"]
+
 install:
-  - export CXX="${COMPILER}"
+  - eval "${MATRIX_EVAL}"
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      if [[ "${COMPILER}" == "g++-8" ]]; then
+      if [[ "${MATRIX_EVAL}" == "CC=gcc-8 && CXX=g++-8" ]]; then
         brew link --overwrite gcc
       else
         brew install lcov
@@ -69,7 +61,7 @@ before_script:
 
 script:
   - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "clang++" ]]; then
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${MATRIX_EVAL}" == "CC=clang && CXX=clang++" ]]; then
       cd build && cmake -DCOVERAGE_ENABLED=ON .. && cmake --build . && cd test && ctest
     else
       cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . && cd test && ctest
