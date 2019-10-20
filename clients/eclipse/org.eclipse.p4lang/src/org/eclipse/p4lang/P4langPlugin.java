@@ -51,7 +51,7 @@ public class P4langPlugin extends AbstractUIPlugin {
 	
 	public static Process getProcessForCommand(String... commandStrings) throws IOException {
 		ProcessBuilder builder = new ProcessBuilder(commandStrings);
-		//builder.directory(getWorkingDirectoryFromPreferences());
+		builder.directory(getWorkingDirectoryFromPreferences());
 		getDefault().getLog().log(new Status(IStatus.INFO,
 		getDefault().getBundle().getSymbolicName(),
 		MessageFormat.format("Starting a new process for command {0} {1} {2}", (Object[])commandStrings)));
