@@ -32,6 +32,7 @@
 *.app
 
 # LSP
+*.dfa
 .cquery_cached_index/
 compile_commands.json
 
