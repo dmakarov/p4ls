@@ -200,10 +200,15 @@ bool set_params_from_json(const rapidjson::Value &json, Params_initialize &param
 	if (json.HasMember("initializationOptions") && !json["initializationOptions"].IsNull())
 	{
 		std::vector<std::string> options;
+		// TODO: initializationOptions is _any_, can have arbitrary
+		// structure. Ignore them for now, and implement a custom
+		// parser when options become an option.
+#if 0
 		for (auto *it = json["initializationOptions"].Begin(); it != json["initializationOptions"].End(); ++it)
 		{
 			options.emplace_back(it->GetString());
 		}
+#endif
 		params._initialization_options.emplace(options);
 	}
 	if (json.HasMember("capabilities"))
