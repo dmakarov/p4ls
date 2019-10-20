@@ -69,7 +69,7 @@ script:
 
 after_success:
   - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${COMPILER}" == "clang++" ]]; then
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]] && [[ "${MATRIX_EVAL}" == "CC=clang && CXX=clang++" ]]; then
       lcov --capture --directory . --output-file coverage.info
       lcov --remove coverage.info '/usr/*' --output-file coverage.info
       lcov --list coverage.info
