@@ -11,8 +11,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 public class P4langPreferenceInitializer extends AbstractPreferenceInitializer {
 
 	private static final IPreferenceStore STORE = P4langPlugin.getDefault().getPreferenceStore();
-	public static String p4lsdPathPreference = "p4lang.p4lsdPath";
-	public static String p4lsdArgsPreference = "p4lang.p4lsdArgs";
+	public static final String p4lsdPathPreference = "p4lang.p4lsdPath";
+	public static final String p4lsdArgsPreference = "p4lang.p4lsdArgs";
+	public static final String WORKING_DIRECTORY_PREFERENCE = "p4lang.workingDirectory"; //$NON-NLS-1$
 
 	@Override
 	public void initializeDefaultPreferences() {
