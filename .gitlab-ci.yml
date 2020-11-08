@@ -1,0 +1,16 @@
+image: ubuntu:20.04
+
+build:
+  stage: build
+  variables:
+    LANG: 'C.UTF-8'
+    TZ: 'Europe/Berlin'
+  before_script:
+    - ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+    - apt update && apt -y install build-essential g++-9 cmake libboost-all-dev
+  script:
+    - cmake .
+    - cmake --build .
+  artifacts:
+    paths:
+      - p4lsd
