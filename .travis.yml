@@ -26,7 +26,7 @@ matrix:
       compiler: clang
       osx_image: xcode11.2
 
-    - env: MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+    - env: MATRIX_EVAL="CC=gcc && CXX=g++"
       os: osx
       compiler: gcc
       osx_image: xcode10.1
